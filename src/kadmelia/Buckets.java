@@ -1,6 +1,5 @@
 package kadmelia;
 
-import java.math.BigInteger;
 import java.net.InetSocketAddress;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -64,7 +63,7 @@ public class Buckets implements NodeStatusListener {
 		}
 		
 		List<Node> nearest = new ArrayList<Node>(nearSet);
-		return nearest.subList(0, nearest.size() > numberOfNodes ? numberOfNodes - 1 : nearest.size() - 1);
+		return nearest.subList(0, nearest.size() > numberOfNodes ? numberOfNodes : nearest.size());
 	}
 	
 	public int getBucketNodeCount(int bucket) {
@@ -73,6 +72,6 @@ public class Buckets implements NodeStatusListener {
 	
 	public int calculateBucketNumber(Identifiable obj) {
 		return (int) Math.floor(Math.log(Identifier.calculateDistance(
-				networkInstance.getLocalNode().getIdentifier(), obj).doubleValue())/Math.log(2));
+				networkInstance.getLocalNodeIdentifier(), obj).doubleValue())/Math.log(2));
 	}
 }

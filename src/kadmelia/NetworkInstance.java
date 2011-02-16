@@ -1,6 +1,9 @@
 package kadmelia;
 
 public class NetworkInstance {
+	protected Identifier localIdentifier;
+	protected Buckets buckets;
+	
 	public NetworkInstance() {
 		
 	}
@@ -9,7 +12,7 @@ public class NetworkInstance {
 		return new Configuration();
 	}
 	
-	public Node getLocalNode() {
+	public Identifier getLocalNodeIdentifier() {
 		return null;
 	}
 }

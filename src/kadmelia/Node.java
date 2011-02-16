@@ -10,8 +10,10 @@ public class Node implements Identifiable{
 	protected Date lastSeen;
 	protected NetworkInstance networkInstance;
 	
-	public Node(NetworkInstance networkInstance) {
+	public Node(NetworkInstance networkInstance, InetSocketAddress address, Identifier nodeID) {
 		this.networkInstance = networkInstance;
+		this.address = address;
+		this.nodeID = nodeID;
 	}
 	
 	public InetSocketAddress getAddress() {

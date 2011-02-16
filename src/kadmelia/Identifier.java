@@ -19,4 +19,9 @@ public class Identifier implements Identifiable {
 	public Identifier getIdentifier() {
 		return this;
 	}
+	
+	public static Identifier generateRandom() {
+		//TODO: Random ID Generation
+		return null;
+	}
 }
