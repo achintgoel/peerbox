@@ -4,14 +4,15 @@ class SearchListener{
 	boolean done = false;
 	Set<Node> prevQueried;
 	Set<Node> querySet;
+	SortedSet<Node> foundNodesSet;
 
 	void searchInit(Identifier targetID){
 		querySet = new HashSet<Node>(getNearestNodes(targetID, alpha));
 		prevQueried = newHashSet<Node>();
 	}
 	
-	while (true) {
-		SortedSet<Node> foundNodesSet = new TreeSet<Node>(new IdentifiableDistanceComparator(targetID));
+	
+	void searchQuerySet(){
 	  	prevQueried.addAll(querySet);
 	  	QueriesObject qo = new QueriesObject(querySet) 
 	  	for (Node node : querySet) {
@@ -19,6 +20,9 @@ class SearchListener{
 		    executeFindNode(node, targetID, new MessageListener(qo) {
 		    	void messageReceived(FindNodeResult result) {
 		          	qo.removeNode (result.sender())
+		          	if(qo.size() == 0){
+		          		//event all replied
+		          	}
 		          	if(result.found()){
 		          	    //event identifier found
 		          	}
@@ -27,9 +31,21 @@ class SearchListener{
 		          	}
 		      	}
 		    })
-	    	foundNodesSet.addAll(fnr.nodes());    
+		    Timer halfTimer = new Timer(halfTimer, new ActionListener(){
+		    	void ActionPerformed(){
+		    		//event half timer
+		    		
+		    	}
+		    }) 
+		    Timer fullTimer = new Timer(fullTimer, new ActionListener(){
+		    	void ActionPerformed(){
+		    		//event full timer
+		    	}
+		    })
 		}
-	
+		
+	void searchNextIteration(){
+	    foundNodesSet.addAll(fnr.nodes());
 		networkInstance.getBuckets().addAll(foundNodesSet);
 		if(done) {
 			return null;
