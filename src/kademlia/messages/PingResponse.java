@@ -1,4 +1,4 @@
-package messages;
+package kademlia.messages;
 
 public class PingResponse implements Response {
 

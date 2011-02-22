@@ -1,4 +1,4 @@
-package kadmelia;
+package kademlia;
 
 import java.math.BigInteger;
 import java.net.InetSocketAddress;

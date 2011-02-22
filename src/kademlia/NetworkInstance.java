@@ -1,4 +1,4 @@
-package kadmelia;
+package kademlia;
 
 public class NetworkInstance {
 	protected Identifier localIdentifier;

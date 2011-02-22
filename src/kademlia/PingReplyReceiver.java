@@ -1,4 +1,4 @@
-package kadmelia;
+package kademlia;
 
 public interface PingReplyReceiver {
 	public void pingSucceeded();

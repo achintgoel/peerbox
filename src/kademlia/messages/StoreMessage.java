@@ -1,6 +1,6 @@
-package messages;
+package kademlia.messages;
 
-import kadmelia.Key;
+import kademlia.Key;
 
 public class StoreMessage implements Message {
 	protected Key key;

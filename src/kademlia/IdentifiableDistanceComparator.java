@@ -1,4 +1,4 @@
-package kadmelia;
+package kademlia;
 
 import java.util.Comparator;
 

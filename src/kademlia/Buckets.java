@@ -1,4 +1,4 @@
-package kadmelia;
+package kademlia;
 
 import java.net.InetSocketAddress;
 import java.util.ArrayList;

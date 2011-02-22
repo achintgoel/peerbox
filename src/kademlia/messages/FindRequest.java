@@ -1,6 +1,6 @@
-package messages;
+package kademlia.messages;
 
-public class FindNodeResponse extends FindResponse {
+public class FindRequest implements Request {
 
 	@Override
 	public String toJSON() {

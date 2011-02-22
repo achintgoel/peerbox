@@ -1,6 +1,6 @@
-package messages;
+package kademlia.messages;
 
-import kadmelia.Identifier;
+import kademlia.Identifier;
 
 public class FindNodeRequest extends FindRequest {
 	protected Identifier targetIdentifier;

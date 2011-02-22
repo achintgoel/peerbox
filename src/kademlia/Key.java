@@ -1,4 +1,4 @@
-package kadmelia;
+package kademlia;
 
 public class Key implements Identifiable {
 

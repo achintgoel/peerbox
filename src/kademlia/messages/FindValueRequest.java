@@ -1,6 +1,6 @@
-package messages;
+package kademlia.messages;
 
-import kadmelia.Key;
+import kademlia.Key;
 
 public class FindValueRequest extends FindRequest {
 	Key key;

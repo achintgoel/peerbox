@@ -1,4 +1,4 @@
-package kadmelia;
+package kademlia;
 
 public interface NodeStatusListener {
 	public void onNodeAlive(Node node);

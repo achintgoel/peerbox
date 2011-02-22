@@ -1,4 +1,4 @@
-package kadmelia;
+package kademlia;
 
 public class Configuration {
 	final static int alpha = 3;
