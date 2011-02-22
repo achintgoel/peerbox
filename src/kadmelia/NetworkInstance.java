@@ -13,6 +13,6 @@ public class NetworkInstance {
 	}
 	
 	public Identifier getLocalNodeIdentifier() {
-		return null;
+		return localIdentifier;
 	}
 }
