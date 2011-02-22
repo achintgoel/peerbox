@@ -20,43 +20,48 @@ class SearchListener{
 		    executeFindNode(node, targetID, new MessageListener(qo) {
 		    	void messageReceived(FindNodeResult result) {
 		          	qo.removeNode (result.sender())
-		          	if(qo.size() == 0){
-		          		//event all replied
-		          	}
 		          	if(result.found()){
 		          	    //event identifier found
 		          	}
 		          	else{
-		          		//event identifier not found
+		          		//trigger updatePrevQueried
+		          	}
+		          	if(qo.size() == 0){
+		          		//trigger build and search
 		          	}
 		      	}
+		      	void timeOut(){
+					//trigger final search step
+		      	}
 		    })
-		    Timer halfTimer = new Timer(halfTimer, new ActionListener(){
-		    	void ActionPerformed(){
-		    		//event half timer
-		    		
-		    	}
-		    }) 
-		    Timer fullTimer = new Timer(fullTimer, new ActionListener(){
-		    	void ActionPerformed(){
-		    		//event full timer
-		    	}
-		    })
-		}
-		
-	void searchNextIteration(){
+		}		
+	    Timer halfTimer = new Timer(halfTimer, new ActionListener(){
+	    	void ActionPerformed(){
+	    		if(qo.size < alpha){
+	    			//trigger updatePrevQueried buildNewQuerySet searchQuerySet
+	    		}
+	    	}
+	    }) 
+	}
+	
+	void updatePrevQueried(){	
 	    foundNodesSet.addAll(fnr.nodes());
 		networkInstance.getBuckets().addAll(foundNodesSet);
-		if(done) {
-			return null;
-		}
+	}
+	
+	void buildNewQuerySet(){
 		Set<Node> newQuerySet = new HashSet((new ArrayList(foundNodesSet)).subList(0, foundNodesSet.size() > alpha ? alpha : foundNodesSet.size()));
 		newQuerySet.removeAll(prevQueried);
-		querySet = newQuerySet;  
+		querySet = newQuerySet;
 		if (querySet.size() == 0) {
-			done = true;
-			querySet = new HashSet<Node>(getNearestNodes(targetID, k, excluding: prevQueried));
+			//call finalSearchStep
 		}
 	}
+
+	void finalSearchStep(){
+		querySet = new HashSet<Node>(getNearestNodes(targetID, k, excluding: prevQueried));
+	}
+	
+}
 	
 
