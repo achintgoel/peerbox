@@ -12,6 +12,7 @@ public class ValueEvent<V extends Serializable> {
 	}
 	
 	public ValueEvent() {
+		this.value = null;
 		this.exists = false;
 	}
 	
