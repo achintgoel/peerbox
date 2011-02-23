@@ -5,7 +5,6 @@ import java.security.PublicKey;
 import java.util.HashMap;
 
 import security.SecureUserTable;
-import security.SignedMessage;
 import dht.ValueEvent;
 import dht.ValueListener;
 

@@ -1,6 +1,12 @@
 package security;
 
-import java.security.*;
+import java.security.InvalidKeyException;
+import java.security.KeyPairGenerator;
+import java.security.NoSuchAlgorithmException;
+import java.security.PrivateKey;
+import java.security.PublicKey;
+import java.security.Signature;
+import java.security.SignatureException;
 
 public class SecureMessageHandler {
 	protected Signature sig;

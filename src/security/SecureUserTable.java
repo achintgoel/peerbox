@@ -1,5 +1,4 @@
 package security;
-import java.net.InetSocketAddress;
 import java.security.PublicKey;
 
 import dht.DistributedMap;

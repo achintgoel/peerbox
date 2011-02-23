@@ -1,8 +1,7 @@
 package dht;
 
-import java.io.Serializable;
 
-public class CompositeKey<A extends Serializable, B extends Serializable> implements Serializable {
+public class CompositeKey<A, B> {
 	protected A primaryKey;
 	protected B secondaryKey;
 	
