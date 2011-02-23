@@ -4,12 +4,19 @@ import java.net.InetSocketAddress;
 import java.security.PublicKey;
 import java.util.HashMap;
 
+import security.SecureUserTable;
+import security.SignedMessage;
+import dht.ValueEvent;
+import dht.ValueListener;
+
 public class FriendManager {
 	protected HashMap<PublicKey, Friend> KeyToFriend;
 	protected HashMap<String, Friend> AliasToKey;
+	protected SecureUserTable secureTable;
 	public FriendManager() {
 		KeyToFriend = new HashMap<PublicKey, Friend>();
 		AliasToKey = new HashMap<String, Friend>();
+		secureTable = new SecureUserTable();
 	}
 	
 	public Friend getPublicKey(String alias) {
@@ -29,6 +36,21 @@ public class FriendManager {
 	void updateFriend(String oldAlias, String newAlias, Friend friend) {
 		AliasToKey.remove(oldAlias);
 		AliasToKey.put(newAlias, friend);
+	}
+	
+	public void findFriend(final String alias) {
+		secureTable.get(AliasToKey.get(alias).getPubKey(), new ValueListener<byte[]>(){
+			public void valueComplete(final ValueEvent<byte[]> val){
+				if(val.exists()){
+					AliasToKey.get(alias).setIPaddress(convert(val));
+				}
+				//TO DO: else do something
+			}
+		});
+	}
+	//TO DO: NEED TO IMPLEMENT
+	public InetSocketAddress convert(ValueEvent<byte[]> val){
+		return null;
 	}
 
 }
