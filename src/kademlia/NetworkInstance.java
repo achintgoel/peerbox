@@ -15,4 +15,8 @@ public class NetworkInstance {
 	public Identifier getLocalNodeIdentifier() {
 		return localIdentifier;
 	}
+	
+	public Buckets getBuckets(){
+		return buckets;
+	}
 }

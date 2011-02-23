@@ -10,116 +10,71 @@ import java.util.TreeSet;
 
 import javax.swing.Timer;
 
+import kademlia.messages.FindRequest;
+import kademlia.messages.FindResponse;
+
 
 public class SearchHandler {
-	Set<Node> prevQueried;				// previously queried nodes
-	Set<Node> querySet;					// nodes to be queried in the next search
-	SortedSet<Node> totalFoundSet;		// nodes that have been found through all searches
-	SortedSet<Node> currentFoundSet;	// nodes found in current search
-	Set<Node> current;					// nodes currently being queried but haven't replied
-	Identifier targetID;				// node being searched for
-	boolean oneReply;					// true if at least one node from current replied
+	final int maxRequests;
+	final int nearestSetSize;				
+	final Set<Node> prevQueried;			// previously queried nodes
+	final SortedSet<Node> nearestSet;		// nodes that have been found through all searches
+	final Set<Node> current;				// nodes currently being queried but haven't replied
+	FindRequest target;						// target being searched for
+	NetworkInstance networkInstance;
 
 	
 	
-	public SearchHandler(Identifier target){
-		targetID = target;
-		querySet = new HashSet<Node>(getNearestNodes(targetID, alpha));
+	private SearchHandler(NetworkInstance ni, FindRequest request){
+		networkInstance = ni;
+		maxRequests = networkInstance.getConfiguration().getAlpha() * networkInstance.getConfiguration().getAlpha();
+		nearestSetSize = networkInstance.getConfiguration().getK() * 2;
+		target = request;
 		prevQueried = new HashSet<Node>();
-		oneReply = false;
-		totalFoundSet = new TreeSet<Node>(new IdentifiableDistanceComparator(targetID));
-		currentFoundSet = new TreeSet<Node>(new IdentifiableDistanceComparator(targetID));
-		searchQuerySet();
+		nearestSet = new TreeSet<Node>(new IdentifiableDistanceComparator(target.getTargetIdentifier()));
+		nearestSet.addAll(networkInstance.getBuckets().getNearestNodes(target.getTargetIdentifier(), networkInstance.getConfiguration().getAlpha()));
+		current = new HashSet<Node>();
+		nextIteration();		
+	}
+	
+	public static void search(NetworkInstance ni, FindRequest request){
+		SearchHandler sh = new SearchHandler(ni, request);
 	}
 	
 	
-	void searchQuerySet(){
+	void nextIteration(){
 		// add the querySet to prevQueried and current and then search for every node
-	  	prevQueried.addAll(querySet);
-	  	current.addAll(querySet);
-	  	for (Node node : querySet) {
-		    executeFindNode(node, targetID, new MessageListener(){
+		while(current.size() < maxRequests){
+			while(nearestSet.size() > nearestSetSize){
+				nearestSet.remove(nearestSet.last());				
+			}
+			SortedSet<Node> unsearchedNodes = new TreeSet<Node>(new IdentifiableDistanceComparator(target.getTargetIdentifier()));
+			unsearchedNodes = nearestSet;
+			unsearchedNodes.removeAll(prevQueried);
+			final Node nextRequest = unsearchedNodes.first();
+		  	prevQueried.add(nextRequest);
+		  	current.add(nextRequest);
+		  	// TODO: executeFindNode
+			executeFindNode(nextRequest, target, new MessageListener(){
 		    	// event that a message was received
-		    	void messageReceived(FindNodeResult result) {
+		    	void messageReceived(FindResponse result) {
 		    		// if the reply contains the target then trigger identifier found
 		          	if(result.found()){
 		          	    //event identifier found
 		          	}
-		          	// otherwise updatePrev
 		          	else{
-		          		updateCurrent(result);
+		          		nearestSet.add(result.getNodes());
+		          		current.remove(nextRequest);
+		          		nextIteration();
 		          	}
-		      	}
+		      	}		    	
 		    	
 		    	// event that the message timed out
 		      	void timeOut(){
-					updateCurrent(new FindNodeResult(timeout));
+		      		current.remove(nextRequest);
+		      		nextIteration();
 		      	}
 		    });
 		}
-	  	// then start a timer for half timeout
-	    Timer halfTimer = new Timer(halfTimeout, new ActionListener(){
-			public void actionPerformed(ActionEvent arg0) {
-				updateCurrent(new FindNodeResult(halfTime));
-			}
-	  	}); 
-	}
-	
-	
-	void updateCurrent(FindNodeResult fnr){
-		// if request timed out
-		if(fnr.timeOut()){
-			// remove request from current
-			current.remove(fnr.getSender());
-			if(!currentFoundSet.isEmpty()){
-				
-			}
-			// if no active searches
-			if(current.isEmpty()){
-				// if no results have been found in the last alpha requests
-				if(currentFoundSet.isEmpty()){
-					finalSearchStep();
-				}
-				// if there have been results then build the new query set and search
-				else{
-					buildNewQuerySet();
-				}
-			}
-		}
-		// if there is a half timeout
-		else if(fnr.halfTimeOut()){
-			if(!currentFoundSet.isEmpty()){
-				buildNewQuerySet();
-			}
-		}
-		// otherwise there is a reply
-		else{
-			current.remove(fnr.getSender());
-			currentFoundSet.addAll(fnr.nodes());
-			totalFoundSet.addAll(fnr.nodes());
-			NetworkInstance.getBuckets().addAll(fnr.nodes());
-			if(current.isEmpty()){
-				buildNewQuerySet();
-			}
-		}
-	}
-	
-	// 
-	void buildNewQuerySet(){
-		Set<Node> newQuerySet = new HashSet<Node>((new ArrayList<Node>(currentFoundSet)).subList(0, currentFoundSet.size() > alpha ? alpha : currentFoundSet.size()));
-		currentFoundSet = new TreeSet<Node>(new IdentifiableDistanceComparator(targetID));
-		newQuerySet.removeAll(prevQueried);
-		querySet = newQuerySet;
-		//if no new results
-		if (querySet.size() == 0) {
-			finalSearchStep();
-		}
-		else{
-			searchQuerySet();
-		}
-	}
-
-	void finalSearchStep(){
-		querySet = new HashSet<Node>(getNearestNodes(targetID, k));
 	}
 }

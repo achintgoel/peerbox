@@ -13,4 +13,8 @@ public class Configuration {
 	public int getB() {
 		return B;
 	}
+	
+	public int getAlpha() {
+		return alpha;
+	}
 }
