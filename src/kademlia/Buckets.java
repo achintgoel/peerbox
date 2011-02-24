@@ -74,4 +74,9 @@ public class Buckets implements NodeStatusListener {
 		return (int) Math.floor(Math.log(Identifier.calculateDistance(
 				networkInstance.getLocalNodeIdentifier(), obj).doubleValue())/Math.log(2));
 	}
+
+	public void addAll(Node nodes) {
+		// TODO Auto-generated method stub
+		
+	}
 }

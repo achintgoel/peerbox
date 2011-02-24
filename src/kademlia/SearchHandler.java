@@ -51,6 +51,9 @@ public class SearchHandler {
 			SortedSet<Node> unsearchedNodes = new TreeSet<Node>(new IdentifiableDistanceComparator(target.getTargetIdentifier()));
 			unsearchedNodes = nearestSet;
 			unsearchedNodes.removeAll(prevQueried);
+			if(unsearchedNodes.isEmpty()){
+				// event identifier not found
+			}
 			final Node nextRequest = unsearchedNodes.first();
 		  	prevQueried.add(nextRequest);
 		  	current.add(nextRequest);
@@ -64,6 +67,7 @@ public class SearchHandler {
 		          	}
 		          	else{
 		          		nearestSet.add(result.getNodes());
+		    			networkInstance.getBuckets().addAll(result.getNodes());
 		          		current.remove(nextRequest);
 		          		nextIteration();
 		          	}
