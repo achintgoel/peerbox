@@ -8,7 +8,7 @@ public class SecureUserTable {
 	//protected SecureMessageHandler messageHandler;
 	protected DistributedMap<PublicKey, SignedMessage> dt;
 	public SecureUserTable() {
-		dt = new DistributedMap();
+		dt = null; //TODO
 		//messageHandler = new SecureMessageHandler();
 	}
 	public void get(final PublicKey key, final ValueListener<byte[]> handler) {
