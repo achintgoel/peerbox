@@ -2,6 +2,7 @@ package kademlia;
 
 import java.net.InetSocketAddress;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.SortedSet;
@@ -75,7 +76,7 @@ public class Buckets implements NodeStatusListener {
 				networkInstance.getLocalNodeIdentifier(), obj).doubleValue())/Math.log(2));
 	}
 
-	public void addAll(Node nodes) {
+	public void addAll(Collection<Node> nodes) {
 		// TODO Auto-generated method stub
 		
 	}

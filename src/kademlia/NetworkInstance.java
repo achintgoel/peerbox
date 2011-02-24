@@ -25,7 +25,12 @@ public class NetworkInstance {
 		return null;
 	}
 	
-	protected void sendRequestRPC(Request requestRPC) {
+	protected void sendRequestRPC(Node destination, Request requestRPC, ResponseListener callback) {
 		
+	}
+
+	public Buckets getBuckets() {
+		// TODO Auto-generated method stub
+		return null;
 	}
 }
