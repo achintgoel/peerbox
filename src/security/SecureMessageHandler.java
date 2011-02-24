@@ -1,15 +1,21 @@
 package security;
 
-import java.security.*;
+import java.security.InvalidKeyException;
+import java.security.KeyPairGenerator;
+import java.security.NoSuchAlgorithmException;
+import java.security.PrivateKey;
+import java.security.PublicKey;
+import java.security.Signature;
+import java.security.SignatureException;
 
 public class SecureMessageHandler {
-	protected Signature dsa;
+	protected Signature sig;
 	protected KeyPairGenerator keyGen;
 
 	public SecureMessageHandler() {
 		try {
 			keyGen = KeyPairGenerator.getInstance("DSA");
-			dsa = Signature.getInstance("SHA1withDSA");
+			sig = Signature.getInstance("SHA1withDSA");
 			
 		} catch (NoSuchAlgorithmException e) {
 			
@@ -19,9 +25,9 @@ public class SecureMessageHandler {
 	
 	public byte[] signMessage(byte[] data, PrivateKey key) {
 		try {
-			dsa.initSign(key);
-			dsa.update(data);
-			return dsa.sign();
+			sig.initSign(key);
+			sig.update(data);
+			return sig.sign();
 		} catch (InvalidKeyException e) {
 
 		} catch (SignatureException e) {
@@ -34,9 +40,9 @@ public class SecureMessageHandler {
 	public boolean verifyMessage(byte[] data, byte[] signature, PublicKey key) {
 		
 		try {
-			dsa.initVerify(key);
-			dsa.update(data);
-			return dsa.verify(signature);
+			sig.initVerify(key);
+			sig.update(data);
+			return sig.verify(signature);
 		} catch (InvalidKeyException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

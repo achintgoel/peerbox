@@ -1,8 +1,7 @@
 package dht;
 
-import java.io.Serializable;
 
-public class ValueEvent<V extends Serializable> {
+public class ValueEvent<V> {
 	protected V value;
 	protected boolean exists;
 	
@@ -12,6 +11,7 @@ public class ValueEvent<V extends Serializable> {
 	}
 	
 	public ValueEvent() {
+		this.value = null;
 		this.exists = false;
 	}
 	
