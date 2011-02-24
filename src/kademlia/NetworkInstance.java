@@ -2,6 +2,7 @@ package kademlia;
 
 import java.io.Serializable;
 
+import kademlia.messages.Request;
 import dht.DistributedMap;
 
 public class NetworkInstance {
@@ -24,7 +25,7 @@ public class NetworkInstance {
 		return null;
 	}
 	
-	public Buckets getBuckets(){
-		return buckets;
+	protected void sendRequestRPC(Request requestRPC) {
+		
 	}
 }

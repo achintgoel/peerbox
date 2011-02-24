@@ -1,5 +1,5 @@
 package kademlia.messages;
 
-public interface Request extends Message {
+public abstract class Request extends Message {
 
 }

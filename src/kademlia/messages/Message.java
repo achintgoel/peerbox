@@ -1,5 +1,5 @@
 package kademlia.messages;
 
-public interface Message {
-	public String toJSON();
+public abstract class Message {
+	
 }

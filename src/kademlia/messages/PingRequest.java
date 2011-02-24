@@ -1,11 +1,5 @@
 package kademlia.messages;
 
-public class PingRequest implements Request {
-
-	@Override
-	public String toJSON() {
-		// TODO Auto-generated method stub
-		return null;
-	}
+public class PingRequest extends Request {
 
 }

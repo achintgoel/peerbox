@@ -1,11 +1,10 @@
 package kademlia.messages;
 
+import java.util.List;
+
+import kademlia.Node;
+
 public class FindNodeResponse extends FindResponse {
-
-	@Override
-	public String toJSON() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
+	protected Node foundNode;
+	protected List<Node> nearbyNodes;
 }
