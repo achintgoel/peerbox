@@ -1,0 +1,22 @@
+//find_node
+//request
+{
+"pbox": "1.0",
+"service": "kad",
+"id": "...",
+"request": {
+			"command": "find_node",
+			"myNodeID": "...",
+			"targetID": "...",
+			}
+}
+//response
+{
+"pbox": "1.0",
+"service": "kad",
+"id": "...",
+"request": {
+			"found": "false",
+			"nearestNodes": [{"address": "udp://IP:port", "nodeID": "..."}, {...}, ...]
+			}
+}
