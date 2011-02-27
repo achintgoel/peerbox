@@ -1,23 +1,23 @@
 package kademlia;
 
 import java.math.BigInteger;
-import java.net.InetSocketAddress;
+import java.net.URI;
 import java.util.Date;
 
 public class Node implements Identifiable{
 	protected Identifier nodeID;
-	protected InetSocketAddress address;
+	protected URI uri;
 	protected Date lastSeen;
 	protected NetworkInstance networkInstance;
 	
-	public Node(NetworkInstance networkInstance, InetSocketAddress address, Identifier nodeID) {
+	public Node(NetworkInstance networkInstance, URI uri, Identifier nodeID) {
 		this.networkInstance = networkInstance;
-		this.address = address;
+		this.uri = uri;
 		this.nodeID = nodeID;
 	}
 	
-	public InetSocketAddress getAddress() {
-		return address;
+	public URI getNetworkURI() {
+		return uri;
 	}
 	
 	public BigInteger getDistance(Node other) {

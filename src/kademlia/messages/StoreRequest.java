@@ -4,7 +4,12 @@ import kademlia.Key;
 
 public class StoreRequest extends Request {
 	protected Key key;
-	protected Message value; 
-	final protected String command = "STORE";
+	protected String value; 
+	final protected String command = "store";
+	
+	@Override
+	public String getCommand() {
+		return command;
+	}
 	
 }

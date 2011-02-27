@@ -49,7 +49,8 @@ public class FindProcess<FRT extends FindResponse> {
 			unsearchedNodes = nearestSet;
 			unsearchedNodes.removeAll(prevQueried);
 			if(unsearchedNodes.isEmpty()){
-				//TODO: failure response
+				callback.onFailure();
+				// TODO: this is not right
 			}
 			final Node nextRequest = unsearchedNodes.first();
 		  	prevQueried.add(nextRequest);
@@ -71,7 +72,7 @@ public class FindProcess<FRT extends FindResponse> {
 		      	}		    	
 		    	
 		    	// event that the message timed out
-		      	public void timedOut(){
+		      	public void onFailure(){
 		      		current.remove(nextRequest);
 		      		nextIteration();
 		      	}

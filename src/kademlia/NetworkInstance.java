@@ -3,22 +3,36 @@ package kademlia;
 import java.io.Serializable;
 import java.util.ArrayList;
 
+import kademlia.messages.FindNodeRequest;
 import kademlia.messages.FindNodeResponse;
 import kademlia.messages.FindRequest;
 import kademlia.messages.FindResponse;
 import kademlia.messages.FindValueRequest;
 import kademlia.messages.FindValueResponse;
 import kademlia.messages.PingRequest;
+import kademlia.messages.PingResponse;
 import kademlia.messages.Request;
+import kademlia.messages.Response;
 import kademlia.messages.StoreRequest;
+import kademlia.messages.StoreResponse;
+import rpc.RPCEvent;
+import rpc.RPCResponseListener;
+import rpc.RPCServer;
+
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
+
 import dht.DistributedMap;
 
 public class NetworkInstance {
 	protected Identifier localIdentifier;
 	protected Buckets buckets;
+	protected final Gson gson;
+	protected final String rpcServiceName;
 	
 	public NetworkInstance() {
-		
+		gson = new Gson();
+		rpcServiceName = "kad";
 	}
 	
 	public Configuration getConfiguration() {
@@ -33,8 +47,23 @@ public class NetworkInstance {
 		return null;
 	}
 	
-	protected void sendRequestRPC(Node destination, Request requestRPC, ResponseListener callback) {
-		
+	protected <T extends Response> void sendRequestRPC(Node destination, Request request, final ResponseListener<T> callback) {
+		String requestData = gson.toJson(request);
+		getRPC().sendRequest(destination.getNetworkURI(), rpcServiceName, requestData, new RPCResponseListener() {
+			@SuppressWarnings("unchecked")
+			@Override
+			public void onResponseReceived(RPCEvent event) {
+				try {
+					callback.responseReceived((T) gson.fromJson(event.getDataString(), new TypeToken<T>(){}.getType()));
+				} catch (Exception e) {
+					//
+				}
+			}
+		});
+	}
+	
+	public RPCServer getRPC() {
+		return null; //TODO
 	}
 
 	public Buckets getBuckets() {
@@ -42,6 +71,29 @@ public class NetworkInstance {
 		return null;
 	}
 	
+	public void findNode(Identifier targetNodeId, ResponseListener<FindNodeResponse> responseListener) {
+		FindNodeRequest request = new FindNodeRequest(getLocalNodeIdentifier(), targetNodeId);
+		FindProcess.execute(this, request, responseListener);
+	}
+	
+	public void findValue(Key targetKey, ResponseListener<FindValueResponse> responseListener) {
+		FindValueRequest request = new FindValueRequest(getLocalNodeIdentifier(), targetKey);
+		FindProcess.execute(this, request, responseListener);
+	}
+	
+	public void storeValue(Key key, String value, ResponseListener<StoreResponse> responseListener) {
+		// TODO
+	}
+	
+	//Maybe put in Node
+	public void ping(Node target, ResponseListener<PingResponse> responseListener) {
+		// TODO
+	}
+	
+	//TODO add bootstrap function
+	
+	
+	////////
 	public void onRequestReceived(Request request){
 		if(request instanceof FindRequest){
 			FindResponse fr;

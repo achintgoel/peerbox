@@ -1,0 +1,5 @@
+
+syntax: regexp
+^lib/netty-3\.2\.4\.Final$
+syntax: regexp
+^lib/google-gson-1\.6$

@@ -1,6 +1,6 @@
 package kademlia;
 
-import java.net.InetSocketAddress;
+import java.net.URI;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedHashMap;
@@ -9,16 +9,16 @@ import java.util.SortedSet;
 import java.util.TreeSet;
 
 public class Buckets implements NodeStatusListener {
-	protected List<LinkedHashMap<InetSocketAddress, Node>> buckets;
+	protected List<LinkedHashMap<URI, Node>> buckets;
 	final protected NetworkInstance networkInstance;
 	final int k;
 	
 	public Buckets(NetworkInstance instance) {
 		networkInstance = instance;
 		k = networkInstance.getConfiguration().getK();
-		buckets = new ArrayList<LinkedHashMap<InetSocketAddress,Node>>(networkInstance.getConfiguration().getB());
+		buckets = new ArrayList<LinkedHashMap<URI,Node>>(networkInstance.getConfiguration().getB());
 		for (int i = 0; i < k; i++) {
-			buckets.add(i, new LinkedHashMap<InetSocketAddress, Node>());
+			buckets.add(i, new LinkedHashMap<URI, Node>());
 		}
 	}
 	
@@ -28,15 +28,15 @@ public class Buckets implements NodeStatusListener {
 	
 	public void onNodeAlive(Node node) {
 		int bucketNumber = calculateBucketNumber(node);
-		LinkedHashMap<InetSocketAddress, Node> bucket = buckets.get(bucketNumber);
-		if (bucket.containsKey(node.getAddress())) {
+		LinkedHashMap<URI, Node> bucket = buckets.get(bucketNumber);
+		if (bucket.containsKey(node.getNetworkURI())) {
 			// Move existing node to the front
-			bucket.remove(node.getAddress());
-			bucket.put(node.getAddress(), node);
+			bucket.remove(node.getNetworkURI());
+			bucket.put(node.getNetworkURI(), node);
 		} else {
 			if (bucket.size() < k) {
 				// Add new node
-				bucket.put(node.getAddress(), node);
+				bucket.put(node.getNetworkURI(), node);
 			} else {
 				//TODO: Ping last seen node and see if it responds
 				//      If it does, move to back. If not, add new 

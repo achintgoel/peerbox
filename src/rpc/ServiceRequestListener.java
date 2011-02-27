@@ -1,5 +1,5 @@
 package rpc;
 
-public interface ServiceListener {
+public interface ServiceRequestListener {
 	public void requestReceived(RPCEvent e);
 }
