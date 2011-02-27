@@ -52,28 +52,28 @@ public class FindProcess<FRT extends FindResponse> {
 				callback.onFailure();
 				// TODO: this is not right
 			}
-			final Node nextRequest = unsearchedNodes.first();
-		  	prevQueried.add(nextRequest);
-		  	current.add(nextRequest);
+			final Node nextRequestDestination = unsearchedNodes.first();
+		  	prevQueried.add(nextRequestDestination);
+		  	current.add(nextRequestDestination);
 		  	// TODO: executeFindNode
-			networkInstance.sendRequestRPC(nextRequest, findRequest, new ResponseListener<FRT>(){
+			networkInstance.sendRequestRPC(nextRequestDestination, findRequest, new ResponseListener<FRT>(){
 		    	// event that a message was received
-		    	public void responseReceived(FRT response) {
+		    	public void onResponseReceived(FRT response) {
 		    		// if the reply contains the target then trigger identifier found
 		          	if(response.isFound()){
-		          	    callback.responseReceived(response);
+		          	    callback.onResponseReceived(response);
 		          	}
 		          	else{
 		          		nearestSet.addAll(response.getNearbyNodes());
 		    			networkInstance.getBuckets().addAll(response.getNearbyNodes());
-		          		current.remove(nextRequest);
+		          		current.remove(nextRequestDestination);
 		          		nextIteration();
 		          	}
 		      	}		    	
 		    	
 		    	// event that the message timed out
 		      	public void onFailure(){
-		      		current.remove(nextRequest);
+		      		current.remove(nextRequestDestination);
 		      		nextIteration();
 		      	}
 		    });

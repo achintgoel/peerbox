@@ -11,10 +11,10 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
 import com.google.gson.JsonParser;
 
-public class RPCServer {
+public class RPCHandler {
 	final protected Map<String, ServiceRequestListener> registeredServices;
 	
-	protected RPCServer() {
+	protected RPCHandler() {
 		registeredServices = new HashMap<String, ServiceRequestListener>();
 	}
 	

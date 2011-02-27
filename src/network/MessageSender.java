@@ -12,7 +12,7 @@ public class MessageSender {
 		this.channel = channel;
 	}
 	
-	protected void sendData(String data, URI destination) {
+	protected void sendData(URI destination, String data) {
 		channel.write(data, new InetSocketAddress(destination.getHost(), destination.getPort()));
 	}
 }

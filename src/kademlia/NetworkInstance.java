@@ -17,7 +17,7 @@ import kademlia.messages.StoreRequest;
 import kademlia.messages.StoreResponse;
 import rpc.RPCEvent;
 import rpc.RPCResponseListener;
-import rpc.RPCServer;
+import rpc.RPCHandler;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
@@ -54,7 +54,7 @@ public class NetworkInstance {
 			@Override
 			public void onResponseReceived(RPCEvent event) {
 				try {
-					callback.responseReceived((T) gson.fromJson(event.getDataString(), new TypeToken<T>(){}.getType()));
+					callback.onResponseReceived((T) gson.fromJson(event.getDataString(), new TypeToken<T>(){}.getType()));
 				} catch (Exception e) {
 					//
 				}
@@ -62,7 +62,7 @@ public class NetworkInstance {
 		});
 	}
 	
-	public RPCServer getRPC() {
+	public RPCHandler getRPC() {
 		return null; //TODO
 	}
 

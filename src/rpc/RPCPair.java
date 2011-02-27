@@ -4,23 +4,23 @@ import network.MessageSender;
 import network.MessageServerHandler;
 
 public class RPCPair {
-	final protected RPCServer server;
+	final protected RPCHandler server;
 	final protected RPCClient client;
 	
-	public RPCPair(RPCServer server, RPCClient client) {
+	public RPCPair(RPCHandler server, RPCClient client) {
 		this.server = server;
 		this.client = client;
 	}
 	
 	public static RPCPair getUDPInstance(int port) {
-		RPCServer rpcServer = new RPCServer();
+		RPCHandler rpcServer = new RPCHandler();
 		MessageSender sender = MessageServerHandler.startUDPServer(port, rpcServer.newListener());
 		RPCClient rpcClient = new RPCClient(sender);
 		RPCPair rpcPair = new RPCPair(rpcServer, rpcClient);
 		return rpcPair;
 	}
 	
-	public RPCServer getServer() {
+	public RPCHandler getServer() {
 		return server;
 	}
 	
