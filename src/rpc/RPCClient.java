@@ -1,5 +1,9 @@
 package rpc;
 
-public class RPCClient {
+import network.MessageSender;
 
+public class RPCClient {
+	public RPCClient(MessageSender sender) {
+		
+	}
 }
