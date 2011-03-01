@@ -2,13 +2,10 @@ package kademlia;
 
 import java.io.Serializable;
 import java.net.URI;
-import java.util.ArrayList;
 import java.util.List;
 
 import kademlia.messages.FindNodeRequest;
 import kademlia.messages.FindNodeResponse;
-import kademlia.messages.FindRequest;
-import kademlia.messages.FindResponse;
 import kademlia.messages.FindValueRequest;
 import kademlia.messages.FindValueResponse;
 import kademlia.messages.PingRequest;

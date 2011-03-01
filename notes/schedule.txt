@@ -1,0 +1,19 @@
+Crunch Schedule
+------------------
+Monday Night:
+ x Handling Kademlia Requests (Vineet) * except store/find values
+ x Bootstrap (Vineet)
+ x Implemented RPC Receiving requests & responding to requests (Rajiv)
+ x Started FileShare Code (Messages etc.)
+ - FileShare responding to requests (Achint)
+ - RPC sending new requests (Rajiv)
+ 
+Tuesday Night:
+ - Store / StoreFilter components (Rajiv)
+ - Expose Kad as DHT maps (Rajiv)
+ - Bring everything for launching Kad instances (Rajiv)
+ - Finish other ToDos in Kad (Vineet)
+ - TCP Networking for FileShare (Achint)
+ - Implement StoreFilter for Kademlia (Achint)
+ - Finish documenting Kademlia (Vineet)
+ - Come up with test cases for Kademlia (Vineet)
