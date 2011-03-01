@@ -1,6 +1,5 @@
 package kademlia;
 
-import java.net.URI;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedHashMap;

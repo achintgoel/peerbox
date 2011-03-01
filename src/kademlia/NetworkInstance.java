@@ -98,32 +98,4 @@ public class NetworkInstance {
 	public void bootstrap(List<URI> friends, BootstrapListener bootstrapListener) {
 		BootstrapProcess.execute(this, friends, bootstrapListener);
 	}
-	
-	
-	////////TODO: remove
-	@Deprecated
-	public void onRequestReceived(Request request){
-		if(request instanceof FindRequest){
-			FindResponse fr;
-			ArrayList<Node> nearestNodes = (ArrayList<Node>) buckets.getNearestNodes(((FindRequest) request).getTargetIdentifier(), getConfiguration().getK());
-			if(request instanceof FindValueRequest){
-				fr = new FindValueResponse();
-				//TODO: if value found return new FindValueResponse with the value
-			}
-			else{
-				fr = new FindNodeResponse(); 
-				if(nearestNodes.contains(((FindRequest) request).getTargetIdentifier())){ 
-				}
-				//TODO: if node found return new FindNodeResponse with node
-			}
-			// if value or node not found send findResponse with nearest k nodes 
-			
-		}
-		else if(request instanceof StoreRequest){
-			
-		}
-		else if(request instanceof PingRequest){
-			
-		}
-	}
 }
