@@ -79,6 +79,11 @@ public class RPCHandler {
 							public String getServiceName() {
 								return rpcMessage.getService();
 							}
+
+							@Override
+							public URI getSenderURI() {
+								return message.getSenderURI();
+							}
 							
 						});
 					}

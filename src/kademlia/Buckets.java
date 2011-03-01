@@ -9,16 +9,16 @@ import java.util.SortedSet;
 import java.util.TreeSet;
 
 public class Buckets implements NodeStatusListener {
-	protected List<LinkedHashMap<URI, Node>> buckets;
+	protected List<LinkedHashMap<Identifier, Node>> buckets;
 	final protected NetworkInstance networkInstance;
 	final int k;
 	
 	public Buckets(NetworkInstance instance) {
 		networkInstance = instance;
 		k = networkInstance.getConfiguration().getK();
-		buckets = new ArrayList<LinkedHashMap<URI,Node>>(networkInstance.getConfiguration().getB());
+		buckets = new ArrayList<LinkedHashMap<Identifier ,Node>>(networkInstance.getConfiguration().getB());
 		for (int i = 0; i < k; i++) {
-			buckets.add(i, new LinkedHashMap<URI, Node>());
+			buckets.add(i, new LinkedHashMap<Identifier, Node>());
 		}
 	}
 	
@@ -28,15 +28,15 @@ public class Buckets implements NodeStatusListener {
 	
 	public void onNodeAlive(Node node) {
 		int bucketNumber = calculateBucketNumber(node);
-		LinkedHashMap<URI, Node> bucket = buckets.get(bucketNumber);
-		if (bucket.containsKey(node.getNetworkURI())) {
+		LinkedHashMap<Identifier, Node> bucket = buckets.get(bucketNumber);
+		if (bucket.containsKey(node.getIdentifier())) {
 			// Move existing node to the front
-			bucket.remove(node.getNetworkURI());
-			bucket.put(node.getNetworkURI(), node);
+			bucket.remove(node.getIdentifier());
+			bucket.put(node.getIdentifier(), node);
 		} else {
 			if (bucket.size() < k) {
 				// Add new node
-				bucket.put(node.getNetworkURI(), node);
+				bucket.put(node.getIdentifier(), node);
 			} else {
 				//TODO: Ping last seen node and see if it responds
 				//      If it does, move to back. If not, add new 
@@ -84,7 +84,11 @@ public class Buckets implements NodeStatusListener {
 
 	public void add(Node newNode) {
 		int bucketNumber = calculateBucketNumber(newNode.getIdentifier());
-		buckets.get(bucketNumber).put(newNode.getNetworkURI(), newNode);
-		
+		buckets.get(bucketNumber).put(newNode.getIdentifier(), newNode);
+	}
+	
+	public Node findNodeByIdentifier(Identifier identifier) {
+		int bucketNumber = calculateBucketNumber(identifier);
+		return buckets.get(bucketNumber).get(identifier);
 	}
 }

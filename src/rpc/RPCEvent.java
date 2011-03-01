@@ -1,5 +1,7 @@
 package rpc;
 
+import java.net.URI;
+
 import com.google.gson.JsonElement;
 
 public interface RPCEvent {
@@ -9,4 +11,6 @@ public interface RPCEvent {
 	public String getDataString();
 	
 	public String getServiceName();
+	
+	public URI getSenderURI();
 }
