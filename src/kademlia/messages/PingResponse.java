@@ -1,5 +1,11 @@
 package kademlia.messages;
 
-public class PingResponse extends Response {
+import kademlia.Identifier;
 
+public class PingResponse extends Response {
+	protected Identifier myNodeId;
+	
+	public Identifier getMyNodeId(){
+		return myNodeId;
+	}
 }

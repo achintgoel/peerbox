@@ -1,7 +1,9 @@
 package kademlia;
 
 import java.io.Serializable;
+import java.net.URI;
 import java.util.ArrayList;
+import java.util.List;
 
 import kademlia.messages.FindNodeRequest;
 import kademlia.messages.FindNodeResponse;
@@ -16,8 +18,8 @@ import kademlia.messages.Response;
 import kademlia.messages.StoreRequest;
 import kademlia.messages.StoreResponse;
 import rpc.RPCEvent;
-import rpc.RPCResponseListener;
 import rpc.RPCHandler;
+import rpc.RPCResponseListener;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
@@ -93,9 +95,13 @@ public class NetworkInstance {
 	}
 	
 	//TODO add bootstrap function
+	public void bootstrap(List<URI> friends, BootstrapListener bootstrapListener) {
+		BootstrapProcess.execute(this, friends, bootstrapListener);
+	}
 	
 	
-	////////
+	////////TODO: remove
+	@Deprecated
 	public void onRequestReceived(Request request){
 		if(request instanceof FindRequest){
 			FindResponse fr;

@@ -80,4 +80,9 @@ public class Buckets implements NodeStatusListener {
 		// TODO Auto-generated method stub
 		
 	}
+
+	public void add(Node newNode) {
+		// TODO Auto-generated method stub
+		
+	}
 }

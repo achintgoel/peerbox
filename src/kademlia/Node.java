@@ -16,6 +16,12 @@ public class Node implements Identifiable{
 		this.nodeID = nodeID;
 	}
 	
+	public Node(NetworkInstance networkInstance, URI uri){
+		this.networkInstance = networkInstance;
+		this.uri = uri;
+		this.nodeID = null;
+	}
+	
 	public URI getNetworkURI() {
 		return uri;
 	}
