@@ -10,14 +10,14 @@ import kademlia.messages.FindResponse;
 
 
 public class FindProcess<FRT extends FindResponse> {
-	final int maxRequests;
-	final int nearestSetSize;				
-	final Set<Node> prevQueried;			// previously queried nodes
-	final SortedSet<Node> nearestSet;		// nodes that have been found through all searches
-	final Set<Node> current;				// nodes currently being queried but haven't replied
-	FindRequest findRequest;						// target being searched for
-	NetworkInstance networkInstance;
-	final ResponseListener<FRT> callback;
+	protected final int maxRequests;
+	protected final int nearestSetSize;				
+	protected final Set<Node> prevQueried;			// previously queried nodes
+	protected final SortedSet<Node> nearestSet;		// nodes that have been found through all searches
+	protected final Set<Node> current;				// nodes currently being queried but haven't replied
+	protected final FindRequest findRequest;						// target being searched for
+	protected final NetworkInstance networkInstance;
+	protected final ResponseListener<FRT> callback;
 	
 	
 	private FindProcess(NetworkInstance ni, FindRequest request, ResponseListener<FRT> responseListener){

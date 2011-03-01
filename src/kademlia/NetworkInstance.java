@@ -82,12 +82,14 @@ public class NetworkInstance {
 	}
 	
 	public void storeValue(Key key, String value, ResponseListener<StoreResponse> responseListener) {
-		// TODO
+		StoreRequest request = new StoreRequest(getLocalNodeIdentifier(), key, value);
+		StoreProcess.execute(this, request, responseListener);
 	}
 	
 	//Maybe put in Node
-	public void ping(Node target, ResponseListener<PingResponse> responseListener) {
-		// TODO
+	public void ping(Node targetNode, ResponseListener<PingResponse> responseListener) {
+		PingRequest request = new PingRequest(getLocalNodeIdentifier(), targetNode.getIdentifier());
+		this.sendRequestRPC(targetNode, request, responseListener);
 	}
 	
 	//TODO add bootstrap function
