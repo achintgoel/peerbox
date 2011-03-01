@@ -77,12 +77,14 @@ public class Buckets implements NodeStatusListener {
 	}
 
 	public void addAll(Collection<Node> nodes) {
-		// TODO Auto-generated method stub
-		
+		for (Node node : nodes) {
+			add(node);
+		}		
 	}
 
 	public void add(Node newNode) {
-		// TODO Auto-generated method stub
+		int bucketNumber = calculateBucketNumber(newNode.getIdentifier());
+		buckets.get(bucketNumber).put(newNode.getNetworkURI(), newNode);
 		
 	}
 }
