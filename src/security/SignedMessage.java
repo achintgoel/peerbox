@@ -2,15 +2,15 @@ package security;
 import java.io.Serializable;
 
 public class SignedMessage implements Serializable {
-	protected byte[] message;
+	protected String message;
 	protected byte[] signature;
 	
-	public SignedMessage(byte[] mess, byte[] sig) {
+	public SignedMessage(String mess, byte[] sig) {
 		message = mess;
 		signature = sig;
 	}
 
-	public byte[] getMessage() {
+	public String getMessage() {
 		return message;
 	}
 
