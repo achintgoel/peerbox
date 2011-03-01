@@ -4,7 +4,7 @@ import kademlia.Identifier;
 
 public class PingRequest extends Request {
 	final protected Identifier targetId;
-	final protected String command = "ping";
+	final static public String command = "ping";
 	
 	public PingRequest(Identifier myNodeId, Identifier targetId){
 		this.myNodeId = myNodeId;

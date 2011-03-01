@@ -6,7 +6,7 @@ import kademlia.Key;
 public class StoreRequest extends Request {
 	protected Key key;
 	protected String value; 
-	final protected String command = "store";
+	final static public String command = "store";
 	
 	public StoreRequest(Identifier myNodeID, Key key, String value){
 		this.myNodeId = myNodeID;
