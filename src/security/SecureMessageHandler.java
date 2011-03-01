@@ -1,5 +1,6 @@
 package security;
 
+import java.io.UnsupportedEncodingException;
 import java.security.InvalidKeyException;
 import java.security.KeyPairGenerator;
 import java.security.NoSuchAlgorithmException;
@@ -23,32 +24,40 @@ public class SecureMessageHandler {
 
 	}
 	
-	public byte[] signMessage(byte[] data, PrivateKey key) {
+	public byte[] signMessage(String data, PrivateKey key) {
 		try {
 			sig.initSign(key);
-			sig.update(data);
+			sig.update(data.getBytes("UTF8"));
 			return sig.sign();
 		} catch (InvalidKeyException e) {
 
 		} catch (SignatureException e) {
 
+		} catch (UnsupportedEncodingException e) {
+
 		}
 		return null;
 		
 	}
-	
-	public boolean verifyMessage(byte[] data, byte[] signature, PublicKey key) {
+	/**
+	 * verifyMessage: verifies a signature given a public key with the original message
+	 * @param message represented as a String.  Will be converted to a UTF-8 encoded byte array for verification
+	 * @param signature represented as a byte array.
+	 * @param key
+	 * @return 
+	 */
+	public boolean verifyMessage(String message, byte[] signature, PublicKey key) {
 		
 		try {
 			sig.initVerify(key);
-			sig.update(data);
+			sig.update(message.getBytes("UTF8"));
 			return sig.verify(signature);
 		} catch (InvalidKeyException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			
 		} catch (SignatureException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			
+		} catch (UnsupportedEncodingException e) {
+			
 		}
 		return false;
 	}

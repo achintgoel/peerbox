@@ -1,18 +1,19 @@
 package friendpeer;
 
 import java.net.InetSocketAddress;
+import java.net.URI;
 import java.security.PublicKey;
 
 public class Friend {
 	protected String alias;
-	protected InetSocketAddress IPaddress;
+	protected URI address;
 	final protected PublicKey pubKey;
 	final protected FriendManager manager;
 	
-	Friend(FriendManager fm, String al, InetSocketAddress IP, PublicKey pub) {
+	Friend(FriendManager fm, String al, URI address, PublicKey pub) {
 		manager = fm;
 		alias = al;
-		IPaddress = IP;
+		this.address = address;
 		pubKey = pub;
 	}
 
@@ -26,13 +27,12 @@ public class Friend {
 		manager.updateFriend(oldAlias, this.alias, this);
 	}
 
-	public InetSocketAddress getIPaddress() {
-		return IPaddress;
+	public URI getNetworkAddress() {
+		return address;
 	}
 
-	public void setIPaddress(InetSocketAddress iPaddress) {
-		
-		IPaddress = iPaddress;
+	public void setAddress(URI address) {
+		this.address = address;
 	}
 
 	public PublicKey getPubKey() {
