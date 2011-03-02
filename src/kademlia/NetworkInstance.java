@@ -28,6 +28,11 @@ import dht.DistributedMap;
 import dht.LocalDataStore;
 import dht.MapDataFilter;
 
+
+/**
+ * 
+ *
+ */
 public class NetworkInstance {
 	protected Identifier localIdentifier;
 	protected final Buckets buckets;
@@ -111,7 +116,6 @@ public class NetworkInstance {
 		this.sendRequestRPC(targetNode, request, responseListener);
 	}
 	
-	//TODO add bootstrap function
 	public void bootstrap(List<URI> friends, BootstrapListener bootstrapListener) {
 		BootstrapProcess.execute(this, friends, bootstrapListener);
 	}

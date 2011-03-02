@@ -13,7 +13,6 @@ public class PingRequest extends Request {
 	
 	@Override
 	public String getCommand() {
-		// TODO Auto-generated method stub
 		return command;
 	}
 	
