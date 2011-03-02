@@ -9,7 +9,7 @@ Monday Night:
  x RPC sending new requests (Rajiv)
  
 Tuesday Night:
- - Store / StoreFilter components (Rajiv)
+ x Store / StoreFilter components (Rajiv)
  - Expose Kad as DHT maps (Rajiv)
  - Bring everything for launching Kad instances (Rajiv)
  - Finish other ToDos in Kad (Vineet)
@@ -17,3 +17,8 @@ Tuesday Night:
  - Implement StoreFilter for Kademlia (Achint)
  - Finish documenting Kademlia (Vineet)
  - Come up with test cases for Kademlia (Vineet)
+
+Sometime:
+ - Timeouts in networking through RPC code
+ - Expiration and Republication of DHT data (low priority)
+ 

@@ -1,5 +1,8 @@
 package kademlia;
 
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+
 import dht.CompositeKey;
 
 public class Key extends CompositeKey<String, String> implements Identifiable {
@@ -10,8 +13,24 @@ public class Key extends CompositeKey<String, String> implements Identifiable {
 
 	@Override
 	public Identifier getIdentifier() {
-		// TODO: Identifier generation
-		return null;
+		
+		try {
+			MessageDigest md;
+			md = MessageDigest.getInstance("SHA");
+			md.reset();
+			md.update(primaryKey.getBytes());
+			md.update("::".getBytes());
+			md.update(secondaryKey.getBytes());
+			byte[] digest = md.digest();
+			
+			return Identifier.fromBytes(digest);
+
+		} catch (NoSuchAlgorithmException e) {
+			e.printStackTrace();
+			throw new RuntimeException("Java Runtime does not support SHA-1");
+		}
+		
+		
 	}
 
 }

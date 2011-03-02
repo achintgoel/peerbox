@@ -60,7 +60,7 @@ public class MessageServerHandler extends SimpleChannelUpstreamHandler {
 
         // Bind to the port and start the service.
         Channel c = b.bind(new InetSocketAddress(port));
-        return new MessageSender(c);
+        return new MessageSender(c, "udp");
 	}
 	
 	protected MessageServerHandler(MessageListener downstreamMessageListener, String protocol) {
@@ -79,7 +79,6 @@ public class MessageServerHandler extends SimpleChannelUpstreamHandler {
 			e1.printStackTrace();
 			uri = null;
 		}
-    	
     	IncomingMessage message = new IncomingMessage(e, uri, data);
     	downstreamMessageListener.onMessage(message);
     }

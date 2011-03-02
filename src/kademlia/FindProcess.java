@@ -71,7 +71,7 @@ public class FindProcess<FRT extends FindResponse> {
 			// if no new unsearched nodes that means the requested value wasn't found
 			if(unsearchedNodes.isEmpty()){
 				callback.onFailure();
-				// TODO: this is not right
+				// TODO: node not found isn't realllly a failure, but w/e
 			}
 			// send the findRequest RPC to the first one in the unsearched nodes
 			final Node nextRequestDestination = unsearchedNodes.first();

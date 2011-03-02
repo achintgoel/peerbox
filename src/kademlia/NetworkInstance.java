@@ -50,6 +50,7 @@ public class NetworkInstance {
 		localDataStore = new LocalDataStore();
 		this.rpcHandler = rpcHandler;
 		rpcHandler.registerServiceListener(rpcServiceName, new KademliaRequestListener(this));
+		localIdentifier = Identifier.generateRandom(); // Possibly remember for future restarts
 	}
 	
 	LocalDataStore getLocalDataStore() {

@@ -26,4 +26,9 @@ public class IncomingMessage {
 	public void sendResponse(String responseData) {
 		origMessageEvent.getChannel().write(responseData, origMessageEvent.getRemoteAddress());
 	}
+	
+	public String toString() {
+		return this.sender.toString() + ": " + this.data;
+		
+	}
 }

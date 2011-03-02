@@ -31,6 +31,10 @@ public class RPCHandler {
 		return rpcHandler;
 	}
 	
+	public URI getLocalURI() {
+		return messageSender.getLocalURI();
+	}
+	
 	public void registerServiceListener(String serviceName, ServiceRequestListener serviceListener) {
 		if (serviceListener == null) {
 			registeredServices.remove(serviceName);

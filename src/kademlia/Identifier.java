@@ -1,8 +1,15 @@
 package kademlia;
 
 import java.math.BigInteger;
+import java.security.SecureRandom;
 
 public class Identifier implements Identifiable {
+	protected BigInteger value;
+	protected static final SecureRandom secureRandom = new SecureRandom();
+	
+	protected Identifier(BigInteger value) {
+		this.value = value;
+	}
 	
 	public BigInteger getIntegerValue() {
 		return null;
@@ -20,8 +27,13 @@ public class Identifier implements Identifiable {
 		return this;
 	}
 	
+	public static Identifier fromBytes(byte[] bytes) {
+		return new Identifier(new BigInteger(bytes));
+	}
+	
 	public static Identifier generateRandom() {
-		//TODO: Random ID Generation
-		return null;
+		byte[] randomBytes = new byte[160];
+		secureRandom.nextBytes(randomBytes);
+		return fromBytes(randomBytes);
 	}
 }
