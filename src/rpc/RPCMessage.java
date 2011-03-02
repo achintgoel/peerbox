@@ -3,7 +3,7 @@ package rpc;
 public class RPCMessage {
 	protected String pbox;
 	protected String service;
-	protected int id;
+	protected String id;
 	protected String request;
 	protected String response;
 	
@@ -11,14 +11,14 @@ public class RPCMessage {
 	 * 
 	 * @param version
 	 * @param service
-	 * @param id
+	 * @param uuid
 	 * @param request
 	 * @param response
 	 */
-	public RPCMessage(String version, String service, int id, String request, String response) {
+	public RPCMessage(String version, String service, String uuid, String request, String response) {
 		this.pbox = version;
 		this.service = service;
-		this.id = id;
+		this.id = uuid;
 		this.request = request;
 		this.response = response;
 	}
@@ -31,7 +31,7 @@ public class RPCMessage {
 		return service;
 	}
 	
-	public int getId() {
+	public String getId() {
 		return id;
 	}
 	

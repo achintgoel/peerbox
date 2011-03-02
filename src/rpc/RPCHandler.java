@@ -1,9 +1,9 @@
 package rpc;
 
-import java.io.Console;
 import java.net.URI;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.UUID;
 
 import network.IncomingMessage;
 import network.MessageListener;
@@ -11,19 +11,18 @@ import network.MessageSender;
 import network.MessageServerHandler;
 
 import com.google.gson.Gson;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
-import com.google.gson.JsonParser;
 
 public class RPCHandler {
 	final protected Map<String, ServiceRequestListener> registeredServices;
 	protected MessageSender messageSender;
 	final static protected String VERSION = "1.0";
 	final protected Gson gson = new Gson();
+	final protected Map<String, RPCWaitingRequest> waitingRequests;
 	
 	protected RPCHandler() {
 		registeredServices = new HashMap<String, ServiceRequestListener>();
+		waitingRequests = new HashMap<String, RPCWaitingRequest>();
 	}
 	
 	public static RPCHandler getUDPInstance(int port) {
@@ -41,7 +40,10 @@ public class RPCHandler {
 	}
 	
 	public void sendRequest(URI recipient, String serviceName, String dataString, RPCResponseListener responseListener) {
-		//TODO
+		String uuid = UUID.randomUUID().toString(); // Is this safe to assume absolute local uniqueness?
+		RPCMessage requestMessage = new RPCMessage(VERSION, serviceName, uuid, dataString, null);
+		waitingRequests.put(uuid, new RPCWaitingRequest(requestMessage, recipient, responseListener));
+		messageSender.sendData(recipient, gson.toJson(requestMessage));
 	}
 	
 	IncomingMessageListener newListener() {
@@ -51,10 +53,8 @@ public class RPCHandler {
 	class IncomingMessageListener implements MessageListener {
 		@Override
 		public void onMessage(final IncomingMessage message) {
-			JsonParser parser = new JsonParser();
 			try {
-				final JsonObject root = (JsonObject) parser.parse(message.getDataString());
-				final RPCMessage rpcMessage = gson.fromJson(root, RPCMessage.class);
+				final RPCMessage rpcMessage = gson.fromJson(message.getDataString(), RPCMessage.class);
 				if (rpcMessage.getVersion() != VERSION) {
 					// Unsupported Message Version
 					System.out.println("Unsupported Message Version");   
@@ -72,7 +72,7 @@ public class RPCHandler {
 
 							@Override
 							public String getDataString() {
-								return root.get("request").getAsString();
+								return rpcMessage.getRequest();
 							}
 
 							@Override
@@ -88,7 +88,31 @@ public class RPCHandler {
 						});
 					}
 				} else if (rpcMessage.getResponse() != null) {
-					
+					RPCWaitingRequest waitingRequest = waitingRequests.get(rpcMessage.getId());
+					if (waitingRequest != null && waitingRequest.getRequestRecipient().equals(message.getSenderURI()) && waitingRequest.getRequestMessage().getService().equals(rpcMessage.getService())) {
+						waitingRequests.remove(rpcMessage.getId());
+						waitingRequest.getResponseListener().onResponseReceived(new RPCEvent() {
+							@Override
+							public void respond(String data) {
+								throw new UnsupportedOperationException("Cannot respond to a request response");
+							}
+
+							@Override
+							public String getDataString() {
+								return rpcMessage.getResponse();
+							}
+
+							@Override
+							public String getServiceName() {
+								return rpcMessage.getService();
+							}
+
+							@Override
+							public URI getSenderURI() {
+								return message.getSenderURI();
+							}
+						});
+					}
 				}
 			} catch (JsonParseException e) {
 				

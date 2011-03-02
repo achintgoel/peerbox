@@ -6,7 +6,7 @@ Monday Night:
  x Implemented RPC Receiving requests & responding to requests (Rajiv)
  x Started FileShare Code (Messages etc.)
  - FileShare responding to requests (Achint)
- - RPC sending new requests (Rajiv)
+ x RPC sending new requests (Rajiv)
  
 Tuesday Night:
  - Store / StoreFilter components (Rajiv)
