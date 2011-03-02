@@ -6,7 +6,7 @@ import friendpeer.Friend;
 public class FileRequest extends Request{
 	protected Friend targetFriend;
 	protected FileInfo file;
-	final protected String command = "get_file";
+	final static public String command = "get_file";
 	
 	public FileRequest(Friend targetFriend, FileInfo file) {
 		super();

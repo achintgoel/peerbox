@@ -1,6 +1,8 @@
 package fileshare;
 
 
+import java.util.UUID;
+
 import rpc.RPCEvent;
 import rpc.ServiceRequestListener;
 
@@ -8,7 +10,8 @@ import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
-import fileshare.messages.Request;
+import fileshare.messages.FileRequest;
+import fileshare.messages.FileResponse;
 import fileshare.messages.Response;
 import fileshare.messages.SharedDirectoryRequest;
 import fileshare.messages.SharedDirectoryResponse;
@@ -39,6 +42,11 @@ public class FileshareRequestListener implements ServiceRequestListener{
 					response = new SharedDirectoryResponse(contents);
 				}
 				
+			}
+			else if(command.equals(FileRequest.command)) {
+				FileRequest fnr = gson.fromJson(root, FileRequest.class);
+				String requestId = UUID.randomUUID().toString();
+				response = new FileResponse(null, requestId);
 			}
 	}
 		
