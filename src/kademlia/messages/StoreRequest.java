@@ -23,4 +23,7 @@ public class StoreRequest extends Request {
 		return key;
 	}
 	
+	public String getValue() {
+		return value;
+	}
 }

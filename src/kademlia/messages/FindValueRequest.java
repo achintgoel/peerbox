@@ -12,6 +12,10 @@ public class FindValueRequest extends FindRequest {
 		this.key = key;
 	}
 	
+	public Key getKey() {
+		return key;
+	}
+	
 	@Override
 	public Identifier getTargetIdentifier() {
 		return key.getIdentifier();

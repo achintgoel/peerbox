@@ -17,4 +17,27 @@ public class CompositeKey<A, B> {
 	public B getSecondaryKey() {
 		return secondaryKey;
 	}
+	
+	@Override
+	public boolean equals(Object o) {
+		if (o == this) {
+			return true;
+		}
+		
+		if (this.getClass() != o.getClass()) {
+			return false;
+		}
+		
+		CompositeKey<?, ?> ck = (CompositeKey<?, ?>) o;
+		
+		return primaryKey.equals(ck.primaryKey) && secondaryKey.equals(ck.secondaryKey);
+	}
+	
+	@Override
+	public int hashCode() {
+		int result = 17;
+		result = 31 * result + primaryKey.hashCode();
+		result = 31 * result + secondaryKey.hashCode();
+		return result;
+	}
 }
