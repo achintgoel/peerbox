@@ -2,7 +2,9 @@ package kademlia;
 
 import java.io.Serializable;
 import java.net.URI;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import kademlia.messages.FindNodeRequest;
 import kademlia.messages.FindNodeResponse;
@@ -17,21 +19,40 @@ import kademlia.messages.StoreResponse;
 import rpc.RPCEvent;
 import rpc.RPCHandler;
 import rpc.RPCResponseListener;
+import rpc.ServiceRequestListener;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
 import dht.DistributedMap;
+import dht.LocalDataStore;
+import dht.MapDataFilter;
 
 public class NetworkInstance {
 	protected Identifier localIdentifier;
-	protected Buckets buckets;
+	protected final Buckets buckets;
 	protected final Gson gson;
 	protected final String rpcServiceName;
+	protected final Map<String, MapDataFilter<String, String>> dataFilters;
+	protected final LocalDataStore localDataStore;
+	protected final RPCHandler rpcHandler;
 	
-	public NetworkInstance() {
+	public NetworkInstance(RPCHandler rpcHandler) {
 		gson = new Gson();
 		rpcServiceName = "kad";
+		buckets = new Buckets(this);
+		dataFilters = new HashMap<String, MapDataFilter<String, String>>();
+		localDataStore = new LocalDataStore();
+		this.rpcHandler = rpcHandler;
+		rpcHandler.registerServiceListener(rpcServiceName, new KademliaRequestListener(this));
+	}
+	
+	LocalDataStore getLocalDataStore() {
+		return localDataStore;
+	}
+	
+	public void registerDataFilter(String primaryKey, MapDataFilter<String, String> dataFilter) {
+		localDataStore.registerDataFilter(primaryKey, dataFilter);
 	}
 	
 	public Configuration getConfiguration() {
@@ -62,12 +83,11 @@ public class NetworkInstance {
 	}
 	
 	public RPCHandler getRPC() {
-		return null; //TODO
+		return rpcHandler;
 	}
 
 	public Buckets getBuckets() {
-		// TODO Auto-generated method stub
-		return null;
+		return buckets;
 	}
 	
 	public void findNode(Identifier targetNodeId, ResponseListener<FindNodeResponse> responseListener) {

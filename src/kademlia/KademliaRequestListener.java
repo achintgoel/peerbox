@@ -22,7 +22,7 @@ public class KademliaRequestListener implements ServiceRequestListener {
 	protected final Gson gson = new Gson();
 	protected final NetworkInstance ni;
 	
-	public KademliaRequestListener(NetworkInstance networkInstance){
+	public KademliaRequestListener(NetworkInstance networkInstance) {
 		this.ni = networkInstance;
 	}
 	
@@ -47,13 +47,18 @@ public class KademliaRequestListener implements ServiceRequestListener {
 			}
 			else if(command.equals(FindValueRequest.command)){
 				FindValueRequest fvr = gson.fromJson(root, FindValueRequest.class);
-				// TODO: get Node closest to the value
-				response = new FindValueResponse();
+				String returnValue = ni.getLocalDataStore().get(fvr.getKey());
+				if(returnValue == null){
+					response = new FindValueResponse(ni.getBuckets().getNearestNodes(fvr.getTargetIdentifier(), ni.getConfiguration().getK()));
+				}
+				else{
+					response = new FindValueResponse(returnValue);
+				}
 				request = fvr;
 			}
 			else if(command.equals(StoreRequest.command)){
 				StoreRequest sr = gson.fromJson(root, StoreRequest.class);
-				// TODO: store key value pair in the buckets
+				ni.getLocalDataStore().put(sr.getKey(), sr.getValue());
 				response = new StoreResponse(false);
 				request = sr;
 			}
