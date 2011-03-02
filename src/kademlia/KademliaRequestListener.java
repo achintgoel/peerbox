@@ -43,7 +43,7 @@ public class KademliaRequestListener implements ServiceRequestListener {
 			String command = root.get("command").getAsString();
 			Request request;
 			Response response;
-			if(command.equals(FindNodeRequest.command)){
+			if(command.equals(FindNodeRequest.COMMAND)){
 				FindNodeRequest fnr = gson.fromJson(root, FindNodeRequest.class);
 				Node returnNode = ni.getBuckets().findNodeByIdentifier(fnr.getTargetIdentifier());
 				if(returnNode == null){
@@ -54,7 +54,7 @@ public class KademliaRequestListener implements ServiceRequestListener {
 				}
 				request = fnr;
 			}
-			else if(command.equals(FindValueRequest.command)){
+			else if(command.equals(FindValueRequest.COMMAND)){
 				FindValueRequest fvr = gson.fromJson(root, FindValueRequest.class);
 				String returnValue = ni.getLocalDataStore().get(fvr.getKey());
 				if(returnValue == null){
@@ -65,13 +65,13 @@ public class KademliaRequestListener implements ServiceRequestListener {
 				}
 				request = fvr;
 			}
-			else if(command.equals(StoreRequest.command)){
+			else if(command.equals(StoreRequest.COMMAND)){
 				StoreRequest sr = gson.fromJson(root, StoreRequest.class);
 				boolean success = ni.getLocalDataStore().put(sr.getKey(), sr.getValue());
 				response = new StoreResponse(success);
 				request = sr;
 			}
-			else if(command.equals(PingRequest.command)){
+			else if(command.equals(PingRequest.COMMAND)){
 				PingRequest pr = gson.fromJson(root, PingRequest.class);
 				response = new PingResponse(ni.getLocalNodeIdentifier());
 				request = pr;

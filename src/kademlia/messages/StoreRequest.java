@@ -6,17 +6,19 @@ import kademlia.Key;
 public class StoreRequest extends Request {
 	protected Key key;
 	protected String value; 
-	final static public String command = "store";
+	final static public String COMMAND = "store";
+	final protected String command;
 	
 	public StoreRequest(Identifier myNodeID, Key key, String value){
 		this.myNodeId = myNodeID;
 		this.key = key;
 		this.value = value;
+		this.command = COMMAND;
 	}
 	
 	@Override
 	public String getCommand() {
-		return command;
+		return COMMAND;
 	}
 	
 	public Key getKey(){
