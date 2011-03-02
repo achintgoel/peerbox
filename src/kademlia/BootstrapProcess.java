@@ -29,7 +29,7 @@ public class BootstrapProcess {
 	}
 	
 	/**
-	 * basically the static constructor
+	 * The static function called to initialize the bootstrap process
 	 * @param networkInstance
 	 * @param friends list of URIs we send ping to
 	 * @param bootstrapListener the callback from this process 
@@ -42,6 +42,7 @@ public class BootstrapProcess {
 	/**
 	 * Method that pings all friends and sends 
 	 * an iterative findNode request to the first one
+	 * 
 	 */
 	private void pingFriends(){
 		for(final URI uri : friends){

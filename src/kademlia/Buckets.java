@@ -10,11 +10,23 @@ import java.util.TreeSet;
 import kademlia.messages.PingResponse;
 import kademlia.messages.Response;
 
+
+/**
+ * 
+ * Object that holds the k-bucket(DHT) for the known nodes in kademlia
+ *
+ */
 public class Buckets implements NodeStatusListener {
 	protected List<LinkedHashMap<Identifier, Node>> buckets;
 	final protected NetworkInstance networkInstance;
 	final int k;
 	
+	
+	/**
+	 * Constructor
+	 * @param instance
+	 * 
+	 */
 	public Buckets(NetworkInstance instance) {
 		networkInstance = instance;
 		k = networkInstance.getConfiguration().getK();
@@ -24,14 +36,27 @@ public class Buckets implements NodeStatusListener {
 		}
 	}
 	
+	/**
+	 * function called when a node is found to be down 
+	 */
 	public void onNodeDown(Node node) {
 		buckets.get(calculateBucketNumber(node)).remove(node);
 	}
 	
+	/**
+	 * function called when a node is found to be alive
+	 */
 	public void onNodeAlive(Node node) {
 		add(node); 
 	}
 	
+	
+	/**
+	 * Function to find the closest nodes to the given node
+	 * @param id ID of the target node
+	 * @param numberOfNodes number of results to return
+	 * @return List<Node>
+	 */
 	public List<Node> getNearestNodes(Identifier id, int numberOfNodes) {
 		int bucketNumber = calculateBucketNumber(id);
 		
@@ -54,21 +79,39 @@ public class Buckets implements NodeStatusListener {
 		return nearest.subList(0, nearest.size() > numberOfNodes ? numberOfNodes : nearest.size());
 	}
 	
+	/**
+	 * find the number of nodes in a given bucket
+	 * @param bucket
+	 * @return
+	 */
 	public int getBucketNodeCount(int bucket) {
 		return buckets.get(bucket).size();
 	}
 	
+	/**
+	 * To calculate the bucket number a certain Node will fall in
+	 * @param obj
+	 * @return
+	 */
 	public int calculateBucketNumber(Identifiable obj) {
 		return (int) Math.floor(Math.log(Identifier.calculateDistance(
 				networkInstance.getLocalNodeIdentifier(), obj).doubleValue())/Math.log(2));
 	}
-
+	
+	/**
+	 * to add a collection of nodes to the DHT
+	 * @param nodes Collection of Nodes
+	 */
 	public void addAll(Collection<Node> nodes) {
 		for (Node node : nodes) {
 			add(node);
 		}		
 	}
 
+	/**
+	 * To add a single Node to the DHT
+	 * @param newNode
+	 */
 	public void add(final Node newNode) {
 		int bucketNumber = calculateBucketNumber(newNode.getIdentifier());
 		final LinkedHashMap<Identifier, Node> currentBucket = buckets.get(bucketNumber);
@@ -100,6 +143,11 @@ public class Buckets implements NodeStatusListener {
 		}
 	}
 	
+	/**
+	 * To find a Node by its Identifier
+	 * @param identifier
+	 * @return Node
+	 */
 	public Node findNodeByIdentifier(Identifier identifier) {
 		int bucketNumber = calculateBucketNumber(identifier);
 		return buckets.get(bucketNumber).get(identifier);
