@@ -8,7 +8,12 @@ import java.util.TreeSet;
 import kademlia.messages.FindRequest;
 import kademlia.messages.FindResponse;
 
-
+/**
+ * 
+ * Object created when a node or a value is searched for
+ *
+ * @param <FRT> the type of FindResponse FindNodeResponse or a FindValueResponse
+ */
 public class FindProcess<FRT extends FindResponse> {
 	protected final int maxRequests;
 	protected final int nearestSetSize;				
@@ -33,29 +38,45 @@ public class FindProcess<FRT extends FindResponse> {
 			
 	}
 	
+	/**
+	 * 
+	 * To initialize the find process
+	 * @param <T> type of FindResponse
+	 * @param ni NetworkInstance
+	 * @param request the request to be sent
+	 * @param responseListener callback
+	 */
 	public static <T extends FindResponse> void execute(NetworkInstance ni, FindRequest request, ResponseListener<T> responseListener){
 		FindProcess<T> sh = new FindProcess<T>(ni, request, responseListener);
 		sh.nextIteration();
 	}
 	
 	
+	/**
+	 * To actually run the FindProcess
+	 * 
+	 * 
+	 */
 	private void nextIteration(){
-		// add the querySet to prevQueried and current and then search for every node
+		// Until upto maxRequests are made
 		while(current.size() < maxRequests){
+			// resize the nearestSet by removing the last elements
 			while(nearestSet.size() > nearestSetSize){
 				nearestSet.remove(nearestSet.last());				
 			}
+			// find the unsearched nodes by removing the previously queried from the nearest set
 			SortedSet<Node> unsearchedNodes = new TreeSet<Node>(new IdentifiableDistanceComparator(findRequest.getTargetIdentifier()));
 			unsearchedNodes = nearestSet;
 			unsearchedNodes.removeAll(prevQueried);
+			// if no new unsearched nodes that means the requested value wasn't found
 			if(unsearchedNodes.isEmpty()){
 				callback.onFailure();
 				// TODO: this is not right
 			}
+			// send the findRequest RPC to the first one in the unsearched nodes
 			final Node nextRequestDestination = unsearchedNodes.first();
 		  	prevQueried.add(nextRequestDestination);
 		  	current.add(nextRequestDestination);
-		  	// TODO: executeFindNode
 			networkInstance.sendRequestRPC(nextRequestDestination, findRequest, new ResponseListener<FRT>(){
 		    	// event that a message was received
 		    	public void onResponseReceived(FRT response) {
@@ -63,6 +84,7 @@ public class FindProcess<FRT extends FindResponse> {
 		          	if(response.isFound()){
 		          	    callback.onResponseReceived(response);
 		          	}
+		          	// otherwise add the nodes to the nearestSet and to the k-buckets 
 		          	else{
 		          		nearestSet.addAll(response.getNearbyNodes());
 		    			networkInstance.getBuckets().addAll(response.getNearbyNodes());

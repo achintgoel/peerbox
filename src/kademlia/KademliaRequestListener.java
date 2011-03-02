@@ -17,6 +17,11 @@ import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
+
+/**
+ * The listener to handle the received kademlia requests
+ *
+ */
 public class KademliaRequestListener implements ServiceRequestListener {
 	
 	protected final Gson gson = new Gson();
@@ -26,10 +31,14 @@ public class KademliaRequestListener implements ServiceRequestListener {
 		this.ni = networkInstance;
 	}
 	
+	/**
+	 * the function called on receiving a request
+	 */
 	@Override
 	public void onRequestRecieved(RPCEvent e) {
 		JsonParser parser = new JsonParser();
 		try {
+			// Get the command type
 			final JsonObject root = (JsonObject) parser.parse(e.getDataString());
 			String command = root.get("command").getAsString();
 			Request request;

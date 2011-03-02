@@ -1,5 +1,12 @@
 package kademlia;
 
+
+/**
+ * The configuration of the networkInstance
+ * holds the value of alpha, k and other constants
+ * 
+ *
+ */
 public class Configuration {
 	final static int alpha = 3;
 	final static int B = 160;
