@@ -27,7 +27,7 @@ public class KadThisBetterWork {
 			instance = new NetworkInstance(RPCHandler.getUDPInstance(port++));
 			LinkedList<URI> startURIs = new LinkedList<URI>();
 			try {
-				startURIs.add(new URI("udp://localhost:" + (port - 1)));
+				startURIs.add(new URI("udp://localhost:" + (port - 2)));
 			} catch (URISyntaxException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();

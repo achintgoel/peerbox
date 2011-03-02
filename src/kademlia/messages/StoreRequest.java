@@ -7,18 +7,16 @@ public class StoreRequest extends Request {
 	protected Key key;
 	protected String value; 
 	final static public String COMMAND = "store";
-	final protected String command;
+	
+	protected StoreRequest() {
+		
+	}
 	
 	public StoreRequest(Identifier myNodeID, Key key, String value){
 		this.myNodeId = myNodeID;
 		this.key = key;
 		this.value = value;
 		this.command = COMMAND;
-	}
-	
-	@Override
-	public String getCommand() {
-		return COMMAND;
 	}
 	
 	public Key getKey(){

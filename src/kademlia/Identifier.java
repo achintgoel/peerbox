@@ -7,12 +7,16 @@ public class Identifier implements Identifiable {
 	protected BigInteger value;
 	protected static final SecureRandom secureRandom = new SecureRandom();
 	
+	protected Identifier() {
+		
+	}
+	
 	protected Identifier(BigInteger value) {
 		this.value = value;
 	}
 	
 	public BigInteger getIntegerValue() {
-		return null;
+		return value;
 	}
 	
 	public static BigInteger calculateDistance(Identifier x, Identifier y) {

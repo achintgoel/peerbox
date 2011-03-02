@@ -6,7 +6,10 @@ import kademlia.Key;
 public class FindValueRequest extends FindRequest {
 	protected Key key;
 	final static public String COMMAND = "find_value";
-	final protected String command;
+	
+	protected FindValueRequest() {
+		
+	}
 	
 	public FindValueRequest(Identifier myNodeId, Key key) {
 		this.myNodeId = myNodeId;
@@ -21,11 +24,6 @@ public class FindValueRequest extends FindRequest {
 	@Override
 	public Identifier getTargetIdentifier() {
 		return key.getIdentifier();
-	}
-
-	@Override
-	public String getCommand() {
-		return COMMAND;
 	}
 	
 }

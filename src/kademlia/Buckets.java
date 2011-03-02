@@ -30,8 +30,9 @@ public class Buckets implements NodeStatusListener {
 	public Buckets(NetworkInstance instance) {
 		networkInstance = instance;
 		k = networkInstance.getConfiguration().getK();
-		buckets = new ArrayList<LinkedHashMap<Identifier ,Node>>(networkInstance.getConfiguration().getB());
-		for (int i = 0; i < k; i++) {
+		int b = networkInstance.getConfiguration().getB();
+		buckets = new ArrayList<LinkedHashMap<Identifier, Node>>(b);
+		for (int i = 0; i < b; i++) {
 			buckets.add(i, new LinkedHashMap<Identifier, Node>());
 		}
 	}
@@ -94,6 +95,8 @@ public class Buckets implements NodeStatusListener {
 	 * @return
 	 */
 	public int calculateBucketNumber(Identifiable obj) {
+		System.out.println("DISTANCE: " + Math.floor(Math.log(Identifier.calculateDistance(
+				networkInstance.getLocalNodeIdentifier(), obj).doubleValue())/Math.log(2)));
 		return (int) Math.floor(Math.log(Identifier.calculateDistance(
 				networkInstance.getLocalNodeIdentifier(), obj).doubleValue())/Math.log(2));
 	}

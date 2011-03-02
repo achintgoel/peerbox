@@ -1,6 +1,8 @@
 package kademlia;
 
 import java.io.Serializable;
+import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
 import java.net.URI;
 import java.util.HashMap;
 import java.util.List;
@@ -80,7 +82,8 @@ public class NetworkInstance {
 			@Override
 			public void onResponseReceived(RPCEvent event) {
 				try {
-					callback.onResponseReceived((T) gson.fromJson(event.getDataString(), new TypeToken<T>(){}.getType()));
+					Type responseType = ((ParameterizedType) new TypeToken<List<T>>(){}.getType()).getActualTypeArguments()[0];
+					callback.onResponseReceived((T) gson.fromJson(event.getDataString(), responseType));
 				} catch (Exception e) {
 					//
 				}

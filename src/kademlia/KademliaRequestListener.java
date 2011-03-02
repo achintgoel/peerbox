@@ -86,12 +86,14 @@ public class KademliaRequestListener implements ServiceRequestListener {
 			}
 			if(request != null){
 				Node newNode = new Node(ni, e.getSenderURI(), request.getMyNodeId());
+				System.out.println(e.getSenderURI());
+				System.out.println(ni.getRPC().getLocalURI());
 				ni.getBuckets().add(newNode);
 			}
 		}
 		catch(Exception exception){
 			System.out.println(exception.getClass());
-			System.out.println(exception.getStackTrace());
+			exception.printStackTrace();
 		}
 	}
 

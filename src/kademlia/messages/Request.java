@@ -3,11 +3,14 @@ package kademlia.messages;
 import kademlia.Identifier;
 
 public abstract class Request extends Message {
-	public Identifier myNodeId;
-	
-	public abstract String getCommand();
-	
+	protected Identifier myNodeId;
+	protected String command;
+
 	public Identifier getMyNodeId() {
 		return myNodeId;
+	}
+
+	public String getCommand() {
+		return command;
 	}
 }
