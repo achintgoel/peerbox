@@ -7,6 +7,9 @@ import java.util.List;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
+import kademlia.messages.PingResponse;
+import kademlia.messages.Response;
+
 public class Buckets implements NodeStatusListener {
 	protected List<LinkedHashMap<Identifier, Node>> buckets;
 	final protected NetworkInstance networkInstance;
@@ -26,22 +29,7 @@ public class Buckets implements NodeStatusListener {
 	}
 	
 	public void onNodeAlive(Node node) {
-		int bucketNumber = calculateBucketNumber(node);
-		LinkedHashMap<Identifier, Node> bucket = buckets.get(bucketNumber);
-		if (bucket.containsKey(node.getIdentifier())) {
-			// Move existing node to the front
-			bucket.remove(node.getIdentifier());
-			bucket.put(node.getIdentifier(), node);
-		} else {
-			if (bucket.size() < k) {
-				// Add new node
-				bucket.put(node.getIdentifier(), node);
-			} else {
-				//TODO: Ping last seen node and see if it responds
-				//      If it does, move to back. If not, add new 
-				//      node to the back
-			}
-		}
+		add(node); 
 	}
 	
 	public List<Node> getNearestNodes(Identifier id, int numberOfNodes) {
@@ -81,9 +69,35 @@ public class Buckets implements NodeStatusListener {
 		}		
 	}
 
-	public void add(Node newNode) {
+	public void add(final Node newNode) {
 		int bucketNumber = calculateBucketNumber(newNode.getIdentifier());
-		buckets.get(bucketNumber).put(newNode.getIdentifier(), newNode);
+		final LinkedHashMap<Identifier, Node> currentBucket = buckets.get(bucketNumber);
+		if(currentBucket.containsKey(newNode.getIdentifier())){
+			// Move existing node to the front
+			currentBucket.remove(newNode.getIdentifier());
+			currentBucket.put(newNode.getIdentifier(), newNode);
+		}
+		else {
+			if (currentBucket.size() < k) {
+				// Add new node
+				currentBucket.put(newNode.getIdentifier(), newNode);
+			} else {
+				// gets the first element from the LinkedHashMap
+				final Node firstNode = currentBucket.entrySet().iterator().next().getValue();
+				networkInstance.ping(firstNode, new ResponseListener<PingResponse>(){
+					@Override
+					public void onFailure() {
+						currentBucket.remove(firstNode.getIdentifier());
+						currentBucket.put(newNode.getIdentifier(), newNode);
+					}
+					@Override
+					public void onResponseReceived(PingResponse response) {
+						currentBucket.remove(firstNode);
+						currentBucket.put(firstNode.getIdentifier(), firstNode);
+					}					
+				});
+			}
+		}
 	}
 	
 	public Node findNodeByIdentifier(Identifier identifier) {
