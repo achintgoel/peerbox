@@ -1,10 +1,16 @@
 package kademlia;
 
-public class Key implements Identifiable {
+import dht.CompositeKey;
+
+public class Key extends CompositeKey<String, String> implements Identifiable {
+	
+	public Key(String primaryKey, String secondaryKey) {
+		super(primaryKey, secondaryKey);
+	}
 
 	@Override
 	public Identifier getIdentifier() {
-		// TODO Auto-generated method stub
+		// TODO: Identifier generation
 		return null;
 	}
 
