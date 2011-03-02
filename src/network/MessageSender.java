@@ -17,10 +17,11 @@ public class MessageSender {
 	
 	public void sendData(URI destination, String data) {
 		channel.write(data, new InetSocketAddress(destination.getHost(), destination.getPort()));
+		System.out.println(System.currentTimeMillis() + " [S]: " + destination.toString() + ": " + data); //DEBUG, TODO: REMOVE
 	}
 	
 	public URI getLocalURI() {
-		InetSocketAddress addr = (InetSocketAddress) channel.getRemoteAddress();
+		InetSocketAddress addr = (InetSocketAddress) channel.getLocalAddress();
     	URI uri;
     	try {
 			uri = new URI(protocol + "://" + addr.getHostName() + ":" + addr.getPort());
