@@ -13,6 +13,8 @@ import rpc.RPCResponseListener;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
+import fileshare.messages.FileRequest;
+import fileshare.messages.FileResponse;
 import fileshare.messages.Request;
 import fileshare.messages.Response;
 import fileshare.messages.SharedDirectoryRequest;
@@ -82,4 +84,8 @@ public class FileShareManager {
 		this.sendRequestRPC(friend, request, response);
 	}
 
+	public void getFile(Friend friend, FileInfo file, ResponseListener<FileResponse> response) {
+		FileRequest request = new FileRequest(friend, file);
+		this.sendRequestRPC(friend, request, response);
+	}
 }
