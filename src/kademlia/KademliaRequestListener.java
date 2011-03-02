@@ -90,7 +90,8 @@ public class KademliaRequestListener implements ServiceRequestListener {
 			}
 		}
 		catch(Exception exception){
-			
+			System.out.println(exception.getClass());
+			System.out.println(exception.getStackTrace());
 		}
 	}
 
