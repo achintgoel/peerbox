@@ -5,8 +5,9 @@ import friendpeer.Friend;
 
 public class SharedDirectoryRequest extends Request{
 	protected Friend targetFriend;
+	protected String sharedRelativePath;
 
-	final protected String command = "get_shared";
+	final static public String command = "get_shared";
 	public SharedDirectoryRequest(Friend tagetFriend) {
 		this.targetFriend = tagetFriend;
 	}
@@ -19,6 +20,13 @@ public class SharedDirectoryRequest extends Request{
 
 	public String getCommand() {
 		return command;
+	}
+	
+	public String getSharedRelativePath() {
+		return sharedRelativePath;
+	}
+	public void setSharedRelativePath(String sharedRelativePath) {
+		this.sharedRelativePath = sharedRelativePath;
 	}
 	
 	
