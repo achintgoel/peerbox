@@ -59,7 +59,7 @@ public class RPCHandler {
 		public void onMessage(final IncomingMessage message) {
 			try {
 				final RPCMessage rpcMessage = gson.fromJson(message.getDataString(), RPCMessage.class);
-				if (rpcMessage.getVersion() != VERSION) {
+				if (!rpcMessage.getVersion().equals(VERSION)) {
 					// Unsupported Message Version
 					System.out.println("Unsupported Message Version");   
 				}

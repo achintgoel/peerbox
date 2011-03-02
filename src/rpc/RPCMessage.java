@@ -7,6 +7,10 @@ public class RPCMessage {
 	protected String request;
 	protected String response;
 	
+	protected RPCMessage() {
+		
+	}
+	
 	/**
 	 * 
 	 * @param version

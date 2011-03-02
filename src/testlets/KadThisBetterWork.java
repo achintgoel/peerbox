@@ -10,7 +10,7 @@ import rpc.RPCHandler;
 
 public class KadThisBetterWork {
 	public static void main(String[] args) {
-		int port = 7010;
+		int port = 7012;
 		LinkedList<NetworkInstance> networkInstances = new LinkedList<NetworkInstance>();
 		NetworkInstance instance = new NetworkInstance(RPCHandler.getUDPInstance(port++));
 		networkInstances.add(instance);

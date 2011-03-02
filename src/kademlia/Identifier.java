@@ -32,7 +32,7 @@ public class Identifier implements Identifiable {
 	}
 	
 	public static Identifier generateRandom() {
-		byte[] randomBytes = new byte[160];
+		byte[] randomBytes = new byte[20];
 		secureRandom.nextBytes(randomBytes);
 		return fromBytes(randomBytes);
 	}
