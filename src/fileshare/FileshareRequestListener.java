@@ -46,6 +46,7 @@ public class FileshareRequestListener implements ServiceRequestListener{
 			else if(command.equals(FileRequest.command)) {
 				FileRequest fnr = gson.fromJson(root, FileRequest.class);
 				String requestId = UUID.randomUUID().toString();
+				//TODO: generate URI to pass to client
 				response = new FileResponse(null, requestId);
 			}
 	}
