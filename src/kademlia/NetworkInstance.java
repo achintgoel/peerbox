@@ -82,10 +82,10 @@ public class NetworkInstance {
 			@Override
 			public void onResponseReceived(RPCEvent event) {
 				try {
-					Type responseType = ((ParameterizedType) new TypeToken<List<T>>(){}.getType()).getActualTypeArguments()[0];
+					Type responseType = ((ParameterizedType) new TypeToken<List<T>>(){}.getType()).getActualTypeArguments()[0]; //TODO: Type detection is broken
 					callback.onResponseReceived((T) gson.fromJson(event.getDataString(), responseType));
 				} catch (Exception e) {
-					//
+					e.printStackTrace();
 				}
 			}
 		});

@@ -32,7 +32,7 @@ public class Identifier implements Identifiable {
 	}
 	
 	public static Identifier fromBytes(byte[] bytes) {
-		return new Identifier(new BigInteger(bytes));
+		return new Identifier(new BigInteger(1, bytes));
 	}
 	
 	public static Identifier generateRandom() {

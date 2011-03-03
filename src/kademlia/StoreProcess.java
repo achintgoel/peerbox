@@ -5,12 +5,13 @@ import java.util.List;
 import kademlia.messages.StoreRequest;
 import kademlia.messages.StoreResponse;
 
+//TODO: must execute a FindNode to get the closest nodes prior to running store operation.
+
 /**
  * Storing a key value pair in the k closest nodes
  * 
  *
  */
-
 public class StoreProcess {
 	
 	protected final int threshhold;
@@ -23,7 +24,6 @@ public class StoreProcess {
 	
 	
 	/**
-	 * constructor 
 	 * threshhold - Number of Nodes store should be successful to return success
 	 * 				(half the number of recipients)
 	 * @param ni

@@ -19,6 +19,7 @@ Tuesday Night:
  - Come up with test cases for Kademlia (Vineet)
 
 Sometime:
+ - Fix Store Operation (does not execute FindNode first)
  - Timeouts in networking through RPC code
  - Expiration and Republication of DHT data (low priority)
  
