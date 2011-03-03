@@ -46,22 +46,22 @@ public class KademliaRequestListener implements ServiceRequestListener {
 			if(command.equals(FindNodeRequest.COMMAND)){
 				FindNodeRequest fnr = gson.fromJson(root, FindNodeRequest.class);
 				Node returnNode = ni.getBuckets().findNodeByIdentifier(fnr.getTargetIdentifier());
-				if(returnNode == null){
+				if(returnNode == null) {
 					response = new FindNodeResponse(ni.getBuckets().getNearestNodes(fnr.getTargetIdentifier(), ni.getConfiguration().getK()));
 				}
 				else{
-					response = new FindNodeResponse(returnNode);
+					response = new FindNodeResponse(returnNode, ni.getBuckets().getNearestNodes(fnr.getTargetIdentifier(), ni.getConfiguration().getK()));
 				}
 				request = fnr;
 			}
 			else if(command.equals(FindValueRequest.COMMAND)){
 				FindValueRequest fvr = gson.fromJson(root, FindValueRequest.class);
 				String returnValue = ni.getLocalDataStore().get(fvr.getKey());
-				if(returnValue == null){
+				if(returnValue == null) {
 					response = new FindValueResponse(ni.getBuckets().getNearestNodes(fvr.getTargetIdentifier(), ni.getConfiguration().getK()));
 				}
 				else{
-					response = new FindValueResponse(returnValue);
+					response = new FindValueResponse(returnValue, ni.getBuckets().getNearestNodes(fvr.getTargetIdentifier(), ni.getConfiguration().getK()));
 				}
 				request = fvr;
 			}

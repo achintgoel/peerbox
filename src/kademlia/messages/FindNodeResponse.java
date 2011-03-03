@@ -13,10 +13,10 @@ public class FindNodeResponse extends FindResponse {
 		this.nearbyNodes = nearestNodes;
 	}
 
-	public FindNodeResponse(Node returnNode) {
+	public FindNodeResponse(Node returnNode, List<Node> nearestNodes) {
 		this.found = true;
 		this.foundNode = returnNode;
-		this.nearbyNodes = null;
+		this.nearbyNodes = nearestNodes;
 	}
 
 

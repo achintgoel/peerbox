@@ -13,10 +13,10 @@ public class FindValueResponse extends FindResponse {
 		this.nearbyNodes = nearestNodes;
 	}
 	
-	public FindValueResponse(String foundValue) {
+	public FindValueResponse(String foundValue, List<Node> nearestNodes) {
 		this.foundValue = foundValue;
 		this.found = true;
-		this.nearbyNodes = null;
+		this.nearbyNodes = nearestNodes;
 	}
 	
 	public String getFoundValue() {
