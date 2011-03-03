@@ -9,8 +9,11 @@ public abstract class FindResponse extends Response {
 	protected List<Node> nearbyNodes;
 	
 	public List<Node> getNearbyNodes() {
-		return nearbyNodes;
-		
+		return nearbyNodes;		
+	}
+	
+	public void setNearbyNodes(List<Node> nearestNodes){
+		nearbyNodes = nearestNodes;
 	}
 	
 	public boolean isFound() {
