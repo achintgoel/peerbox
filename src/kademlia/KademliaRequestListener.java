@@ -50,7 +50,7 @@ public class KademliaRequestListener implements ServiceRequestListener {
 					response = new FindNodeResponse(ni.getBuckets().getNearestNodes(fnr.getTargetIdentifier(), ni.getConfiguration().getK()));
 				}
 				else{
-					response = new FindNodeResponse(returnNode);
+					response = new FindNodeResponse(returnNode, ni.getBuckets().getNearestNodes(fnr.getTargetIdentifier(), ni.getConfiguration().getK()));
 				}
 				request = fnr;
 			}
@@ -61,7 +61,7 @@ public class KademliaRequestListener implements ServiceRequestListener {
 					response = new FindValueResponse(ni.getBuckets().getNearestNodes(fvr.getTargetIdentifier(), ni.getConfiguration().getK()));
 				}
 				else{
-					response = new FindValueResponse(returnValue);
+					response = new FindValueResponse(returnValue, ni.getBuckets().getNearestNodes(fvr.getTargetIdentifier(), ni.getConfiguration().getK()));
 				}
 				request = fvr;
 			}
