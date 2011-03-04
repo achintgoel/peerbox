@@ -3,24 +3,20 @@ package fileshare.messages;
 import java.net.URI;
 
 public class FileResponse extends Response{
-	protected URI fileLocURI;
-	protected String requestID;
-	public FileResponse(URI fileLocURI, String requestID) {
+	protected URI fileReqURI;
+	public FileResponse(URI fileLocURI) {
 		super();
-		this.fileLocURI = fileLocURI;
-		this.requestID = requestID;
+		this.fileReqURI = fileLocURI;
+
+	}
+	protected FileResponse() {
+		
 	}
 	public URI getFileLocURI() {
-		return fileLocURI;
+		return fileReqURI;
 	}
 	public void setFileLocURI(URI fileLocURI) {
-		this.fileLocURI = fileLocURI;
-	}
-	public String getRequestID() {
-		return requestID;
-	}
-	public void setRequestID(String requestID) {
-		this.requestID = requestID;
+		this.fileReqURI = fileLocURI;
 	}
 	
 

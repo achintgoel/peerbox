@@ -1,6 +1,8 @@
 package fileshare;
 
+ 
 
+import java.util.Calendar;
 import java.util.UUID;
 
 import rpc.RPCEvent;
@@ -31,8 +33,8 @@ public class FileshareRequestListener implements ServiceRequestListener{
 			final JsonObject root = (JsonObject) parser.parse(e.getDataString());
 			String command = root.get("command").getAsString();
 			//Request request;
-			Response response;
-			if(command.equals(SharedDirectoryRequest.command)){
+			Response response = null;
+			if(command.equals(SharedDirectoryRequest.COMMAND)){
 				SharedDirectoryRequest fnr = gson.fromJson(root, SharedDirectoryRequest.class);
 				FileInfo[] contents = manager.getSharedContents(fnr.getSharedRelativePath());
 				if(contents == null){
@@ -49,7 +51,13 @@ public class FileshareRequestListener implements ServiceRequestListener{
 				//TODO: generate URI to pass to client
 				//TODO: figure out how to determine local IP address
 				//URI uri = new URI("http://")
-				response = new FileResponse(null, requestId);
+				//TODO: set the expiration date properly
+				manager.setRequestIDtoFileRequest(fnr.getRelativePath(), requestId, fnr.getFile().getName(), Calendar.getInstance().getTime(), fnr.fromFriend.getNetworkAddress());
+				response = new FileResponse(null);
+			}
+			if(response != null){
+				String responseString = gson.toJson(response);
+				e.respond(responseString);
 			}
 	}
 		

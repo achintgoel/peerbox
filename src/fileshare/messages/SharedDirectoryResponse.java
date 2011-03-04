@@ -10,6 +10,9 @@ public class SharedDirectoryResponse extends Response{
 		super();
 		this.contents = contents;
 	}
+	protected SharedDirectoryResponse() {
+		
+	}
 
 	public FileInfo[] getContents() {
 		return contents;
