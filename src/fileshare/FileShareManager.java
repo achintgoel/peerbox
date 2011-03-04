@@ -95,5 +95,6 @@ public class FileShareManager {
 	}
 	public String getFilePath(URI uri) {
 		//TODO: see if the Date is expired or not, and if not, return the path to the file
+		return null;
 	}
 }
