@@ -9,6 +9,9 @@ public class FileResponse extends Response{
 		this.fileReqURI = fileLocURI;
 
 	}
+	protected FileResponse() {
+		
+	}
 	public URI getFileLocURI() {
 		return fileReqURI;
 	}

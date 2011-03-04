@@ -16,6 +16,9 @@ public class FileRequest extends Request{
 		this.targetFriend = targetFriend;
 		this.file = file;
 	}
+	protected FileRequest() {
+		
+	}
 	
 	public FileInfo getFile() {
 		return file;

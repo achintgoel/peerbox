@@ -41,7 +41,13 @@ public class FileShareManager {
 	
 	//TODO: handle OS specific slashes
 	public FileInfo[] getSharedContents(String relativePath) {
-		File requestDir = new File(mySharedDirectory.getAbsolutePath().concat(relativePath));
+		File requestDir = null;
+		if(!relativePath.isEmpty()) {
+			requestDir = new File(mySharedDirectory.getAbsolutePath().concat(relativePath));
+		}
+		else {
+			requestDir = new File(mySharedDirectory.getAbsolutePath());
+		}
 		try {
 			if(requestDir.getCanonicalPath().startsWith(mySharedDirectory.getAbsolutePath())) {
 				FileFilter f = null;
@@ -122,4 +128,5 @@ public class FileShareManager {
 		return null;
 
 	}
+	
 }

@@ -11,6 +11,9 @@ public class FileInfo {
 		this.type = type;
 		this.size = size;
 	}
+	protected FileInfo() {
+		
+	}
 
 	public String getName() {
 		return name;

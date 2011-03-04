@@ -5,8 +5,10 @@ import friendpeer.Friend;
 
 public abstract class Request extends Message{
 	public Friend fromFriend;
-	
-	public abstract String getCommand();
+	protected String command;
+	public String getCommand() {
+		return command;
+	}
 
 	public Friend getFromFriend() {
 		return fromFriend;
