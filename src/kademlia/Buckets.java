@@ -98,6 +98,11 @@ public class Buckets implements NodeStatusListener {
 		System.out.println(obj.getIdentifier().getIntegerValue());
 		System.out.println("DISTANCE: " + Math.floor(Math.log(Identifier.calculateDistance(
 				networkInstance.getLocalNodeIdentifier(), obj).doubleValue())/Math.log(2)));
+		
+		if (obj.equals(networkInstance.getLocalNodeIdentifier())) {
+			return 0;
+		}
+		
 		return (int) Math.floor(Math.log(Identifier.calculateDistance(
 				networkInstance.getLocalNodeIdentifier(), obj).doubleValue())/Math.log(2));
 	}
@@ -117,6 +122,10 @@ public class Buckets implements NodeStatusListener {
 	 * @param newNode
 	 */
 	public void add(final Node newNode) {
+		if (newNode.getIdentifier().equals(networkInstance.getLocalNodeIdentifier())) {
+			return;
+		}
+		
 		int bucketNumber = calculateBucketNumber(newNode.getIdentifier());
 		final LinkedHashMap<Identifier, Node> currentBucket = buckets.get(bucketNumber);
 		if(currentBucket.containsKey(newNode.getIdentifier())){

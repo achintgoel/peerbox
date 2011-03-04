@@ -40,4 +40,24 @@ public class Identifier implements Identifiable {
 		secureRandom.nextBytes(randomBytes);
 		return fromBytes(randomBytes);
 	}
+	
+	@Override
+	public boolean equals(Object o) {
+		if (o == this) {
+			return true;
+		}
+		
+		if (!(o instanceof Identifier)) {
+			return false;
+		}
+		
+		Identifier id = (Identifier) o;
+		
+		return value.equals(id.value);
+	}
+	
+	@Override
+	public int hashCode() {
+		return value.hashCode();
+	}
 }
