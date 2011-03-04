@@ -51,4 +51,9 @@ public class Node implements Identifiable{
 		
 		return nodeID.equals(n.nodeID);
 	}
+	
+	@Override
+	public int hashCode() {
+		return nodeID.hashCode();
+	}
 }
