@@ -7,17 +7,18 @@ import java.util.Date;
 public class Node implements Identifiable{
 	protected Identifier nodeID;
 	protected URI uri;
-	protected Date lastSeen;
-	protected NetworkInstance networkInstance;
+	protected transient Date lastSeen;
 	
-	public Node(NetworkInstance networkInstance, URI uri, Identifier nodeID) {
-		this.networkInstance = networkInstance;
+	protected Node() {
+		
+	}
+	
+	public Node(URI uri, Identifier nodeID) {
 		this.uri = uri;
 		this.nodeID = nodeID;
 	}
 	
-	public Node(NetworkInstance networkInstance, URI uri){
-		this.networkInstance = networkInstance;
+	public Node(URI uri){
 		this.uri = uri;
 		this.nodeID = null;
 	}
