@@ -25,10 +25,11 @@ public class FindProcess<FRT extends FindResponse> {
 	protected final NetworkInstance networkInstance;
 	protected final ResponseListener<FRT> callback;
 	protected final TreeSet<Node> unsearchedNodes;
+	protected final Class<FRT> responseClass;
 	protected FRT lastResponse;
 	
 	
-	private FindProcess(NetworkInstance ni, FindRequest request, ResponseListener<FRT> responseListener){
+	private FindProcess(NetworkInstance ni, FindRequest request, Class<FRT> responseClass, ResponseListener<FRT> responseListener){
 		networkInstance = ni;
 		maxRequests = networkInstance.getConfiguration().getAlpha() * networkInstance.getConfiguration().getAlpha();
 		nearestSetSize = networkInstance.getConfiguration().getK() * 2;
@@ -38,6 +39,7 @@ public class FindProcess<FRT extends FindResponse> {
 		nearestSet.addAll(networkInstance.getBuckets().getNearestNodes(findRequest.getTargetIdentifier(), networkInstance.getConfiguration().getAlpha()));
 		current = new HashSet<Node>();
 		callback = responseListener;
+		this.responseClass = responseClass;
 		unsearchedNodes = (TreeSet) nearestSet.clone();
 		lastResponse = null;
 	}
@@ -50,8 +52,8 @@ public class FindProcess<FRT extends FindResponse> {
 	 * @param request the request to be sent
 	 * @param responseListener callback
 	 */
-	public static <T extends FindResponse> void execute(NetworkInstance ni, FindRequest request, ResponseListener<T> responseListener){
-		FindProcess<T> sh = new FindProcess<T>(ni, request, responseListener);
+	public static <T extends FindResponse> void execute(NetworkInstance ni, FindRequest request, Class<T> responseClass, ResponseListener<T> responseListener){
+		FindProcess<T> sh = new FindProcess<T>(ni, request, responseClass, responseListener);
 		sh.computeUnsearchedNodes();
 		sh.nextIteration();
 	}
@@ -69,7 +71,7 @@ public class FindProcess<FRT extends FindResponse> {
 			final Node nextRequestDestination = unsearchedNodes.first();
 		  	prevQueried.add(nextRequestDestination);
 		  	current.add(nextRequestDestination);
-			networkInstance.sendRequestRPC(nextRequestDestination, findRequest, new ResponseListener<FRT>(){
+			networkInstance.sendRequestRPC(nextRequestDestination, findRequest, responseClass, new ResponseListener<FRT>(){
 		    	// event that a message was received
 		    	public void onResponseReceived(FRT response) {
 		    		// if the reply contains the target then trigger identifier found

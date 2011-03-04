@@ -7,6 +7,10 @@ import kademlia.Node;
 public class FindNodeResponse extends FindResponse {
 	protected Node foundNode;
 	
+	protected FindNodeResponse() {
+		
+	}
+	
 	public FindNodeResponse(List<Node> nearestNodes) {
 		this.foundNode = null;
 		this.found = false;

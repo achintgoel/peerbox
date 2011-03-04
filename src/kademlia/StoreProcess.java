@@ -55,7 +55,7 @@ public class StoreProcess {
 	
 	private void performStore(){
 		for(Node node : recipients){
-			networkInstance.sendRequestRPC(node, request, new ResponseListener<StoreResponse>(){
+			networkInstance.sendRequestRPC(node, request, StoreResponse.class, new ResponseListener<StoreResponse>(){
 
 				@Override
 				public void onFailure() {

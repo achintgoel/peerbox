@@ -13,7 +13,7 @@ import kademlia.messages.Response;
 
 /**
  * 
- * Object that holds the k-bucket(DHT) for the known nodes in kademlia
+ * Object that holds the k-buckets routing table for the known nodes in Kademlia network
  *
  */
 public class Buckets implements NodeStatusListener {
@@ -25,7 +25,6 @@ public class Buckets implements NodeStatusListener {
 	/**
 	 * Constructor
 	 * @param instance
-	 * 
 	 */
 	public Buckets(NetworkInstance instance) {
 		networkInstance = instance;
@@ -38,14 +37,14 @@ public class Buckets implements NodeStatusListener {
 	}
 	
 	/**
-	 * function called when a node is found to be down 
+	 * Should be called when a node is detected to be offline
 	 */
 	public void onNodeDown(Node node) {
 		buckets.get(calculateBucketNumber(node)).remove(node);
 	}
 	
 	/**
-	 * function called when a node is found to be alive
+	 * Called when a node is found online
 	 */
 	public void onNodeAlive(Node node) {
 		add(node); 
@@ -53,7 +52,7 @@ public class Buckets implements NodeStatusListener {
 	
 	
 	/**
-	 * Function to find the closest nodes to the given node
+	 * Find the closest nodes in buckets routing table to the given node
 	 * @param id ID of the target node
 	 * @param numberOfNodes number of results to return
 	 * @return List<Node>
@@ -81,7 +80,7 @@ public class Buckets implements NodeStatusListener {
 	}
 	
 	/**
-	 * find the number of nodes in a given bucket
+	 * Return the number of nodes in a given bucket
 	 * @param bucket
 	 * @return
 	 */
@@ -90,7 +89,7 @@ public class Buckets implements NodeStatusListener {
 	}
 	
 	/**
-	 * To calculate the bucket number a certain Node will fall in
+	 * To calculate the bucket number a Node or other identifiable object will fall in
 	 * @param obj
 	 * @return
 	 */
@@ -102,7 +101,7 @@ public class Buckets implements NodeStatusListener {
 	}
 	
 	/**
-	 * to add a collection of nodes to the DHT
+	 * to add a collection of nodes to the buckets routing table
 	 * @param nodes Collection of Nodes
 	 */
 	public void addAll(Collection<Node> nodes) {
@@ -112,7 +111,7 @@ public class Buckets implements NodeStatusListener {
 	}
 
 	/**
-	 * To add a single Node to the DHT
+	 * To add a single Node to the buckets routing table
 	 * @param newNode
 	 */
 	public void add(final Node newNode) {
