@@ -7,17 +7,18 @@ import java.util.Date;
 public class Node implements Identifiable{
 	protected Identifier nodeID;
 	protected URI uri;
-	protected Date lastSeen;
-	protected NetworkInstance networkInstance;
+	protected transient Date lastSeen;
 	
-	public Node(NetworkInstance networkInstance, URI uri, Identifier nodeID) {
-		this.networkInstance = networkInstance;
+	protected Node() {
+		
+	}
+	
+	public Node(URI uri, Identifier nodeID) {
 		this.uri = uri;
 		this.nodeID = nodeID;
 	}
 	
-	public Node(NetworkInstance networkInstance, URI uri){
-		this.networkInstance = networkInstance;
+	public Node(URI uri){
 		this.uri = uri;
 		this.nodeID = null;
 	}
@@ -38,7 +39,22 @@ public class Node implements Identifiable{
 		lastSeen = new Date();
 	}
 	
-	public void ping(PingReplyReceiver pingReceiver) {
+	public boolean equals(Object o) {
+		if (o == this) {
+			return true;
+		}
 		
+		if (!(o instanceof Node)) {
+			return false;
+		}
+		
+		Node n = (Node) o;
+		
+		return nodeID.equals(n.nodeID);
+	}
+	
+	@Override
+	public int hashCode() {
+		return nodeID.hashCode();
 	}
 }

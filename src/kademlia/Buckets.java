@@ -66,7 +66,7 @@ public class Buckets implements NodeStatusListener {
 		
 		int left = bucketNumber - 1;
 		int right = bucketNumber + 1;
-		while (nearSet.size() < numberOfNodes) {
+		while (nearSet.size() < numberOfNodes && (left >= 0 || right < buckets.size())) {
 			if (left >= 0) {
 				nearSet.addAll(buckets.get(left--).values());
 			}
@@ -93,12 +93,7 @@ public class Buckets implements NodeStatusListener {
 	 * @param obj
 	 * @return
 	 */
-	public int calculateBucketNumber(Identifiable obj) {
-		System.out.println(networkInstance.getLocalNodeIdentifier().getIntegerValue());
-		System.out.println(obj.getIdentifier().getIntegerValue());
-		System.out.println("DISTANCE: " + Math.floor(Math.log(Identifier.calculateDistance(
-				networkInstance.getLocalNodeIdentifier(), obj).doubleValue())/Math.log(2)));
-		
+	public int calculateBucketNumber(Identifiable obj) {		
 		if (obj.equals(networkInstance.getLocalNodeIdentifier())) {
 			return 0;
 		}

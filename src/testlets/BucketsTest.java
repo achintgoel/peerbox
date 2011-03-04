@@ -55,7 +55,7 @@ public class BucketsTest {
 			BigInteger id = new BigInteger(populate);
 			id = id.flipBit(i);
 			populate = id.toByteArray();
-			nodePerBucket.add(new Node(dni, null, Identifier.fromBytes(populate)));
+			nodePerBucket.add(new Node(null, Identifier.fromBytes(populate)));
 		}
 		for(int i = 0; i < 40; i++){
 			byte[] populate = new byte[20];
@@ -63,7 +63,7 @@ public class BucketsTest {
 			id = id.flipBit(i);
 			System.out.println(id);
 			populate = id.toByteArray();
-			nodesInLastBucket.add(new Node(dni, null, Identifier.fromBytes(populate)));			
+			nodesInLastBucket.add(new Node(null, Identifier.fromBytes(populate)));			
 		}
 	}
 

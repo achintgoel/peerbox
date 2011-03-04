@@ -47,7 +47,7 @@ public class BootstrapProcess {
 	private void pingFriends(){
 		for(final URI uri : friends){
 			System.out.println("pinging!");
-			Node node = new Node(ni, uri);
+			Node node = new Node(uri);
 			ni.ping(node, new ResponseListener<PingResponse>() {
 				@Override
 				public void onFailure() {
@@ -62,13 +62,17 @@ public class BootstrapProcess {
 				public void onResponseReceived(PingResponse response) {
 					successes++;
 					Identifier friendId = response.getMyNodeId();
-					Node newNode = new Node(ni, uri, friendId);
+					Node newNode = new Node(uri, friendId);
 					ni.getBuckets().add(newNode);
 					if(successes == 1){
 						System.out.println("bootstrap success");
 						ni.findNode(ni.getLocalNodeIdentifier(), new ResponseListener<FindNodeResponse>(){
-							public void onFailure() {}
-							public void onResponseReceived(FindNodeResponse response) {}
+							public void onFailure() {
+								System.out.println("bootstrap findnode failed");
+							}
+							public void onResponseReceived(FindNodeResponse response) {
+								System.out.println("bootstrap findnode succeeded");
+							}
 						});
 						callback.onBootstrapSuccess();
 					}
