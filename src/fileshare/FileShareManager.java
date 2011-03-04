@@ -5,6 +5,8 @@ package fileshare;
 import java.io.File;
 import java.io.FileFilter;
 import java.io.IOException;
+import java.net.URI;
+import java.util.Date;
 
 import rpc.RPCEvent;
 import rpc.RPCHandler;
@@ -87,5 +89,12 @@ public class FileShareManager {
 	public void getFile(Friend friend, FileInfo file, ResponseListener<FileResponse> response) {
 		FileRequest request = new FileRequest(friend, file);
 		this.sendRequestRPC(friend, request, response);
+	}
+	public void setRequestIDtoFilePath(String requestID, String filename, Date expiration) {
+		
+	}
+	public String getFilePath(URI uri) {
+		//TODO: see if the Date is expired or not, and if not, return the path to the file
+		return null;
 	}
 }

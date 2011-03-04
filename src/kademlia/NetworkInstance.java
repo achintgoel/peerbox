@@ -1,10 +1,9 @@
 package kademlia;
 
 import java.io.Serializable;
-import java.lang.reflect.ParameterizedType;
-import java.lang.reflect.Type;
 import java.net.URI;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
@@ -21,10 +20,8 @@ import kademlia.messages.StoreResponse;
 import rpc.RPCEvent;
 import rpc.RPCHandler;
 import rpc.RPCResponseListener;
-import rpc.ServiceRequestListener;
 
 import com.google.gson.Gson;
-import com.google.gson.reflect.TypeToken;
 
 import dht.DistributedMap;
 import dht.LocalDataStore;
@@ -87,15 +84,12 @@ public class NetworkInstance {
 		return null;
 	}
 	
-	protected <T extends Response> void sendRequestRPC(Node destination, Request request, final ResponseListener<T> callback) {
+	protected <T extends Response> void sendRequestRPC(Node destination, Request request, final Class<T> responseClass, final ResponseListener<T> callback) {
 		String requestData = gson.toJson(request);
 		getRPC().sendRequest(destination.getNetworkURI(), rpcServiceName, requestData, new RPCResponseListener() {
-			@SuppressWarnings("unchecked")
-			@Override
 			public void onResponseReceived(RPCEvent event) {
 				try {
-					Type responseType = ((ParameterizedType) new TypeToken<List<T>>(){}.getType()).getActualTypeArguments()[0]; //TODO: Type detection is broken
-					callback.onResponseReceived((T) gson.fromJson(event.getDataString(), responseType));
+					callback.onResponseReceived(gson.fromJson(event.getDataString(), responseClass));
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
@@ -113,15 +107,22 @@ public class NetworkInstance {
 	
 	public void findNode(Identifier targetNodeId, ResponseListener<FindNodeResponse> responseListener) {
 		FindNodeRequest request = new FindNodeRequest(getLocalNodeIdentifier(), targetNodeId);
-		FindProcess.execute(this, request, responseListener);
+		FindProcess.execute(this, request, FindNodeResponse.class, responseListener);
 	}
 	
 	public void findValue(Key targetKey, ResponseListener<FindValueResponse> responseListener) {
+		String value = getLocalDataStore().get(targetKey);
+		if (value != null) {
+			responseListener.onResponseReceived(new FindValueResponse(value, new LinkedList<Node>()));
+			//NOTE: should we include nearby nodes since we have the value locally?
+		}
+		
 		FindValueRequest request = new FindValueRequest(getLocalNodeIdentifier(), targetKey);
-		FindProcess.execute(this, request, responseListener);
+		FindProcess.execute(this, request, FindValueResponse.class, responseListener);
 	}
 	
 	public void storeValue(Key key, String value, ResponseListener<StoreResponse> responseListener, boolean publish) {
+		getLocalDataStore().put(key, value);
 		StoreRequest request = new StoreRequest(getLocalNodeIdentifier(), key, value);
 		StoreProcess.execute(this, request, responseListener);
 	}
@@ -129,7 +130,7 @@ public class NetworkInstance {
 	//Maybe put in Node
 	public void ping(Node targetNode, ResponseListener<PingResponse> responseListener) {
 		PingRequest request = new PingRequest(getLocalNodeIdentifier(), targetNode.getIdentifier());
-		this.sendRequestRPC(targetNode, request, responseListener);
+		this.sendRequestRPC(targetNode, request, PingResponse.class, responseListener);
 	}
 	
 	public void bootstrap(List<URI> friends, BootstrapListener bootstrapListener) {
