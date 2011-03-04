@@ -93,7 +93,8 @@ public class RPCHandler {
 					}
 				} else if (rpcMessage.getResponse() != null) {
 					RPCWaitingRequest waitingRequest = waitingRequests.get(rpcMessage.getId());
-					if (waitingRequest != null && waitingRequest.getRequestRecipient().equals(message.getSenderURI()) && waitingRequest.getRequestMessage().getService().equals(rpcMessage.getService())) {
+					// && waitingRequest.getRequestRecipient().equals(message.getSenderURI())
+					if (waitingRequest != null && waitingRequest.getRequestMessage().getService().equals(rpcMessage.getService())) {
 						waitingRequests.remove(rpcMessage.getId());
 						waitingRequest.getResponseListener().onResponseReceived(new RPCEvent() {
 							@Override
@@ -117,11 +118,15 @@ public class RPCHandler {
 							}
 						});
 					}
+					else{
+						System.out.println("No matching request found for the received response");
+					}
 				}
 			} catch (JsonParseException e) {
+				e.printStackTrace();
 				
 			} catch (ClassCastException e) {
-				
+				e.printStackTrace();
 			}
 			
 		}
