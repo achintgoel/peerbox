@@ -1,4 +1,4 @@
-package network;
+package network.http;
 import static org.jboss.netty.channel.Channels.*;
 import org.jboss.netty.channel.ChannelPipeline;
 import org.jboss.netty.channel.ChannelPipelineFactory;

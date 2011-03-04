@@ -2,6 +2,7 @@ package kademlia;
 
 import java.util.List;
 
+import kademlia.messages.FindNodeResponse;
 import kademlia.messages.StoreRequest;
 import kademlia.messages.StoreResponse;
 
@@ -18,7 +19,7 @@ public class StoreProcess {
 	protected final NetworkInstance networkInstance;
 	protected final StoreRequest request;
 	protected final ResponseListener<StoreResponse> callback;
-	protected final List<Node> recipients;
+	protected List<Node> recipients;
 	protected int successes;
 	protected int failures;
 	
@@ -34,7 +35,7 @@ public class StoreProcess {
 		this.networkInstance = ni;
 		this.request = request;
 		this.callback = responseListener;
-		this.recipients = networkInstance.getBuckets().getNearestNodes(request.getKey().getIdentifier(), networkInstance.getConfiguration().getK());
+		this.recipients = null;
 		this.threshhold = recipients.size()/2;
 		this.successes = 0;
 		this.failures = 0;
@@ -50,7 +51,22 @@ public class StoreProcess {
 	
 	public static void execute(NetworkInstance ni, StoreRequest request, ResponseListener<StoreResponse> responseListener){
 		StoreProcess sp = new StoreProcess(ni, request, responseListener);
-		sp.performStore();
+		sp.performSearch();
+	}
+	
+	private void performSearch(){
+		networkInstance.findNode(request.getKey().getIdentifier(), new ResponseListener<FindNodeResponse>(){
+			@Override
+			public void onFailure() {
+				callback.onFailure();				
+			}
+
+			public void onResponseReceived(FindNodeResponse response) {
+				recipients = response.getNearbyNodes();
+				performStore();
+			}
+			
+		});
 	}
 	
 	private void performStore(){
@@ -69,7 +85,7 @@ public class StoreProcess {
 					makeCallback();
 				}
 				
-				public void makeCallback(){
+				private void makeCallback(){
 					if(successes + failures == recipients.size()){
 						if(successes >= threshhold){
 							callback.onResponseReceived(new StoreResponse(true));
