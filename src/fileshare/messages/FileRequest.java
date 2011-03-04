@@ -6,10 +6,13 @@ import friendpeer.Friend;
 public class FileRequest extends Request{
 	protected Friend targetFriend;
 	protected FileInfo file;
+	protected String relativePath;
+	
 	final static public String command = "get_file";
 	
-	public FileRequest(Friend targetFriend, FileInfo file) {
+	public FileRequest(Friend targetFriend, FileInfo file, String relativePath) {
 		super();
+		this.relativePath = relativePath;
 		this.targetFriend = targetFriend;
 		this.file = file;
 	}
@@ -26,5 +29,14 @@ public class FileRequest extends Request{
 		// TODO Auto-generated method stub
 		return command;
 	}
+	
+	public String getRelativePath() {
+		return relativePath;
+	}
+
+	public void setRelativePath(String relativePath) {
+		this.relativePath = relativePath;
+	}
+
 
 }

@@ -1,6 +1,8 @@
 package fileshare;
 
+ 
 
+import java.util.Calendar;
 import java.util.UUID;
 
 import rpc.RPCEvent;
@@ -49,7 +51,9 @@ public class FileshareRequestListener implements ServiceRequestListener{
 				//TODO: generate URI to pass to client
 				//TODO: figure out how to determine local IP address
 				//URI uri = new URI("http://")
-				response = new FileResponse(null, requestId);
+				//TODO: set the expiration date properly
+				manager.setRequestIDtoFileRequest(fnr.getRelativePath(), requestId, fnr.getFile().getName(), Calendar.getInstance().getTime(), fnr.fromFriend.getNetworkAddress());
+				response = new FileResponse(null);
 			}
 	}
 		

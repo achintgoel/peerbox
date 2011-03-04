@@ -8,8 +8,9 @@ public class SharedDirectoryRequest extends Request{
 	protected String sharedRelativePath;
 
 	final static public String command = "get_shared";
-	public SharedDirectoryRequest(Friend tagetFriend) {
+	public SharedDirectoryRequest(Friend tagetFriend, String relativePath) {
 		this.targetFriend = tagetFriend;
+		this.sharedRelativePath = relativePath;
 	}
 	public Friend getTargetFriend() {
 		return targetFriend;
