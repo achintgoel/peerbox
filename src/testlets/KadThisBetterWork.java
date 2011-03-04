@@ -8,23 +8,33 @@ import kademlia.BootstrapListener;
 import kademlia.NetworkInstance;
 import rpc.RPCHandler;
 
-public class KadThisBetterWork {
+public class KadThisBetterWork implements Runnable {
+	static int port;
+	static boolean first;
+	
 	public static void main(String[] args) {
-		int port = 7012;
-		LinkedList<NetworkInstance> networkInstances = new LinkedList<NetworkInstance>();
-		NetworkInstance instance = new NetworkInstance(RPCHandler.getUDPInstance(port++));
-		networkInstances.add(instance);
-		System.out.println("First node created");
+		port = 7012;
+		first = true;
 		
-		try {
-			Thread.sleep(400);
-		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+		
+		
+		for (int i = 0; i < 20; i++) {
+			try {
+				Thread.sleep(550);
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			new Thread(new KadThisBetterWork()).run();
 		}
 		
-		for (int i = 0; i < 1; i++) {
-			instance = new NetworkInstance(RPCHandler.getUDPInstance(port++));
+	}
+
+	@Override
+	public void run() {
+		// TODO Auto-generated method stub
+		NetworkInstance instance = new NetworkInstance(RPCHandler.getUDPInstance(port++));
+		if (!first) {
 			LinkedList<URI> startURIs = new LinkedList<URI>();
 			try {
 				startURIs.add(new URI("udp://localhost:" + (port - 2)));
@@ -34,13 +44,13 @@ public class KadThisBetterWork {
 			}
 			System.out.println("Second node created");
 			instance.bootstrap(startURIs, new BootstrapListener() {
-
+	
 				@Override
 				public void onBootstrapSuccess() {
 					System.out.println("Second Node Bootstrap Complete");
 					
 				}
-
+	
 				@Override
 				public void onBootstrapFailure() {
 					System.out.println("Second Node Bootstrap Failed");
@@ -48,8 +58,8 @@ public class KadThisBetterWork {
 				}
 				
 			});
-			networkInstances.add(instance);
+		} else {
+			first = false;
 		}
-		
 	}
 }

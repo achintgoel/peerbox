@@ -55,7 +55,7 @@ public class StoreProcess {
 	}
 	
 	private void performSearch(){
-		networkInstance.findNode(request.getKey().getIdentifier(), new ResponseListener<FindNodeResponse>(){
+		networkInstance.findNode(request.getKey().getIdentifier(), false, new ResponseListener<FindNodeResponse>(){
 			@Override
 			public void onFailure() {
 				callback.onFailure();				

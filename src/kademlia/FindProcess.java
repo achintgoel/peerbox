@@ -27,10 +27,12 @@ public class FindProcess<FRT extends FindResponse> {
 	protected TreeSet<Node> unsearchedNodes;
 	protected final Class<FRT> responseClass;
 	protected FRT lastResponse;
-	protected boolean found;
+	protected FRT foundResponse;
+	protected final boolean stopOnFound;
+	protected boolean done;
 	
 	
-	private FindProcess(NetworkInstance ni, FindRequest request, Class<FRT> responseClass, ResponseListener<FRT> responseListener){
+	private FindProcess(NetworkInstance ni, FindRequest request, boolean stopOnFound, Class<FRT> responseClass, ResponseListener<FRT> responseListener){
 		networkInstance = ni;
 		maxRequests = networkInstance.getConfiguration().getAlpha() * networkInstance.getConfiguration().getAlpha();
 		nearestSetSize = networkInstance.getConfiguration().getK() * 2;
@@ -38,16 +40,14 @@ public class FindProcess<FRT extends FindResponse> {
 		prevQueried = new HashSet<Node>();
 		nearestSet = new TreeSet<Node>(new IdentifiableDistanceComparator(findRequest.getTargetIdentifier()));
 		nearestSet.addAll(networkInstance.getBuckets().getNearestNodes(findRequest.getTargetIdentifier(), networkInstance.getConfiguration().getAlpha()));
-		System.out.println("NearestSet:");
-		for(Node node: nearestSet){
-			System.out.println("FindProcess : " + node.getIdentifier().getIntegerValue());
-		}
 		current = new HashSet<Node>();
 		callback = responseListener;
 		this.responseClass = responseClass;
 		unsearchedNodes = (TreeSet) nearestSet.clone();
+		this.stopOnFound = stopOnFound;
 		lastResponse = null;
-		found = false;
+		foundResponse = null;
+		done = false;
 	}
 	
 	/**
@@ -58,8 +58,8 @@ public class FindProcess<FRT extends FindResponse> {
 	 * @param request the request to be sent
 	 * @param responseListener callback
 	 */
-	public static <T extends FindResponse> void execute(NetworkInstance ni, FindRequest request, Class<T> responseClass, ResponseListener<T> responseListener){
-		FindProcess<T> sh = new FindProcess<T>(ni, request, responseClass, responseListener);
+	public static <T extends FindResponse> void execute(NetworkInstance ni, FindRequest request, boolean stopOnFound, Class<T> responseClass, ResponseListener<T> responseListener){
+		FindProcess<T> sh = new FindProcess<T>(ni, request, stopOnFound, responseClass, responseListener);
 		sh.computeUnsearchedNodes();
 		sh.nextIteration();
 	}
@@ -82,8 +82,14 @@ public class FindProcess<FRT extends FindResponse> {
 		    	public void onResponseReceived(FRT response) {
 		    		// if the reply contains the target then trigger identifier found
 		          	if(response.isFound()){
-		          		found = true;
-		          	    callback.onResponseReceived(response);
+		          		if(stopOnFound){
+		          			done = true;
+		          			callback.onResponseReceived(response);
+		          		}
+		          		else{
+		          			foundResponse = response;
+		          			attemptDone();
+		          		}
 		          	}
 		          	// otherwise add the nodes to the nearestSet and to the k-buckets 
 		          	else{
@@ -91,26 +97,27 @@ public class FindProcess<FRT extends FindResponse> {
 		    			networkInstance.getBuckets().addAll(response.getNearbyNodes());
 		          		current.remove(nextRequestDestination);
 						lastResponse = response;
-		          		attemptDone(response);
+						attemptDone();
 		          	}
 		      	}		    	
 		    	
 		    	// event that the message timed out
 		      	public void onFailure(){
 		      		current.remove(nextRequestDestination);
-		      		attemptDone(lastResponse);
+		      		attemptDone();
 		      	}
 		    });
 			computeUnsearchedNodes();
 		}
 	}
 	
-	private void attemptDone(FRT response){
-		if(!found){
+	private void attemptDone() {
+		if(!done) {
 			computeUnsearchedNodes();
 			// if no new unsearched nodes and queue is over means the requested value wasn't found
-			if(unsearchedNodes.isEmpty() && current.isEmpty()){
-				if(response != null){
+			if(unsearchedNodes.isEmpty() && current.isEmpty()) {
+				FRT response = foundResponse == null ? lastResponse : foundResponse;
+				if(response != null) {
 					// if there has been at least one response and no more unsearched nodes
 					// then callback with the k nearest sets
 					ArrayList<Node> nearbyNodes = new ArrayList<Node>(nearestSet);
@@ -119,7 +126,7 @@ public class FindProcess<FRT extends FindResponse> {
 					response.setNearbyNodes(nearbyNodes);
 					callback.onResponseReceived(response);	
 				}
-				else{
+				else {
 		  			callback.onFailure();
 		  		}
 			}
@@ -137,6 +144,5 @@ public class FindProcess<FRT extends FindResponse> {
 		// find the unsearched nodes by removing the previously queried from the nearest set
 		unsearchedNodes = (TreeSet<Node>) nearestSet.clone();
 		unsearchedNodes.removeAll(prevQueried);		
-		System.out.println("NearestSet: "+nearestSet.size() + ", unsearchedNodes: "+unsearchedNodes.size());
 	}
 }

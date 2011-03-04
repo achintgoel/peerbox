@@ -105,9 +105,13 @@ public class NetworkInstance {
 		return buckets;
 	}
 	
-	public void findNode(Identifier targetNodeId, ResponseListener<FindNodeResponse> responseListener) {
+	public void findNode(Identifier targetNodeId, boolean stopOnFound, ResponseListener<FindNodeResponse> responseListener) {
 		FindNodeRequest request = new FindNodeRequest(getLocalNodeIdentifier(), targetNodeId);
-		FindProcess.execute(this, request, FindNodeResponse.class, responseListener);
+		FindProcess.execute(this, request, stopOnFound, FindNodeResponse.class, responseListener);
+	}
+	
+	public void findNode(Identifier targetNodeId, ResponseListener<FindNodeResponse> responseListener) {
+		findNode(targetNodeId, true, responseListener);
 	}
 	
 	public void findValue(Key targetKey, ResponseListener<FindValueResponse> responseListener) {
@@ -118,7 +122,7 @@ public class NetworkInstance {
 		}
 		
 		FindValueRequest request = new FindValueRequest(getLocalNodeIdentifier(), targetKey);
-		FindProcess.execute(this, request, FindValueResponse.class, responseListener);
+		FindProcess.execute(this, request, true, FindValueResponse.class, responseListener);
 	}
 	
 	public void storeValue(Key key, String value, ResponseListener<StoreResponse> responseListener, boolean publish) {

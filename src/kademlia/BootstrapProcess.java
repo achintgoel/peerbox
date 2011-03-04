@@ -66,7 +66,7 @@ public class BootstrapProcess {
 					ni.getBuckets().add(newNode);
 					if(successes == 1){
 						System.out.println("bootstrap success");
-						ni.findNode(ni.getLocalNodeIdentifier(), new ResponseListener<FindNodeResponse>(){
+						ni.findNode(ni.getLocalNodeIdentifier(), false, new ResponseListener<FindNodeResponse>(){
 							public void onFailure() {
 								System.out.println("bootstrap findnode failed");
 							}
