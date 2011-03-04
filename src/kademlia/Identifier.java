@@ -60,4 +60,8 @@ public class Identifier implements Identifiable {
 	public int hashCode() {
 		return value.hashCode();
 	}
+	
+	public String toString() {
+		return value.toString();
+	}
 }

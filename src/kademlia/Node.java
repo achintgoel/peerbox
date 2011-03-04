@@ -38,7 +38,17 @@ public class Node implements Identifiable{
 		lastSeen = new Date();
 	}
 	
-	public void ping(PingReplyReceiver pingReceiver) {
+	public boolean equals(Object o) {
+		if (o == this) {
+			return true;
+		}
 		
+		if (!(o instanceof Node)) {
+			return false;
+		}
+		
+		Node n = (Node) o;
+		
+		return nodeID.equals(n.nodeID);
 	}
 }
