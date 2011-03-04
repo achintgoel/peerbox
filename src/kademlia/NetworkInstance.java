@@ -55,6 +55,18 @@ public class NetworkInstance {
 		localIdentifier = Identifier.generateRandom(); // Possibly remember for future restarts
 	}
 	
+	
+	// TODO: this constructor only for testing of buckets
+	protected NetworkInstance(byte[] bytes){
+		gson = null;
+		rpcServiceName = "kad";
+		buckets = new Buckets(this);
+		dataFilters = null;
+		localDataStore = null;
+		this.rpcHandler = null;
+		localIdentifier = Identifier.fromBytes(bytes); // Possibly remember for future restarts		
+	}
+	
 	LocalDataStore getLocalDataStore() {
 		return localDataStore;
 	}
