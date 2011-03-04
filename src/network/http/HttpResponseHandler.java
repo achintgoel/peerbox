@@ -1,4 +1,4 @@
-package network;
+package network.http;
 
 import org.jboss.netty.channel.ChannelHandlerContext;
 import org.jboss.netty.channel.MessageEvent;

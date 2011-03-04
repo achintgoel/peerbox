@@ -1,4 +1,4 @@
-package network;
+package network.http;
 
 import java.net.InetSocketAddress;
 import java.net.URI;

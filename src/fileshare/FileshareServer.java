@@ -1,4 +1,4 @@
-package network;
+package fileshare;
 
 import static org.jboss.netty.handler.codec.http.HttpHeaders.*;
 import static org.jboss.netty.handler.codec.http.HttpHeaders.Names.*;
@@ -32,7 +32,7 @@ import org.jboss.netty.handler.ssl.SslHandler;
 import org.jboss.netty.handler.stream.ChunkedFile;
 import org.jboss.netty.util.CharsetUtil;
 
-public class HttpStaticFileServerHandler extends SimpleChannelUpstreamHandler{
+public class FileshareServer extends SimpleChannelUpstreamHandler{
 	public void messageReceived(ChannelHandlerContext ctx, MessageEvent e) throws Exception {
 		HttpRequest request = (HttpRequest) e.getMessage();
 		if(request.getMethod() != GET) {

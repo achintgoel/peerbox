@@ -47,6 +47,8 @@ public class FileshareRequestListener implements ServiceRequestListener{
 				FileRequest fnr = gson.fromJson(root, FileRequest.class);
 				String requestId = UUID.randomUUID().toString();
 				//TODO: generate URI to pass to client
+				//TODO: figure out how to determine local IP address
+				//URI uri = new URI("http://")
 				response = new FileResponse(null, requestId);
 			}
 	}
