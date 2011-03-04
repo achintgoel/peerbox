@@ -94,6 +94,8 @@ public class Buckets implements NodeStatusListener {
 	 * @return
 	 */
 	public int calculateBucketNumber(Identifiable obj) {
+		System.out.println(networkInstance.getLocalNodeIdentifier().getIntegerValue());
+		System.out.println(obj.getIdentifier().getIntegerValue());
 		System.out.println("DISTANCE: " + Math.floor(Math.log(Identifier.calculateDistance(
 				networkInstance.getLocalNodeIdentifier(), obj).doubleValue())/Math.log(2)));
 		return (int) Math.floor(Math.log(Identifier.calculateDistance(

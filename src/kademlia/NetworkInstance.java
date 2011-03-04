@@ -3,6 +3,7 @@ package kademlia;
 import java.io.Serializable;
 import java.net.URI;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
@@ -98,11 +99,18 @@ public class NetworkInstance {
 	}
 	
 	public void findValue(Key targetKey, ResponseListener<FindValueResponse> responseListener) {
+		String value = getLocalDataStore().get(targetKey);
+		if (value != null) {
+			responseListener.onResponseReceived(new FindValueResponse(value, new LinkedList<Node>()));
+			//NOTE: should we include nearby nodes since we have the value locally?
+		}
+		
 		FindValueRequest request = new FindValueRequest(getLocalNodeIdentifier(), targetKey);
 		FindProcess.execute(this, request, FindValueResponse.class, responseListener);
 	}
 	
 	public void storeValue(Key key, String value, ResponseListener<StoreResponse> responseListener, boolean publish) {
+		getLocalDataStore().put(key, value);
 		StoreRequest request = new StoreRequest(getLocalNodeIdentifier(), key, value);
 		StoreProcess.execute(this, request, responseListener);
 	}
