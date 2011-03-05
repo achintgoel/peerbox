@@ -125,7 +125,7 @@ public class NetworkInstance {
 		FindProcess.execute(this, request, true, FindValueResponse.class, responseListener);
 	}
 	
-	public void storeValue(Key key, String value, ResponseListener<StoreResponse> responseListener, boolean publish) {
+	public void storeValue(Key key, String value, boolean publish, ResponseListener<StoreResponse> responseListener) {
 		getLocalDataStore().put(key, value);
 		StoreRequest request = new StoreRequest(getLocalNodeIdentifier(), key, value);
 		StoreProcess.execute(this, request, responseListener);

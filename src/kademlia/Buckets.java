@@ -2,13 +2,14 @@ package kademlia;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.SortedSet;
 import java.util.TreeSet;
+import java.util.Map.Entry;
 
 import kademlia.messages.PingResponse;
-import kademlia.messages.Response;
 
 
 /**
@@ -159,5 +160,20 @@ public class Buckets implements NodeStatusListener {
 	public Node findNodeByIdentifier(Identifier identifier) {
 		int bucketNumber = calculateBucketNumber(identifier);
 		return buckets.get(bucketNumber).get(identifier);
+	}
+	
+	public void print(){
+		for(int i = 0; i < buckets.size(); i++){
+			LinkedHashMap bucket = buckets.get(i);
+			if(!bucket.isEmpty()){
+				Iterator it = bucket.entrySet().iterator();
+				System.out.println("Bucket No : " + i);
+				while(it.hasNext()){
+					Entry entry = (Entry) it.next();
+					System.out.println("   ID = " + entry.getKey() + ", URI = " + ((Node)entry.getValue()).getNetworkURI());
+				}
+				System.out.println();
+			}
+		}
 	}
 }

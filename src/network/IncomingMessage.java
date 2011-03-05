@@ -24,7 +24,7 @@ public class IncomingMessage {
 	}
 	
 	public void sendResponse(String responseData) {
-		System.out.println(System.currentTimeMillis() + " [S]: " + origMessageEvent.getRemoteAddress().toString() + ": " + responseData); //DEBUG, TODO: REMOVE
+//		System.out.println(System.currentTimeMillis() + " [S]: " + origMessageEvent.getRemoteAddress().toString() + ": " + responseData); //DEBUG, TODO: REMOVE
 		origMessageEvent.getChannel().write(responseData, origMessageEvent.getRemoteAddress());
 	}
 	

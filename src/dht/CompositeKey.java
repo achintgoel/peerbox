@@ -5,6 +5,10 @@ public class CompositeKey<A, B> {
 	protected A primaryKey;
 	protected B secondaryKey;
 	
+	protected CompositeKey() {
+		
+	}
+	
 	public CompositeKey(A primaryKey, B secondaryKey) {
 		this.primaryKey = primaryKey;
 		this.secondaryKey = secondaryKey;

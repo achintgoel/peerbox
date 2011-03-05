@@ -82,15 +82,15 @@ public class FindProcess<FRT extends FindResponse> {
 		    	public void onResponseReceived(FRT response) {
 		    		// if the reply contains the target then trigger identifier found
 		          	if(response.isFound()){
+		          		nearestSet.addAll(response.getNearbyNodes());
+		    			networkInstance.getBuckets().addAll(response.getNearbyNodes());
 		          		current.remove(nextRequestDestination);
 		          		if(stopOnFound){
+		          			if(!done)
+		          				callback.onResponseReceived(response);
 		          			done = true;
-		          			callback.onResponseReceived(response);
 		          		}
 		          		else{
-			          		nearestSet.addAll(response.getNearbyNodes());
-			    			networkInstance.getBuckets().addAll(response.getNearbyNodes());
-			          		current.remove(nextRequestDestination);
 		          			foundResponse = response;
 		          			attemptDone();
 		          		}

@@ -7,6 +7,10 @@ import dht.CompositeKey;
 
 public class Key extends CompositeKey<String, String> implements Identifiable {
 	
+	protected Key(){
+		super();
+	}
+	
 	public Key(String primaryKey, String secondaryKey) {
 		super(primaryKey, secondaryKey);
 	}

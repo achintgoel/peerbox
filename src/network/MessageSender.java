@@ -17,7 +17,7 @@ public class MessageSender {
 	
 	public void sendData(URI destination, String data) {
 		channel.write(data, new InetSocketAddress(destination.getHost(), destination.getPort()));
-		System.out.println(System.currentTimeMillis() + " [S]: " + destination.toString() + ": " + data); //DEBUG, TODO: REMOVE
+//		System.out.println(System.currentTimeMillis() + " [S]: " + destination.toString() + ": " + data); //DEBUG, TODO: REMOVE
 	}
 	
 	public URI getLocalURI() {
