@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
 
+import kademlia.messages.FindNodeResponse;
 import kademlia.messages.FindRequest;
 import kademlia.messages.FindResponse;
 
@@ -88,6 +89,9 @@ public class FindProcess<FRT extends FindResponse> {
 		          			callback.onResponseReceived(response);
 		          		}
 		          		else{
+			          		nearestSet.addAll(response.getNearbyNodes());
+			    			networkInstance.getBuckets().addAll(response.getNearbyNodes());
+			          		current.remove(nextRequestDestination);
 		          			foundResponse = response;
 		          			attemptDone();
 		          		}
@@ -133,9 +137,6 @@ public class FindProcess<FRT extends FindResponse> {
 			}
 			else if(!unsearchedNodes.isEmpty()){
 				nextIteration();
-			}
-			else{
-	      		System.out.println("Find process error occured");
 			}
 		}
 	}
