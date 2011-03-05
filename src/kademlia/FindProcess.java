@@ -6,7 +6,6 @@ import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
 
-import kademlia.messages.FindNodeResponse;
 import kademlia.messages.FindRequest;
 import kademlia.messages.FindResponse;
 
