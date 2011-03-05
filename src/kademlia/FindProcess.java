@@ -2,8 +2,8 @@ package kademlia;
 
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
-import java.util.SortedSet;
 import java.util.TreeSet;
 
 import kademlia.messages.FindRequest;
@@ -82,6 +82,7 @@ public class FindProcess<FRT extends FindResponse> {
 		    	public void onResponseReceived(FRT response) {
 		    		// if the reply contains the target then trigger identifier found
 		          	if(response.isFound()){
+		          		current.remove(nextRequestDestination);
 		          		if(stopOnFound){
 		          			done = true;
 		          			callback.onResponseReceived(response);
@@ -120,10 +121,10 @@ public class FindProcess<FRT extends FindResponse> {
 				if(response != null) {
 					// if there has been at least one response and no more unsearched nodes
 					// then callback with the k nearest sets
-					ArrayList<Node> nearbyNodes = new ArrayList<Node>(nearestSet);
+					List<Node> nearbyNodes = new ArrayList<Node>(nearestSet);
 					int k = networkInstance.getConfiguration().getK();
-					nearbyNodes = (ArrayList<Node>) nearbyNodes.subList(0, nearestSet.size() > k ? k : nearestSet.size());
-					response.setNearbyNodes(nearbyNodes);
+					List<Node> kNearbyNodes = nearbyNodes.subList(0, nearestSet.size() > k ? k : nearestSet.size());
+					response.setNearbyNodes(kNearbyNodes);
 					callback.onResponseReceived(response);	
 				}
 				else {
@@ -132,6 +133,9 @@ public class FindProcess<FRT extends FindResponse> {
 			}
 			else if(!unsearchedNodes.isEmpty()){
 				nextIteration();
+			}
+			else{
+	      		System.out.println("Find process error occured");
 			}
 		}
 	}
