@@ -1,11 +1,8 @@
 package kademlia;
 
-import java.io.Serializable;
 import java.net.URI;
-import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 
 import kademlia.messages.FindNodeRequest;
 import kademlia.messages.FindNodeResponse;
@@ -23,9 +20,12 @@ import rpc.RPCResponseListener;
 
 import com.google.gson.Gson;
 
+import dht.CompositeDataFilter;
+import dht.CompositeKey;
 import dht.DistributedMap;
 import dht.LocalDataStore;
 import dht.MapDataFilter;
+import dht.ValueListener;
 
 /**
  * An instance of a local node that is actively/inactively involved in a  particular Kademlia overlay network.
@@ -36,19 +36,21 @@ public class NetworkInstance {
 	protected final Buckets buckets;
 	protected final Gson gson;
 	protected final String rpcServiceName;
-	protected final Map<String, MapDataFilter<String, String>> dataFilters;
 	protected final LocalDataStore localDataStore;
 	protected final RPCHandler rpcHandler;
+	protected final CompositeDataFilter compositeDataFilter;
+	protected final PrimaryDHT primaryDHT;
 	
 	public NetworkInstance(RPCHandler rpcHandler) {
 		gson = new Gson();
 		rpcServiceName = "kad";
 		buckets = new Buckets(this);
-		dataFilters = new HashMap<String, MapDataFilter<String, String>>();
+		compositeDataFilter = new CompositeDataFilter();
 		localDataStore = new LocalDataStore();
 		this.rpcHandler = rpcHandler;
 		rpcHandler.registerServiceListener(rpcServiceName, new KademliaRequestListener(this));
 		localIdentifier = Identifier.generateRandom(); // Possibly remember for future restarts
+		primaryDHT = new PrimaryDHT(this);
 	}
 	
 	
@@ -57,18 +59,23 @@ public class NetworkInstance {
 		gson = null;
 		rpcServiceName = "kad";
 		buckets = new Buckets(this);
-		dataFilters = null;
+		compositeDataFilter = null;
 		localDataStore = null;
 		this.rpcHandler = null;
-		localIdentifier = Identifier.fromBytes(bytes); // Possibly remember for future restarts		
+		localIdentifier = Identifier.fromBytes(bytes); // Possibly remember for future restarts	
+		primaryDHT = new PrimaryDHT(this);
 	}
+	
+	public void registerDataFilter(String primaryKey, MapDataFilter<String, String> dataFilter) {
+		compositeDataFilter.registerDataFilter(primaryKey, dataFilter);
+	}	
 	
 	LocalDataStore getLocalDataStore() {
 		return localDataStore;
 	}
 	
-	public void registerDataFilter(String primaryKey, MapDataFilter<String, String> dataFilter) {
-		localDataStore.registerDataFilter(primaryKey, dataFilter);
+	CompositeDataFilter getCompositeDataFilter() {
+		return compositeDataFilter;
 	}
 	
 	public Configuration getConfiguration() {
@@ -79,8 +86,22 @@ public class NetworkInstance {
 		return localIdentifier;
 	}
 	
-	public DistributedMap<Serializable, Serializable> getPrimaryDHT() {
-		return null;
+	public DistributedMap<Key, String> getPrimaryDHT() {
+		return primaryDHT;
+	}
+	
+	public DistributedMap<String, String> getSingleMap(final String mapKey) {
+		return new DistributedMap<String, String>() {
+			@Override
+			public void get(String key, ValueListener<String> vl) {
+				primaryDHT.get(new Key(mapKey, key), vl);
+			}
+
+			@Override
+			public void put(String key, String value) {
+				primaryDHT.put(new Key(mapKey, key), value);
+			}
+		};
 	}
 	
 	protected <T extends Response> void sendRequestRPC(Node destination, Request request, final Class<T> responseClass, final ResponseListener<T> callback) {
@@ -114,7 +135,8 @@ public class NetworkInstance {
 	}
 	
 	/**
-	 * Find Value retrieves stored values in the DHT by a given key.
+	 * Find Value retrieves stored values in the DHT by a given key (and filters with registered data filters)
+	 * If Value is invalid according to filters, it would appear not to be found.
 	 * Current Assumption: If key/value pair is in local network, skip querying network for the value.
 	 * Is this a valid assumption? Should it be an option?
 	 * 
@@ -122,19 +144,40 @@ public class NetworkInstance {
 	 * @param targetKey
 	 * @param responseListener
 	 */
-	public void findValue(Key targetKey, ResponseListener<FindValueResponse> responseListener) {
+	public void findValue(final Key targetKey, final ResponseListener<FindValueResponse> responseListener) {
 		String value = getLocalDataStore().get(targetKey);
-		if (value != null) {
+		if (value != null && compositeDataFilter.isValid(targetKey, value)) {
 			responseListener.onResponseReceived(new FindValueResponse(value, new LinkedList<Node>()));
 			//NOTE: should we include nearby nodes since we have the value locally?
 			return;
 		}
 		
 		FindValueRequest request = new FindValueRequest(getLocalNodeIdentifier(), targetKey);
-		FindProcess.execute(this, request, true, FindValueResponse.class, responseListener);
+		FindProcess.execute(this, request, true, FindValueResponse.class, new ResponseListener<FindValueResponse>() {
+
+			@Override
+			public void onResponseReceived(FindValueResponse response) {
+				if (response.isFound()) {
+					if (compositeDataFilter.isValid(targetKey, response.getFoundValue())) {
+						responseListener.onResponseReceived(response);
+					} else {
+						responseListener.onResponseReceived(new FindValueResponse(response.getNearbyNodes()));
+					}
+				} else {
+					responseListener.onResponseReceived(response);
+				}
+			}
+
+			@Override
+			public void onFailure() {
+				responseListener.onFailure();
+			}
+			
+		});
 	}
 	/**
-	 * Stores the Key/Value pair in the local data store and then replicates the data across the network
+	 * Stores the Key/Value pair in the local data store and then replicates the data across the network.
+	 * Verifies valid according to data filters prior to storing. Calls failure callback if invalid.
 	 * Replication is done via sending
 	 * 
 	 * TODO: Expiration and re-publication of stored values
@@ -144,9 +187,26 @@ public class NetworkInstance {
 	 * @param publish
 	 */
 	public void storeValue(Key key, String value, boolean publish, ResponseListener<StoreResponse> responseListener) {
-		getLocalDataStore().put(key, value);
+		if (!storeValueLocal(key, value)) {
+			responseListener.onFailure();
+			return;
+		}
 		StoreRequest request = new StoreRequest(getLocalNodeIdentifier(), key, value);
 		StoreProcess.execute(this, request, responseListener);
+	}
+	
+	/**
+	 * Stores Key/Value pair in local data store if pair passes filtering.
+	 * @param key
+	 * @param value
+	 * @return Whether store succeeded (filtering passed)
+	 */
+	public boolean storeValueLocal(Key key, String value) {
+		if (!compositeDataFilter.isValid(key, value)) {
+			return false;
+		}
+		getLocalDataStore().put(key, value);
+		return true;
 	}
 	
 	//Maybe put in Node

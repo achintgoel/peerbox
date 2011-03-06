@@ -35,6 +35,11 @@ public class Identifier implements Identifiable {
 		return new Identifier(new BigInteger(1, bytes));
 	}
 	
+	/**
+	 * This generates a secure random 160bit Identifier object for Kademlia
+	 * TODO: Somehow support for variable key-size lengths should be added.
+	 * @return
+	 */
 	public static Identifier generateRandom() {
 		byte[] randomBytes = new byte[20];
 		secureRandom.nextBytes(randomBytes);

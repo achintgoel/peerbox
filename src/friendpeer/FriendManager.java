@@ -1,6 +1,5 @@
 package friendpeer;
 
-import java.net.InetSocketAddress;
 import java.net.URI;
 import java.security.PublicKey;
 import java.util.HashMap;

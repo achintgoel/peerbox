@@ -67,7 +67,7 @@ public class KademliaRequestListener implements ServiceRequestListener {
 			}
 			else if(command.equals(StoreRequest.COMMAND)){
 				StoreRequest sr = gson.fromJson(root, StoreRequest.class);
-				boolean success = ni.getLocalDataStore().put(sr.getKey(), sr.getValue());
+				boolean success = ni.storeValueLocal(sr.getKey(), sr.getValue());
 				response = new StoreResponse(success);
 				request = sr;
 			}
