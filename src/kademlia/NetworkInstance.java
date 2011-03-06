@@ -27,10 +27,9 @@ import dht.DistributedMap;
 import dht.LocalDataStore;
 import dht.MapDataFilter;
 
-
 /**
- * 
- *
+ * An instance of a local node that is actively/inactively involved in a  particular Kademlia overlay network.
+ * Primary Kademlia Controller
  */
 public class NetworkInstance {
 	protected Identifier localIdentifier;
@@ -114,17 +113,36 @@ public class NetworkInstance {
 		findNode(targetNodeId, true, responseListener);
 	}
 	
+	/**
+	 * Find Value retrieves stored values in the DHT by a given key.
+	 * Current Assumption: If key/value pair is in local network, skip querying network for the value.
+	 * Is this a valid assumption? Should it be an option?
+	 * 
+	 * TODO: Cache found Key/Value Pairs
+	 * @param targetKey
+	 * @param responseListener
+	 */
 	public void findValue(Key targetKey, ResponseListener<FindValueResponse> responseListener) {
 		String value = getLocalDataStore().get(targetKey);
 		if (value != null) {
 			responseListener.onResponseReceived(new FindValueResponse(value, new LinkedList<Node>()));
 			//NOTE: should we include nearby nodes since we have the value locally?
+			return;
 		}
 		
 		FindValueRequest request = new FindValueRequest(getLocalNodeIdentifier(), targetKey);
 		FindProcess.execute(this, request, true, FindValueResponse.class, responseListener);
 	}
-	
+	/**
+	 * Stores the Key/Value pair in the local data store and then replicates the data across the network
+	 * Replication is done via sending
+	 * 
+	 * TODO: Expiration and re-publication of stored values
+	 * @param key
+	 * @param value
+	 * @param responseListener
+	 * @param publish
+	 */
 	public void storeValue(Key key, String value, boolean publish, ResponseListener<StoreResponse> responseListener) {
 		getLocalDataStore().put(key, value);
 		StoreRequest request = new StoreRequest(getLocalNodeIdentifier(), key, value);
