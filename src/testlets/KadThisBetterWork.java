@@ -22,7 +22,6 @@ public class KadThisBetterWork implements Runnable {
 			try {
 				Thread.sleep(550);
 			} catch (InterruptedException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 			new Thread(new KadThisBetterWork()).run();
@@ -39,7 +38,6 @@ public class KadThisBetterWork implements Runnable {
 			try {
 				startURIs.add(new URI("udp://localhost:" + (port - 2)));
 			} catch (URISyntaxException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 			System.out.println("Second node created");

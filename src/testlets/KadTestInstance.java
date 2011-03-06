@@ -27,7 +27,6 @@ public class KadTestInstance {
 			try {
 				startURIs.add(new URI("udp://localhost:" + args[i]));
 			} catch (URISyntaxException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 		}
