@@ -34,9 +34,10 @@ public class UserDistributedMap implements DistributedMap<PublicKey, URI>{
 						address = new URI(gson.fromJson(valueEvent.getValue(), SignedMessage.class).getMessage());
 						vl.valueComplete(new ValueEvent<URI>(address));
 					} catch (JsonSyntaxException e) {
+						e.printStackTrace();
 
 					} catch (URISyntaxException e) {
-
+						e.printStackTrace();
 					}
 					
 				}
@@ -45,13 +46,11 @@ public class UserDistributedMap implements DistributedMap<PublicKey, URI>{
 			}
 			
 		});
-		// TODO Auto-generated method stub
 		
 	}
 
 	@Override
 	public void put(PublicKey key, URI value) {
-		// TODO Auto-generated method stub
 		Gson gson = new Gson();
 		myDistributedMap.put(key.toString(), gson.toJson(value));
 		

@@ -7,8 +7,8 @@ import java.security.PublicKey;
 public class Friend {
 	protected String alias;
 	protected URI address;
-	final protected PublicKey pubKey;
-	final protected FriendManager manager;
+	protected PublicKey pubKey;
+	protected FriendManager manager;
 	
 	Friend(FriendManager fm, String al, URI address, PublicKey pub) {
 		manager = fm;
@@ -16,7 +16,9 @@ public class Friend {
 		this.address = address;
 		pubKey = pub;
 	}
-
+	protected Friend() {
+		
+	}
 	public String getAlias() {
 		return alias;
 	}

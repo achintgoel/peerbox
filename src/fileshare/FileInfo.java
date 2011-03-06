@@ -38,7 +38,4 @@ public class FileInfo {
 	public void setSize(long size) {
 		this.size = size;
 	}
-	
-	
-
 }
