@@ -2,7 +2,6 @@ package friendpeer;
 
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.security.PrivateKey;
 import java.security.PublicKey;
 
 import security.SecureMessageHandler;
@@ -20,12 +19,11 @@ public class UserDistributedMap implements DistributedMap<PublicKey, URI>{
 	
 	DistributedMap<String, String> myDistributedMap;
 	SecureMessageHandler secure;
-	PrivateKey myKey;
 
-	public UserDistributedMap(DistributedMap<String, String> dm, PrivateKey priv) {
+	public UserDistributedMap(DistributedMap<String, String> dm, SecureMessageHandler secure) {
 		myDistributedMap = dm;
-		secure = new SecureMessageHandler();
-		priv = myKey;
+		//this.secure = secure;
+		this.secure = secure;
 	}
 
 	@Override
@@ -37,10 +35,13 @@ public class UserDistributedMap implements DistributedMap<PublicKey, URI>{
 				if(valueEvent.exists()) {
 					URI address;
 					try {
-						String value = gson.fromJson(valueEvent.getValue(), SignedMessage.class).getMessage();
-						System.out.println("value is "+value);
-						if(secure.verifyMessage(value, gson.fromJson(valueEvent.getValue(), SignedMessage.class).getSignature(), key)) {
-							address = new URI(value);
+						SignedMessage signedMessage = gson.fromJson(valueEvent.getValue(), SignedMessage.class);
+						//System.out.println("Validating signed message");
+						//System.out.println("public key: " + key.getEncoded());
+						//System.out.println("message: " + signedMessage.getMessage());
+						//System.out.println("signature: " + signedMessage.getSignature());
+						if(secure.verifyMessage(signedMessage.getMessage(), signedMessage.getSignature(), key)) {
+							address = new URI(signedMessage.getMessage());
 							vl.valueComplete(new ValueEvent<URI>(address));
 						}
 						else {
@@ -72,8 +73,8 @@ public class UserDistributedMap implements DistributedMap<PublicKey, URI>{
 	@Override
 	public void put(PublicKey key, URI val) {
 		Gson gson = new Gson();
-		SignedMessage sig = new SignedMessage(val.toString(), secure.signMessage(val.toString(), myKey));
-		myDistributedMap.put(gson.toJson(key.getEncoded()), gson.toJson(sig));
+		SignedMessage signedMessage = new SignedMessage(val.toString(), secure.signMessage(val.toString()));
+		myDistributedMap.put(gson.toJson(key.getEncoded()), gson.toJson(signedMessage));
 	}
 
 

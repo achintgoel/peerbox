@@ -127,5 +127,9 @@ public class FileShareManager {
 		return null;
 
 	}
+	public void setFilePath(String filePath) {
+		mySharedDirectory = new File(filePath);
+		requestIDtoFileRequest.clear();
+	}
 	
 }

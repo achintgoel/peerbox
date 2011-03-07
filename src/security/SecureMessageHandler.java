@@ -1,45 +1,61 @@
 package security;
 
-import java.io.UnsupportedEncodingException;
 import java.security.InvalidKeyException;
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
 import java.security.NoSuchAlgorithmException;
-import java.security.NoSuchProviderException;
 import java.security.PrivateKey;
 import java.security.PublicKey;
-import java.security.SecureRandom;
 import java.security.Signature;
 import java.security.SignatureException;
 
 public class SecureMessageHandler {
+	protected Signature ver;
 	protected Signature sig;
 	protected KeyPairGenerator keyGen;
-
-	public SecureMessageHandler() {
+	protected KeyPair pair;
+	
+	public SecureMessageHandler(KeyPair pair) {
 		try {
-			keyGen = KeyPairGenerator.getInstance("DSA");
 			sig = Signature.getInstance("SHA1withDSA");
-
-			
+			this.pair = pair;
+			sig.initSign(this.pair.getPrivate());
+			//ver = Signature.getInstance("SHA1withDSA");
 		} catch (NoSuchAlgorithmException e) {
 			e.printStackTrace();
+		} catch (InvalidKeyException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
-
 	}
 	
-	public byte[] signMessage(String data, PrivateKey key) {
+	public SecureMessageHandler() {
 		try {
-			sig.initSign(key);
-			sig.update(data.getBytes("UTF8"));
-			return sig.sign();
+			sig = Signature.getInstance("SHA1withDSA");
+			keyGen = KeyPairGenerator.getInstance("DSA");
+			pair = keyGen.generateKeyPair();
+			sig.initSign(this.pair.getPrivate());
+		} catch (NoSuchAlgorithmException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		} catch (InvalidKeyException e) {
-			e.printStackTrace();
-		} catch (SignatureException e) {
-			e.printStackTrace();
-		} catch (UnsupportedEncodingException e) {
+			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+		
+	}
+	
+	public byte[] signMessage(String data) {
+		
+			
+			try {
+				sig.update(data.getBytes());
+				return sig.sign();
+			} catch (SignatureException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		
 		return null;
 		
 	}
@@ -53,33 +69,23 @@ public class SecureMessageHandler {
 	public boolean verifyMessage(String message, byte[] signature, PublicKey key) {
 		
 		try {
-			//sig = Signature.getInstance("SHA1withDSA");
-			sig.initVerify(key);
-			sig.update(message.getBytes());
-			return sig.verify(signature);
+			ver = Signature.getInstance("SHA1withDSA");
+			ver.initVerify(key);
+			ver.update(message.getBytes());
+			//System.out.println("signature is:"+signature.toString());
+			return ver.verify(signature);
 		} catch (InvalidKeyException e) {
 			e.printStackTrace();
 		} catch (SignatureException e) {
 			e.printStackTrace();
-		} //catch (UnsupportedEncodingException e) {
- 
-			
-		//}
-		//System.out.println("HELPPP");
-		return false;
-	}
-	
-	public KeyPair generateKeyPairs() {
-		SecureRandom random;
-		try {
-			random = SecureRandom.getInstance("SHA1PRNG", "SUN");
-			keyGen.initialize(1024, random);
-			return keyGen.generateKeyPair();
 		} catch (NoSuchAlgorithmException e) {
-			e.printStackTrace();
-		} catch (NoSuchProviderException e) {
+			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		return null;
+		return false;
+	}
+
+	public KeyPair getKeyPair() {
+		return pair;
 	}
 }

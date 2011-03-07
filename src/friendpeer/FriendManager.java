@@ -26,11 +26,10 @@ public class FriendManager {
 		AliasToKey = new HashMap<String, Friend>();
 		
 		secure = new SecureMessageHandler();
-		KeyPair keypair = secure.generateKeyPairs();
+		KeyPair keypair = secure.getKeyPair();
 		myPubKey = keypair.getPublic();
 		myPrivKey = keypair.getPrivate();
-		userTable = new UserDistributedMap(map, myPrivKey);
-		
+		userTable = new UserDistributedMap(map, secure);
 	}
 	
 	public Friend getPublicKey(String alias) {
@@ -72,7 +71,7 @@ public class FriendManager {
 			public void valueComplete(final ValueEvent<URI> val){
 				if(val.exists()){
 					friend.setAddress(val.getValue());
-					System.out.println("new URI of friend is: "+friend.getNetworkAddress().toString());
+					//System.out.println("new URI of friend is: "+friend.getNetworkAddress().toString());
 				}
 				else {
 					System.out.println("New uri retrieval didnt work!!");
