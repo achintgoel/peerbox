@@ -34,12 +34,16 @@ public class PacketMessageTable {
 			if(messages.size() == maxConcurrentMessages){
 				Iterator<Entry<byte[], PacketSequence>> iterator = messages.entrySet().iterator();
 				Entry<byte[], PacketSequence> entry = iterator.next();
-				byte[] nextId = entry.getKey();
-				PacketSequence nextMessage = entry.getValue();
-				long timestamp = nextMessage.getTimeStamp();
-				messages.remove(nextId);
-				while(iterator.hasNext() && (timestamp + timeout) < System.currentTimeMillis()/1000){
-					entry = iterator.next();					
+				messages.remove(entry.getKey());
+				while(iterator.hasNext()){
+					entry = iterator.next();
+					long timestamp = entry.getValue().getTimeStamp();
+					if(timestamp + timeout < System.currentTimeMillis()/1000){
+						messages.remove(entry.getKey());
+					}
+					else{
+						break;
+					}
 				}
 			}
 			currentMessage = new PacketSequence(maxSequenceId);
