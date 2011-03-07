@@ -32,7 +32,7 @@ public class PacketSequence {
 	}
 	
 	public void setLength(int length){
-		count = count - length + 1;
+		count = count - length;
 		this.length = length; 
 	}
 	
@@ -45,11 +45,11 @@ public class PacketSequence {
 	}
 
 	public ChannelBuffer[] toArray() {
-		ChannelBuffer[] returnArray = new ChannelBuffer[length];
-		for(int i = 0; i < length; i++){
-			returnArray[i] = packets[i];
-		}
-		return returnArray;
+			ChannelBuffer[] returnArray = new ChannelBuffer[length];
+			for(int i = 0; i < length; i++){
+				returnArray[i] = packets[i];
+			}
+			return returnArray;
 	}
 	
 	public long getTimeStamp(){
