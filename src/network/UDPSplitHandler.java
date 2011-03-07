@@ -1,9 +1,14 @@
 package network;
 
+import java.util.LinkedList;
+
+import org.jboss.netty.buffer.ChannelBuffer;
+import org.jboss.netty.buffer.ChannelBuffers;
 import org.jboss.netty.channel.ChannelDownstreamHandler;
 import org.jboss.netty.channel.ChannelEvent;
 import org.jboss.netty.channel.ChannelHandlerContext;
 import org.jboss.netty.channel.ChannelUpstreamHandler;
+import org.jboss.netty.channel.MessageEvent;
 
 /**
  * TODO: Implement UDPSplitHandler
@@ -31,18 +36,54 @@ import org.jboss.netty.channel.ChannelUpstreamHandler;
  * @author rajiv
  */
 public class UDPSplitHandler implements ChannelUpstreamHandler, ChannelDownstreamHandler {
+	
+	private final PacketMessageTable pmt;
+	
+	public UDPSplitHandler() {
+		super();
+		pmt = new PacketMessageTable(63, 511);
+	}
+	
 	@Override
 	public void handleDownstream(ChannelHandlerContext ctx, ChannelEvent e)
 			throws Exception {
-		// TODO Auto-generated method stub
-		
+		if (!(e instanceof MessageEvent)) {
+            ctx.sendDownstream(e);
+            return;
+        }
+		Object m = ((MessageEvent) e).getMessage();
+		if (!(m instanceof ChannelBuffer)) {
+            ctx.sendDownstream(e);
+            return;
+        }
 	}
 
 	@Override
 	public void handleUpstream(ChannelHandlerContext ctx, ChannelEvent e)
 			throws Exception {
-		// TODO Auto-generated method stub
+		if (!(e instanceof MessageEvent)) {
+            ctx.sendUpstream(e);
+            return;
+        }
+		Object m = ((MessageEvent) e).getMessage();
+		if (!(m instanceof ChannelBuffer)) {
+            ctx.sendUpstream(e);
+            return;
+        }
+		ChannelBuffer cb = (ChannelBuffer) m;
+		
+		byte[] idBytes = new byte[2];
+		cb.getBytes(0, idBytes);
+		byte[] seqBytes = new byte[1];
+		cb.getBytes(2, seqBytes);
+
+		int seq = 0;
+		seq |= seqBytes[0];
+		seq <<= 8;
+		seq |= seqBytes[1];
+		
 		
 	}
-
+	
+	
 }
