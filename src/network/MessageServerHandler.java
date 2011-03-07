@@ -81,7 +81,7 @@ public class MessageServerHandler extends SimpleChannelUpstreamHandler {
 			uri = null;
 		}
     	IncomingMessage message = new IncomingMessage(e, uri, data);
-    	System.out.println(System.currentTimeMillis() + " [R]: " + message.toString());  //DEBUG, TODO: REMOVE
+    	//System.out.println(System.currentTimeMillis() + " [R]: " + message.toString());  //DEBUG, TODO: REMOVE
     	downstreamMessageListener.onMessage(message);
     }
 

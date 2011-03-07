@@ -32,7 +32,6 @@ public class PacketMessageTable {
 	public ChannelBuffer put(short messageId, int sequenceId, ChannelBuffer channelBuffer){
 		PacketSequence currentMessage = getCurrentSequence(messageId);
 		currentMessage.put(sequenceId, channelBuffer);
-		System.out.println("currentMessageCount" + currentMessage.getCount());
 		if(currentMessage.getCount() == 0){
 			ChannelBuffer[] channelArray = currentMessage.toArray();
 			int length = messages.get(messageId).getLength();
@@ -50,7 +49,6 @@ public class PacketMessageTable {
 	}
 	
 	public void setLength(short messageId, int length){
-		System.out.println("length set to " + length);
 		PacketSequence currentSequence = getCurrentSequence(messageId);
 		currentSequence.setLength(length);
 	}

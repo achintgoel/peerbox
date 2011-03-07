@@ -33,7 +33,6 @@ public class KadThisBetterWork implements Runnable {
 
 	@Override
 	public void run() {
-		// TODO Auto-generated method stub
 		NetworkInstance instance = new NetworkInstance(RPCHandler.getUDPInstance(port++));
 		if (!first) {
 			LinkedList<URI> startURIs = new LinkedList<URI>();
@@ -42,14 +41,15 @@ public class KadThisBetterWork implements Runnable {
 			} catch (URISyntaxException e) {
 				e.printStackTrace();
 			}
-			System.out.println("Next node created");
+			System.out.println("Next node created " + port);
 			instance.bootstrap(startURIs, new BootstrapListener() {
 	
 				@Override
 				public void onBootstrapSuccess() {
 					System.out.println("Next Node Bootstrap Complete");
 					successes++;
-					if (successes == 100) {
+					System.out.println("successes = " + successes);
+					if (successes == 99) {
 						System.out.println("They all bootstrapped successfully!!!!!!");
 					}
 					

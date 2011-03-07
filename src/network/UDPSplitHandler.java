@@ -134,7 +134,7 @@ public class UDPSplitHandler implements ChannelUpstreamHandler, ChannelDownstrea
 						
 			if (seq == 0) {
 				int length = ((int) cb.readByte()) + Byte.MAX_VALUE + 1;
-				System.out.println("R length: " + length);
+				//System.out.println("R length: " + length);
 				pmt.setLength(id, length);
 			}
 			cb.discardReadBytes();
