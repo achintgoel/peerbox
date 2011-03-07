@@ -23,7 +23,7 @@ public class SecureMessageHandler {
 
 			
 		} catch (NoSuchAlgorithmException e) {
-
+			e.printStackTrace();
 		}
 
 	}
@@ -34,11 +34,11 @@ public class SecureMessageHandler {
 			sig.update(data.getBytes("UTF8"));
 			return sig.sign();
 		} catch (InvalidKeyException e) {
-
-		} catch (SignatureException e) {			
-
+			e.printStackTrace();
+		} catch (SignatureException e) {
+			e.printStackTrace();
 		} catch (UnsupportedEncodingException e) {
-
+			e.printStackTrace();
 		}
 		return null;
 		
@@ -53,16 +53,19 @@ public class SecureMessageHandler {
 	public boolean verifyMessage(String message, byte[] signature, PublicKey key) {
 		
 		try {
+			//sig = Signature.getInstance("SHA1withDSA");
 			sig.initVerify(key);
-			sig.update(message.getBytes("UTF8"));
+			sig.update(message.getBytes());
 			return sig.verify(signature);
 		} catch (InvalidKeyException e) {
-
+			e.printStackTrace();
 		} catch (SignatureException e) {
-
-		} catch (UnsupportedEncodingException e) {
-
-		}
+			e.printStackTrace();
+		} //catch (UnsupportedEncodingException e) {
+ 
+			
+		//}
+		//System.out.println("HELPPP");
 		return false;
 	}
 	
