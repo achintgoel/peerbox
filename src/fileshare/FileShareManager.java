@@ -69,7 +69,6 @@ public class FileShareManager {
 				return contentInfo;
 			}
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		return null;
@@ -85,7 +84,7 @@ public class FileShareManager {
 				try {
 					callback.onResponseReceived((T) gson.fromJson(event.getDataString(), responseClass));
 				} catch (Exception e) {
-					//
+					e.printStackTrace();
 				}
 			}
 		});
@@ -116,7 +115,7 @@ public class FileShareManager {
 				FileRequestInfo fileInfo = new FileRequestInfo(requestFrom, expiration, files[0].getCanonicalPath());
 				requestIDtoFileRequest.put(requestID, fileInfo);
 			} catch (IOException e) {
-
+				e.printStackTrace();
 			}
 		}
 	}

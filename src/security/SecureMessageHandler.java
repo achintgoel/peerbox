@@ -2,10 +2,13 @@ package security;
 
 import java.io.UnsupportedEncodingException;
 import java.security.InvalidKeyException;
+import java.security.KeyPair;
 import java.security.KeyPairGenerator;
 import java.security.NoSuchAlgorithmException;
+import java.security.NoSuchProviderException;
 import java.security.PrivateKey;
 import java.security.PublicKey;
+import java.security.SecureRandom;
 import java.security.Signature;
 import java.security.SignatureException;
 
@@ -17,9 +20,10 @@ public class SecureMessageHandler {
 		try {
 			keyGen = KeyPairGenerator.getInstance("DSA");
 			sig = Signature.getInstance("SHA1withDSA");
+
 			
 		} catch (NoSuchAlgorithmException e) {
-			e.printStackTrace();
+
 		}
 
 	}
@@ -30,11 +34,11 @@ public class SecureMessageHandler {
 			sig.update(data.getBytes("UTF8"));
 			return sig.sign();
 		} catch (InvalidKeyException e) {
-			e.printStackTrace();
+
 		} catch (SignatureException e) {			
-			e.printStackTrace();
+
 		} catch (UnsupportedEncodingException e) {
-			e.printStackTrace();
+
 		}
 		return null;
 		
@@ -53,12 +57,26 @@ public class SecureMessageHandler {
 			sig.update(message.getBytes("UTF8"));
 			return sig.verify(signature);
 		} catch (InvalidKeyException e) {
-			e.printStackTrace();
+
 		} catch (SignatureException e) {
-			e.printStackTrace();
+
 		} catch (UnsupportedEncodingException e) {
-			e.printStackTrace();
+
 		}
 		return false;
+	}
+	
+	public KeyPair generateKeyPairs() {
+		SecureRandom random;
+		try {
+			random = SecureRandom.getInstance("SHA1PRNG", "SUN");
+			keyGen.initialize(1024, random);
+			return keyGen.generateKeyPair();
+		} catch (NoSuchAlgorithmException e) {
+			e.printStackTrace();
+		} catch (NoSuchProviderException e) {
+			e.printStackTrace();
+		}
+		return null;
 	}
 }

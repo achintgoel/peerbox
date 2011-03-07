@@ -37,6 +37,7 @@ public class UserDistributedMap implements DistributedMap<PublicKey, URI>{
 						vl.valueComplete(new ValueEvent<URI>(address));
 					} catch (JsonSyntaxException e) {
 						e.printStackTrace();
+
 					} catch (URISyntaxException e) {
 						e.printStackTrace();
 					}
@@ -46,7 +47,8 @@ public class UserDistributedMap implements DistributedMap<PublicKey, URI>{
 				}
 			}
 			
-		});		
+		});
+		
 	}
 
 	@Override
