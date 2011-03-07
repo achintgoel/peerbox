@@ -17,10 +17,6 @@ public class PacketSequence {
 		this.length = 0;
 	}
 	
-	public void clear(){
-		count = 0;
-		length = 0;
-	}
 	
 	public void put(int sequenceId, ChannelBuffer channelBuffer){
 		packets[sequenceId] = channelBuffer;
@@ -28,7 +24,7 @@ public class PacketSequence {
 	}
 	
 	public void setLength(int length){
-		count = count - length;
+		count = count - length + 1;
 		this.length = length; 
 	}
 	
@@ -40,11 +36,11 @@ public class PacketSequence {
 		return count;
 	}
 
-	public ArrayList<ChannelBuffer> toArrayList() {
-		ArrayList<ChannelBuffer> returnList = new ArrayList<ChannelBuffer>();
+	public ChannelBuffer[] toArray() {
+		ChannelBuffer[] returnArray = new ChannelBuffer[length];
 		for(int i = 0; i < length; i++){
-			returnList.add(packets[i]);
+			returnArray[i] = packets[i];
 		}
-		return returnList;
+		return returnArray;
 	}
 }

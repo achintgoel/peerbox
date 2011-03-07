@@ -1,46 +1,50 @@
 package network;
 
-import java.util.ArrayList;
+import java.util.LinkedHashMap;
 
 import org.jboss.netty.buffer.ChannelBuffer;
+import org.jboss.netty.buffer.ChannelBuffers;
 
 public class PacketMessageTable {
-	PacketSequence[] messages;
+	LinkedHashMap<byte[], PacketSequence> messages;
 	int lastMessageId;
-	int maxMessageId;
+	int maxConcurrentMessages;
+	int maxSequenceId;
 	
-	public PacketMessageTable(int maxMessageId, int maxSequenceId){
+	public PacketMessageTable(int maxConcurrentMessages, int maxSequenceId){
 		lastMessageId = 0;
-		messages = new PacketSequence[maxMessageId];
-		for(int i = 0; i < maxMessageId; i++){
-			messages[i] = new PacketSequence(maxSequenceId);
-		}
-		this.maxMessageId = maxMessageId;
+		messages = new LinkedHashMap<byte[], PacketSequence>();
+		this.maxConcurrentMessages = maxConcurrentMessages;
+		this.maxSequenceId = maxSequenceId;
 	}
 	
-	public ChannelBuffer put(int messageId, int sequenceId, ChannelBuffer channelBuffer){
-		PacketSequence currentMessage = messages[messageId];
-		currentMessage.put(sequenceId, channelBuffer);
-		if(messageId > lastMessageId){
-			lastMessageId = messageId;
-			int toClear = lastMessageId - maxMessageId/2;
-			messages[toClear].clear();
+	public ChannelBuffer put(byte[] messageId, int sequenceId, ChannelBuffer channelBuffer){
+		PacketSequence currentMessage;
+		if(!messages.containsKey(messageId)){
+			if(messages.size() == maxConcurrentMessages){
+				byte[] firstId = messages.keySet().iterator().next();
+				messages.remove(firstId);
+			}
+			currentMessage = new PacketSequence(maxSequenceId);
+			messages.put(messageId, currentMessage);
 		}
-		if(currentMessage.count == 0){
-			ArrayList<ChannelBuffer> channelList = new ArrayList<ChannelBuffer>();
-			channelList = currentMessage.toArrayList();
-			//TODO: merge the first length packets
-			currentMessage.clear();
-			// TODO: return the new ChannelBuffer
-			return null;
+		else{
+			currentMessage = messages.get(messageId);
+		}
+		currentMessage.put(sequenceId, channelBuffer);
+		if(currentMessage.getCount() == 0){
+			ChannelBuffer[] channelArray = currentMessage.toArray();
+			messages.remove(messageId);
+			return ChannelBuffers.wrappedBuffer(channelArray);
 		}
 		else{
 			return null;
 		}
 	}
 	
-	public void setLength(int messageId, int length){
-		messages[messageId].setLength(length);
+	public void setLength(byte[] messageId, int length){
+		PacketSequence currentSequence = messages.get(messageId);
+		currentSequence.setLength(length);
 	}
 	
 }
