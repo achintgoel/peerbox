@@ -11,14 +11,16 @@ import rpc.RPCHandler;
 public class KadThisBetterWork implements Runnable {
 	static int port;
 	static boolean first;
+	static int successes;
 	
 	public static void main(String[] args) {
 		port = 7012;
 		first = true;
+		successes = 0;
 		
 		
 		
-		for (int i = 0; i < 20; i++) {
+		for (int i = 0; i < 100; i++) {
 			try {
 				Thread.sleep(550);
 			} catch (InterruptedException e) {
@@ -40,18 +42,22 @@ public class KadThisBetterWork implements Runnable {
 			} catch (URISyntaxException e) {
 				e.printStackTrace();
 			}
-			System.out.println("Second node created");
+			System.out.println("Next node created");
 			instance.bootstrap(startURIs, new BootstrapListener() {
 	
 				@Override
 				public void onBootstrapSuccess() {
-					System.out.println("Second Node Bootstrap Complete");
+					System.out.println("Next Node Bootstrap Complete");
+					successes++;
+					if (successes == 100) {
+						System.out.println("They all bootstrapped successfully!!!!!!");
+					}
 					
 				}
 	
 				@Override
 				public void onBootstrapFailure() {
-					System.out.println("Second Node Bootstrap Failed");
+					System.out.println("Next Node Bootstrap Failed");
 					
 				}
 				
