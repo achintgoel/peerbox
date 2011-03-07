@@ -4,11 +4,18 @@ import java.util.ArrayList;
 
 import org.jboss.netty.buffer.ChannelBuffer;
 
+
+/**
+ * This class stores the packets from one message sorted according to the sequence numbers
+ * @author vineet
+ *
+ */
 public class PacketSequence {
 	ChannelBuffer[] packets;
 	int count;
 	int maxSequenceId;
 	int length;
+	long timestamp;
 	
 	public PacketSequence(int maxSequenceId){
 		packets = new ChannelBuffer[maxSequenceId + 1];
@@ -19,6 +26,7 @@ public class PacketSequence {
 	
 	
 	public void put(int sequenceId, ChannelBuffer channelBuffer){
+		timestamp = System.currentTimeMillis()/1000;
 		packets[sequenceId] = channelBuffer;
 		count++;
 	}
@@ -42,5 +50,9 @@ public class PacketSequence {
 			returnArray[i] = packets[i];
 		}
 		return returnArray;
+	}
+	
+	public long getTimeStamp(){
+		return timestamp;
 	}
 }
