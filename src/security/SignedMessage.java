@@ -9,7 +9,9 @@ public class SignedMessage implements Serializable {
 		message = mess;
 		signature = sig;
 	}
-
+	protected SignedMessage() {
+		
+	}
 	public String getMessage() {
 		return message;
 	}

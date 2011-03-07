@@ -4,6 +4,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.security.PublicKey;
 
+import security.SecureMessageHandler;
 import security.SignedMessage;
 
 import com.google.gson.Gson;
@@ -17,29 +18,47 @@ import dht.ValueListener;
 public class UserDistributedMap implements DistributedMap<PublicKey, URI>{
 	
 	DistributedMap<String, String> myDistributedMap;
+	SecureMessageHandler secure;
 
-	public UserDistributedMap(DistributedMap<String, String> dm) {
+	public UserDistributedMap(DistributedMap<String, String> dm, SecureMessageHandler secure) {
 		myDistributedMap = dm;
+		//this.secure = secure;
+		this.secure = secure;
 	}
 
 	@Override
-	public void get(PublicKey key, final ValueListener<URI> vl) {
+	public void get(final PublicKey key, final ValueListener<URI> vl) {
 		
 		final Gson gson = new Gson();
-		//TODO: PublicKey cannot be converted to a String via toString!
-		myDistributedMap.get(key.toString(), new ValueListener<String>(){
+		myDistributedMap.get(gson.toJson(key.getEncoded()), new ValueListener<String>(){
 			public void valueComplete(final ValueEvent<String> valueEvent) {
 				if(valueEvent.exists()) {
 					URI address;
 					try {
-						//TODO: Validate Signed Message Prior to Returning!
-						address = new URI(gson.fromJson(valueEvent.getValue(), SignedMessage.class).getMessage());
-						vl.valueComplete(new ValueEvent<URI>(address));
+						SignedMessage signedMessage = gson.fromJson(valueEvent.getValue(), SignedMessage.class);
+						//System.out.println("Validating signed message");
+						//System.out.println("public key: " + key.getEncoded());
+						//System.out.println("message: " + signedMessage.getMessage());
+						//System.out.println("signature: " + signedMessage.getSignature());
+						if(secure.verifyMessage(signedMessage.getMessage(), signedMessage.getSignature(), key)) {
+							address = new URI(signedMessage.getMessage());
+							vl.valueComplete(new ValueEvent<URI>(address));
+						}
+						else {
+							System.out.println("verification didnt work");
+							vl.valueComplete(new ValueEvent<URI>());
+						}
 					} catch (JsonSyntaxException e) {
+						System.out.println("json syntax exception!!");
 						e.printStackTrace();
+						vl.valueComplete(new ValueEvent<URI>());
+						
 
 					} catch (URISyntaxException e) {
+						System.out.println("URI syntax exception");
 						e.printStackTrace();
+						vl.valueComplete(new ValueEvent<URI>());
+						
 					}
 				}
 				else {
@@ -52,12 +71,10 @@ public class UserDistributedMap implements DistributedMap<PublicKey, URI>{
 	}
 
 	@Override
-	public void put(PublicKey key, URI value) {
-		//TODO: This does not work! Must create a signed message of the URI, not serialize URI directly for storage in map!
-		//Additionally, public key cannot be stored with "toString" must serialize to binary first, and store as part of a
-		//serialized object!
+	public void put(PublicKey key, URI val) {
 		Gson gson = new Gson();
-		myDistributedMap.put(key.toString(), gson.toJson(value));
+		SignedMessage signedMessage = new SignedMessage(val.toString(), secure.signMessage(val.toString()));
+		myDistributedMap.put(gson.toJson(key.getEncoded()), gson.toJson(signedMessage));
 	}
 
 
