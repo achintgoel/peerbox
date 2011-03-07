@@ -5,25 +5,46 @@ import java.util.ArrayList;
 import org.jboss.netty.buffer.ChannelBuffer;
 
 public class PacketSequence {
-	protected final ArrayList<ChannelBuffer> packets;
+	ChannelBuffer[] packets;
 	int count;
 	int maxSequenceId;
+	int length;
 	
 	public PacketSequence(int maxSequenceId){
-		packets = new ArrayList<ChannelBuffer>(maxSequenceId);
+		packets = new ChannelBuffer[maxSequenceId + 1];
 		this.maxSequenceId = maxSequenceId;
 		this.count = 0;
+		this.length = 0;
 	}
 	
-	public void clear(int messageId){
+	public void clear(){
 		count = 0;
-		
+		length = 0;
 	}
 	
-	public void put(int messageId, int sequenceId, ChannelBuffer channelBuffer){
-		
+	public void put(int sequenceId, ChannelBuffer channelBuffer){
+		packets[sequenceId] = channelBuffer;
+		count++;
 	}
 	
-	public void setLength(int messageId, int length){
+	public void setLength(int length){
+		count = count - length;
+		this.length = length; 
+	}
+	
+	public int getLength(){
+		return length;
+	}
+	
+	public int getCount(){
+		return count;
+	}
+
+	public ArrayList<ChannelBuffer> toArrayList() {
+		ArrayList<ChannelBuffer> returnList = new ArrayList<ChannelBuffer>();
+		for(int i = 0; i < length; i++){
+			returnList.add(packets[i]);
+		}
+		return returnList;
 	}
 }
