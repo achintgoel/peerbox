@@ -15,5 +15,13 @@ public class ByteTesting {
 		System.out.println(bytes[0]);
 		System.out.println(bytes[1]);
 		System.out.println(new BigInteger(bytes));
+		
+		
+		int hello = 0 - Byte.MAX_VALUE;
+		byte blah = (byte) hello;
+		System.out.println(hello);
+		System.out.println(blah);
+		hello = (int) blah + Byte.MAX_VALUE;
+		System.out.println(hello);
 	}
 }
