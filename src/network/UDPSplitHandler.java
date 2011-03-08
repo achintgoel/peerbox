@@ -1,13 +1,17 @@
 package network;
 
-import java.util.LinkedList;
+import java.net.SocketAddress;
+import java.util.HashMap;
+import java.util.Random;
 
 import org.jboss.netty.buffer.ChannelBuffer;
 import org.jboss.netty.buffer.ChannelBuffers;
 import org.jboss.netty.channel.ChannelDownstreamHandler;
 import org.jboss.netty.channel.ChannelEvent;
+import org.jboss.netty.channel.ChannelFuture;
 import org.jboss.netty.channel.ChannelHandlerContext;
 import org.jboss.netty.channel.ChannelUpstreamHandler;
+import org.jboss.netty.channel.Channels;
 import org.jboss.netty.channel.MessageEvent;
 
 /**
@@ -15,33 +19,24 @@ import org.jboss.netty.channel.MessageEvent;
  * Netty In/Out Handler that splits/regroups messages into/from multiple UDP packets due
  * to maximum packet length limitations
  * 
- * Uses custom fixed-length header:
- *    First Packet in Message: | 6bit MSG ID | 0 | 9bit LENGTH  |
- *    Subsequent Packets:      | 6bit MSG ID | 1 | 9bit SEQ NUM |
  * 
- *    All numbers are assumed to be Big-Endian positive binary
- *    
- *    MSG IDs are unique for a specific message, every 64 messages sent:
- *    Range (0, 63)
- *    
- *    LENGTH specifies the number of packets to be sent as part of the 
- *    message (0 means only this packet)
- *    
- *    SEQ NUM specifies (in ascending numerical order) the position of
- *    the specific packet in the message sequence
- *    (1 means the second packet in the sequence, no sequence 
- *    number is present for the 0th packet)
- *    Max = LENGTH
  * 
  * @author rajiv
  */
 public class UDPSplitHandler implements ChannelUpstreamHandler, ChannelDownstreamHandler {
 	
-	private final PacketMessageTable pmt;
+	private final HashMap<SocketAddress, PacketMessageTable> pmtMap;
+	private final int maxPacketSize;
+	private final int MAX_SEQUENCE_SIZE = 65536;
+	private final int FIRST_MESSAGE_HEADER_SIZE = 4;
+	private final int NEXT_MESSAGE_HEADER_SIZE = 3;
+	private int lastSentMessageId;
 	
-	public UDPSplitHandler() {
+	public UDPSplitHandler(int maxPacketSize) {
 		super();
-		pmt = new PacketMessageTable(63, 511);
+		pmtMap = new HashMap<SocketAddress, PacketMessageTable>();
+		this.maxPacketSize = maxPacketSize;
+		lastSentMessageId = new Random().nextInt();
 	}
 	
 	@Override
@@ -51,11 +46,63 @@ public class UDPSplitHandler implements ChannelUpstreamHandler, ChannelDownstrea
             ctx.sendDownstream(e);
             return;
         }
-		Object m = ((MessageEvent) e).getMessage();
+		MessageEvent me = (MessageEvent) e; 
+		Object m = me.getMessage();
 		if (!(m instanceof ChannelBuffer)) {
             ctx.sendDownstream(e);
             return;
         }
+		
+		ChannelBuffer cb = (ChannelBuffer) m;
+		if (!cb.readable()) return;
+		//System.out.println("size: " + cb.readableBytes());
+		int totalBytes = cb.readableBytes();
+		int totalPackets = 1;
+		if (totalBytes + FIRST_MESSAGE_HEADER_SIZE > maxPacketSize) {
+			int tbMinusFirst = totalBytes - (maxPacketSize - FIRST_MESSAGE_HEADER_SIZE);
+			totalPackets += tbMinusFirst / (maxPacketSize - NEXT_MESSAGE_HEADER_SIZE);
+			if (totalPackets % (maxPacketSize - NEXT_MESSAGE_HEADER_SIZE) > 0) {
+				totalPackets++;
+			}
+		}
+		if (totalPackets > MAX_SEQUENCE_SIZE) {
+			//TODO: how do we throw a failure?
+			return;
+		}
+		
+		byte[] messageId = new byte[2];
+		int packet = 0;
+		messageId[0] = (byte) lastSentMessageId++;
+		messageId[1] = (byte) (lastSentMessageId >>> 8);
+		byte[] header = new byte[FIRST_MESSAGE_HEADER_SIZE];
+		header[0] = messageId[0];
+		header[1] = messageId[1];
+		header[2] = (byte) (packet - Byte.MAX_VALUE);
+		header[3] = (byte) (totalPackets - Byte.MAX_VALUE - 1);
+		//System.out.println("S length: " + totalPackets);
+		//System.out.println("Sent: " + ((short) lastSentMessageId) + "," + 0);
+		ChannelBuffer headerBuf = ChannelBuffers.copiedBuffer(header);
+		int dataSize = cb.readableBytes() < (maxPacketSize - FIRST_MESSAGE_HEADER_SIZE) ? cb.readableBytes() : (maxPacketSize - FIRST_MESSAGE_HEADER_SIZE);
+		ChannelBuffer dataBuf = cb.slice(cb.readerIndex(), dataSize);
+		cb.readerIndex(cb.readerIndex() + dataSize);
+		ChannelBuffer frameBuf = ChannelBuffers.wrappedBuffer(headerBuf, dataBuf);
+		ChannelFuture future = Channels.future(ctx.getChannel());
+		Channels.write(ctx, future, frameBuf, me.getRemoteAddress());
+		while (cb.readable()) {
+			header = new byte[NEXT_MESSAGE_HEADER_SIZE];
+			header[0] = messageId[0];
+			header[1] = messageId[1];
+			header[2] = (byte) (++packet - Byte.MAX_VALUE);
+			headerBuf = ChannelBuffers.copiedBuffer(header);
+			dataSize = cb.readableBytes() < (maxPacketSize - NEXT_MESSAGE_HEADER_SIZE) ? cb.readableBytes() : (maxPacketSize - NEXT_MESSAGE_HEADER_SIZE);
+			dataBuf = cb.slice(cb.readerIndex(), dataSize);
+			cb.readerIndex(cb.readerIndex() + dataSize);
+			frameBuf = ChannelBuffers.wrappedBuffer(headerBuf, dataBuf);
+			future = Channels.future(ctx.getChannel());
+			//System.out.println("Sent: " + ((short) lastSentMessageId) + "," + packet);
+			//System.out.println("sending: " + frameBuf);
+			Channels.write(ctx, future, frameBuf, me.getRemoteAddress());
+		}
 	}
 
 	@Override
@@ -65,24 +112,40 @@ public class UDPSplitHandler implements ChannelUpstreamHandler, ChannelDownstrea
             ctx.sendUpstream(e);
             return;
         }
-		Object m = ((MessageEvent) e).getMessage();
+		MessageEvent me = (MessageEvent) e; 
+		Object m = me.getMessage();
 		if (!(m instanceof ChannelBuffer)) {
             ctx.sendUpstream(e);
             return;
         }
 		ChannelBuffer cb = (ChannelBuffer) m;
+		if (!cb.readable()) return;
 		
-		byte[] idBytes = new byte[2];
-		cb.getBytes(0, idBytes);
-		byte[] seqBytes = new byte[1];
-		cb.getBytes(2, seqBytes);
-
-		int seq = 0;
-		seq |= seqBytes[0];
-		seq <<= 8;
-		seq |= seqBytes[1];
-		
-		
+		try {
+			short id = cb.readShort();
+			int seq = ((int) cb.readByte()) + Byte.MAX_VALUE;
+			//System.out.println("Received: " + id + "," + seq);
+			
+			PacketMessageTable pmt = pmtMap.get(me.getRemoteAddress());
+			if (pmt == null) {
+				pmt = new PacketMessageTable(32, MAX_SEQUENCE_SIZE - 1, 45);
+				pmtMap.put(me.getRemoteAddress(), pmt);
+			}
+						
+			if (seq == 0) {
+				int length = ((int) cb.readByte()) + Byte.MAX_VALUE + 1;
+				//System.out.println("R length: " + length);
+				pmt.setLength(id, length);
+			}
+			cb.discardReadBytes();
+			cb = pmt.put(id, seq, cb);
+			if (cb != null) {
+				//System.out.println("read packets pushed upstream");
+				Channels.fireMessageReceived(ctx, cb, me.getRemoteAddress());
+			}
+		} catch (IndexOutOfBoundsException exception) {
+			exception.printStackTrace();
+		}
 	}
 	
 	

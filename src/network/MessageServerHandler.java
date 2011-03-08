@@ -35,6 +35,7 @@ public class MessageServerHandler extends SimpleChannelUpstreamHandler {
         b.setPipelineFactory(new ChannelPipelineFactory() {
             public ChannelPipeline getPipeline() throws Exception {
                 return Channels.pipeline(
+                		new UDPSplitHandler(512),
                         new StringEncoder(CharsetUtil.ISO_8859_1),
                         new StringDecoder(CharsetUtil.ISO_8859_1),
                         new MessageServerHandler(messageListener, "udp"));
@@ -80,7 +81,7 @@ public class MessageServerHandler extends SimpleChannelUpstreamHandler {
 			uri = null;
 		}
     	IncomingMessage message = new IncomingMessage(e, uri, data);
-//    	System.out.println(System.currentTimeMillis() + " [R]: " + message.toString());  //DEBUG, TODO: REMOVE
+    	//System.out.println(System.currentTimeMillis() + " [R]: " + message.toString());  //DEBUG, TODO: REMOVE
     	downstreamMessageListener.onMessage(message);
     }
 
