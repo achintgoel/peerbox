@@ -2,9 +2,12 @@ package fileshare;
 
  
 
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.Calendar;
 import java.util.UUID;
 
+import network.http.HttpStaticFileServer;
 import rpc.RPCEvent;
 import rpc.ServiceRequestListener;
 
@@ -52,8 +55,15 @@ public class FileshareRequestListener implements ServiceRequestListener{
 				//TODO: figure out how to determine local IP address
 				//URI uri = new URI("http://")
 				//TODO: set the expiration date properly
+				//TODO: take out hard coded file response URI
 				manager.setRequestIDtoFileRequest(fnr.getRelativePath(), requestId, fnr.getFile().getName(), Calendar.getInstance().getTime(), fnr.fromFriend.getNetworkAddress());
-				response = new FileResponse(null);
+				HttpStaticFileServer httpserver = new HttpStaticFileServer(8000, manager);
+				try {
+					response = new FileResponse(new URI("http://localhost:8000/"+requestId));
+				} catch (URISyntaxException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}
 			}
 			if(response != null){
 				String responseString = gson.toJson(response);
