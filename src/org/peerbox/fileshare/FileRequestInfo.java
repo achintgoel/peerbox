@@ -5,9 +5,9 @@ import java.util.Date;
 
 public class FileRequestInfo {
 	protected URI fromURI;
-	protected Date expiration;
+	protected long expiration;
 	protected String filePath;
-	public FileRequestInfo(URI fromURI, Date expiration, String path) {
+	public FileRequestInfo(URI fromURI, long expiration, String path) {
 		super();
 		this.fromURI = fromURI;
 		this.expiration = expiration;
@@ -19,10 +19,10 @@ public class FileRequestInfo {
 	public void setFromURI(URI fromURI) {
 		this.fromURI = fromURI;
 	}
-	public Date getExpiration() {
+	public long getExpiration() {
 		return expiration;
 	}
-	public void setExpiration(Date expiration) {
+	public void setExpiration(long expiration) {
 		this.expiration = expiration;
 	}
 	public String getFilePath() {

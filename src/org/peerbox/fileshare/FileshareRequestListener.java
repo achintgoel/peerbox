@@ -49,7 +49,7 @@ public class FileshareRequestListener implements ServiceRequestListener{
 				}
 				
 			}
-			else if(command.equals(FileRequest.command)) {
+			else if(command.equals(FileRequest.COMMAND)) {
 				FileRequest fnr = gson.fromJson(root, FileRequest.class);
 				String requestId = UUID.randomUUID().toString();
 				//TODO: generate URI to pass to client
@@ -57,10 +57,10 @@ public class FileshareRequestListener implements ServiceRequestListener{
 				//URI uri = new URI("http://")
 				//TODO: set the expiration date properly
 				//TODO: take out hard coded file response URI
-				manager.setRequestIDtoFileRequest(fnr.getRelativePath(), requestId, fnr.getFile().getName(), Calendar.getInstance().getTime(), fnr.fromFriend.getNetworkAddress());
-				HttpStaticFileServer httpserver = new HttpStaticFileServer(8000, manager);
+				manager.setRequestIDtoFileRequest(fnr.getRelativePath(), requestId, fnr.getFile().getName(), (System.currentTimeMillis()/1000) + 10, fnr.fromFriend.getNetworkAddress());
+				HttpStaticFileServer httpserver = new HttpStaticFileServer(8012, manager);
 				try {
-					response = new FileResponse(new URI("http://localhost:8000/"+requestId));
+					response = new FileResponse(new URI("http://localhost:8012/"+requestId));
 				} catch (URISyntaxException e1) {
 					// TODO Auto-generated catch block
 					e1.printStackTrace();

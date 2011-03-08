@@ -1,6 +1,7 @@
 package org.peerbox.testlets;
 
 import java.net.URI;
+import java.net.URISyntaxException;
 
 import org.peerbox.fileshare.FileInfo;
 import org.peerbox.fileshare.FileShareManager;
@@ -9,8 +10,8 @@ import org.peerbox.fileshare.messages.FileRequest;
 import org.peerbox.fileshare.messages.FileResponse;
 import org.peerbox.fileshare.messages.SharedDirectoryRequest;
 import org.peerbox.fileshare.messages.SharedDirectoryResponse;
+import org.peerbox.friendpeer.Friend;
 import org.peerbox.rpc.RPCEvent;
-
 
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
@@ -66,7 +67,13 @@ public class SharedFileTest {
 			public String getDataString() {
 				// TODO Auto-generated method stub
 				Gson gson = new Gson();
-				return gson.toJson(new FileRequest(null, new FileInfo("hello.txt", "", 0), null));
+				try {
+					return gson.toJson(new FileRequest(new Friend(null, "newfriend", new URI("udp://localhost:8003"), null), null, new FileInfo("3 Idiots.avi", "", 0), ""));
+				} catch (URISyntaxException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+				return null;
 			}
 
 			@Override
