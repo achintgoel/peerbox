@@ -9,13 +9,15 @@ public class FileRequest extends Request{
 	protected FileInfo file;
 	protected String relativePath;
 	
-	final static public String command = "get_file";
+	final static public String COMMAND = "get_file";
 	
-	public FileRequest(Friend targetFriend, FileInfo file, String relativePath) {
+	public FileRequest(Friend fromFriend, Friend targetFriend, FileInfo file, String relativePath) {
 		super();
 		this.relativePath = relativePath;
+		this.fromFriend = fromFriend;
 		this.targetFriend = targetFriend;
 		this.file = file;
+		this.command = COMMAND;
 	}
 	protected FileRequest() {
 		

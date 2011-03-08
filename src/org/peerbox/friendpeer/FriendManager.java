@@ -75,7 +75,7 @@ public class FriendManager {
 			public void valueComplete(final ValueEvent<URI> val){
 				if(val.exists()){
 					friend.setAddress(val.getValue());
-					//System.out.println("new URI of friend is: "+friend.getNetworkAddress().toString());
+					System.out.println("new URI of friend is: "+friend.getNetworkAddress().toString());
 				}
 				else {
 					System.out.println("New uri retrieval didnt work!!");

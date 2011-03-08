@@ -102,10 +102,11 @@ public class FileShareManager {
 	}
 
 	public void getFile(String relativePath, Friend friend, FileInfo file, ResponseListener<FileResponse> response) {
-		FileRequest request = new FileRequest(friend, file, relativePath);
+		//TODO: figure out how to get from friend info
+		FileRequest request = new FileRequest(null, friend, file, relativePath);
 		this.sendRequestRPC(friend, request, FileResponse.class, response);
 	}
-	public void setRequestIDtoFileRequest(String relativePath, String requestID, final String filename, Date expiration, URI requestFrom) {
+	public void setRequestIDtoFileRequest(String relativePath, String requestID, final String filename, long expiration, URI requestFrom) {
 		File requestDir = new File(mySharedDirectory.getAbsolutePath().concat(relativePath));
 		File[] files = requestDir.listFiles(new FilenameFilter() {
 			public boolean accept(File arg0, String arg1) {
@@ -127,8 +128,15 @@ public class FileShareManager {
 	}
 	public String getFilePath(URI uri) {
 		String requestID = uri.getPath();
-		if(requestIDtoFileRequest.get(requestID).getExpiration().after(Calendar.getInstance().getTime())){
-			return requestIDtoFileRequest.get(requestID).getFilePath();
+		if(requestID.length() > 1) {
+			requestID = requestID.substring(1);
+			FileRequestInfo fri = requestIDtoFileRequest.get(requestID);
+			if(fri != null) {
+				System.out.println("expiration:"+fri.getExpiration()+" current time:"+System.currentTimeMillis()/1000);
+				if(fri.getExpiration() > (System.currentTimeMillis()/1000)){
+					return requestIDtoFileRequest.get(requestID).getFilePath();
+				}
+			}
 		}
 		return null;
 

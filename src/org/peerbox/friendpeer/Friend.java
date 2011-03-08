@@ -9,7 +9,7 @@ public class Friend {
 	protected PublicKey pubKey;
 	protected FriendManager manager;
 	
-	Friend(FriendManager fm, String al, URI address, PublicKey pub) {
+	public Friend(FriendManager fm, String al, URI address, PublicKey pub) {
 		manager = fm;
 		alias = al;
 		this.address = address;
