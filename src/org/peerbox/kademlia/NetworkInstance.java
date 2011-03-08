@@ -43,12 +43,12 @@ public class NetworkInstance {
 	public NetworkInstance(RPCHandler rpcHandler) {
 		gson = new Gson();
 		rpcServiceName = "kad";
-		buckets = new Buckets(this);
 		compositeDataFilter = new CompositeDataFilter();
 		localDataStore = new LocalDataStore();
 		this.rpcHandler = rpcHandler;
 		rpcHandler.registerServiceListener(rpcServiceName, new KademliaRequestListener(this));
 		localIdentifier = Identifier.generateRandom(); // Possibly remember for future restarts
+		buckets = new Buckets(this);
 		primaryDHT = new PrimaryDHT(this);
 	}
 	
@@ -57,11 +57,11 @@ public class NetworkInstance {
 	protected NetworkInstance(byte[] bytes){
 		gson = null;
 		rpcServiceName = "kad";
-		buckets = new Buckets(this);
 		compositeDataFilter = null;
 		localDataStore = null;
 		this.rpcHandler = null;
 		localIdentifier = Identifier.fromBytes(bytes); // Possibly remember for future restarts	
+		buckets = new Buckets(this);
 		primaryDHT = new PrimaryDHT(this);
 	}
 	
@@ -216,9 +216,26 @@ public class NetworkInstance {
 	}
 	
 	//Maybe put in Node
-	public void ping(Node targetNode, ResponseListener<PingResponse> responseListener) {
+	public void ping(final Node targetNode, final ResponseListener<PingResponse> responseListener) {
 		PingRequest request = new PingRequest(getLocalNodeIdentifier(), targetNode.getIdentifier());
-		this.sendRequestRPC(targetNode, request, PingResponse.class, responseListener);
+		this.sendRequestRPC(targetNode, request, PingResponse.class, new ResponseListener<PingResponse>() {
+			@Override
+			public void onResponseReceived(PingResponse response) {
+				if (response.getMyNodeId() == null) {
+					responseListener.onFailure();
+				}
+				if (targetNode.getIdentifier() != null && response.getMyNodeId().equals(targetNode.getIdentifier())) {
+					responseListener.onFailure();
+				} else {
+					responseListener.onResponseReceived(response);
+				}
+			}
+
+			@Override
+			public void onFailure() {
+				responseListener.onFailure();
+			}
+		});
 	}
 	
 	public void bootstrap(List<URI> friends, BootstrapListener bootstrapListener) {
