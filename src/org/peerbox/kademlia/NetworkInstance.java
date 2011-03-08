@@ -103,7 +103,7 @@ public class NetworkInstance {
 		};
 	}
 	
-	protected <T extends Response> void sendRequestRPC(Node destination, Request request, final Class<T> responseClass, final ResponseListener<T> callback) {
+	protected <T extends Response> void sendRequestRPC(final Node destination, Request request, final Class<T> responseClass, final ResponseListener<T> callback) {
 		String requestData = gson.toJson(request);
 		getRPC().sendRequest(destination.getNetworkURI(), rpcServiceName, requestData, new RPCResponseListener() {
 			public void onResponseReceived(RPCEvent event) {
@@ -116,6 +116,7 @@ public class NetworkInstance {
 
 			@Override
 			public void onTimeout() {
+				buckets.remove(destination);
 				callback.onFailure();
 				
 			}

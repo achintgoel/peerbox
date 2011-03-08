@@ -41,7 +41,7 @@ public class Buckets implements NodeStatusListener {
 	 * Should be called when a node is detected to be offline
 	 */
 	public void onNodeDown(Node node) {
-		buckets.get(calculateBucketNumber(node)).remove(node);
+		remove(node);
 	}
 	
 	/**
@@ -173,5 +173,9 @@ public class Buckets implements NodeStatusListener {
 				System.out.println();
 			}
 		}
+	}
+	
+	public void remove(Node node){
+		buckets.get(calculateBucketNumber(node)).remove(node);
 	}
 }
