@@ -1,8 +1,11 @@
 package org.peerbox.rpc;
 
 import java.net.URI;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Timer;
+import java.util.TimerTask;
 import java.util.UUID;
 
 import org.peerbox.network.IncomingMessage;
@@ -18,12 +21,15 @@ public class RPCHandler {
 	final protected Map<String, ServiceRequestListener> registeredServices;
 	protected MessageSender messageSender;
 	final static protected String VERSION = "1.0";
+	final protected int TIMEOUT_SECS = 10;
+	final protected Timer timeoutTimer;
 	final protected Gson gson = new Gson();
 	final protected Map<String, RPCWaitingRequest> waitingRequests;
 	
 	protected RPCHandler() {
 		registeredServices = new HashMap<String, ServiceRequestListener>();
-		waitingRequests = new HashMap<String, RPCWaitingRequest>();
+		waitingRequests = Collections.synchronizedMap(new HashMap<String, RPCWaitingRequest>());
+		timeoutTimer = new Timer("rpcTimeoutTimer", true);
 	}
 	
 	public static RPCHandler getUDPInstance(int port) {
@@ -44,11 +50,20 @@ public class RPCHandler {
 		}
 	}
 	
-	public void sendRequest(URI recipient, String serviceName, String dataString, RPCResponseListener responseListener) {
-		String uuid = UUID.randomUUID().toString(); // Is this safe to assume absolute local uniqueness?
+	public void sendRequest(URI recipient, String serviceName, String dataString, final RPCResponseListener responseListener) {
+		final String uuid = UUID.randomUUID().toString(); // Is this safe to assume absolute local uniqueness?
 		RPCMessage requestMessage = new RPCMessage(VERSION, serviceName, uuid, dataString, null);
-		waitingRequests.put(uuid, new RPCWaitingRequest(requestMessage, recipient, responseListener));
+		TimerTask timeoutTask = new TimerTask() {
+			@Override
+			public void run() {
+				if (waitingRequests.remove(uuid) != null) {
+					responseListener.onTimeout();
+				}
+			}
+		};
+		waitingRequests.put(uuid, new RPCWaitingRequest(requestMessage, recipient, responseListener, timeoutTask));
 		messageSender.sendData(recipient, gson.toJson(requestMessage));
+		timeoutTimer.schedule(timeoutTask, 1000 * TIMEOUT_SECS);
 	}
 	
 	IncomingMessageListener newListener() {
@@ -96,6 +111,7 @@ public class RPCHandler {
 					RPCWaitingRequest waitingRequest = waitingRequests.get(rpcMessage.getId());
 					// && waitingRequest.getRequestRecipient().equals(message.getSenderURI())
 					if (waitingRequest != null && waitingRequest.getRequestMessage().getService().equals(rpcMessage.getService())) {
+						waitingRequest.timeoutTask.cancel();
 						waitingRequests.remove(rpcMessage.getId());
 						waitingRequest.getResponseListener().onResponseReceived(new RPCEvent() {
 							@Override

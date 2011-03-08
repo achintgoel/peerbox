@@ -115,6 +115,12 @@ public class NetworkInstance {
 					e.printStackTrace();
 				}
 			}
+
+			@Override
+			public void onTimeout() {
+				callback.onFailure();
+				
+			}
 		});
 	}
 	

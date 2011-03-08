@@ -88,6 +88,11 @@ public class FileShareManager {
 					e.printStackTrace();
 				}
 			}
+
+			@Override
+			public void onTimeout() {
+				callback.onFailure();
+			}
 		});
 	}
 	

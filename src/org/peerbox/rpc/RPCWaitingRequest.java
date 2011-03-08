@@ -1,16 +1,19 @@
 package org.peerbox.rpc;
 
 import java.net.URI;
+import java.util.TimerTask;
 
 class RPCWaitingRequest {
 	final protected RPCMessage requestMessage;
 	final protected RPCResponseListener responseListener;
 	final protected URI requestRecipient;
+	final protected TimerTask timeoutTask;
 	
-	public RPCWaitingRequest(RPCMessage requestMessage, URI requestRecipient, RPCResponseListener responseListener) {
+	public RPCWaitingRequest(RPCMessage requestMessage, URI requestRecipient, RPCResponseListener responseListener, TimerTask timeoutTask) {
 		this.requestMessage = requestMessage;
 		this.requestRecipient = requestRecipient;
 		this.responseListener = responseListener;
+		this.timeoutTask = timeoutTask;
 	}
 	
 	/**
@@ -34,5 +37,9 @@ class RPCWaitingRequest {
 	 */
 	public URI getRequestRecipient() {
 		return requestRecipient;
+	}
+	
+	public TimerTask getTimeoutTask() {
+		return timeoutTask;
 	}
 }
