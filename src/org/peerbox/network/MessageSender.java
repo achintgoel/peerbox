@@ -1,8 +1,10 @@
 package org.peerbox.network;
 
+import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.net.UnknownHostException;
 
 import org.jboss.netty.channel.Channel;
 
@@ -20,11 +22,22 @@ public class MessageSender {
 //		System.out.println(System.currentTimeMillis() + " [S]: " + destination.toString() + ": " + data); //DEBUG, TODO: REMOVE
 	}
 	
+	/**
+	 * Can return null if local ip address is unknown
+	 * Will only return a single IP address even if we are bound to multiple
+	 * @return
+	 */
 	public URI getLocalURI() {
 		InetSocketAddress addr = (InetSocketAddress) channel.getLocalAddress();
     	URI uri;
     	try {
-			uri = new URI(protocol + "://" + addr.getHostName() + ":" + addr.getPort());
+			try {
+				uri = new URI(protocol + "://" + InetAddress.getLocalHost().getHostAddress() + ":" + addr.getPort());
+			} catch (UnknownHostException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+				uri = null;
+			}
 		} catch (URISyntaxException e1) {
 			e1.printStackTrace();
 			uri = null;

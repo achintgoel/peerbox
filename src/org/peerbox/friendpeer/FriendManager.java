@@ -22,16 +22,19 @@ public class FriendManager {
 	protected SecureMessageHandler secure;
 	protected PublicKey myPubKey;
 	protected PrivateKey myPrivKey;
-	public FriendManager(DistributedMap<String, String> map) {
+	
+	public FriendManager(DistributedMap<String, String> map, SecureMessageHandler secure) {
 		KeyToFriend = new HashMap<PublicKey, Friend>();
 		AliasToKey = new HashMap<String, Friend>();
 		
-		secure = new SecureMessageHandler();
+		this.secure = secure;
 		KeyPair keypair = secure.getKeyPair();
 		myPubKey = keypair.getPublic();
 		myPrivKey = keypair.getPrivate();
 		userTable = new UserDistributedMap(map, secure);
 	}
+	
+	
 	
 	public Friend getPublicKey(String alias) {
 		return AliasToKey.get(alias);

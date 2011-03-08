@@ -12,6 +12,7 @@ import org.peerbox.friendpeer.FriendManager;
 import org.peerbox.kademlia.BootstrapListener;
 import org.peerbox.kademlia.NetworkInstance;
 import org.peerbox.rpc.RPCHandler;
+import org.peerbox.security.SecureMessageHandler;
 
 
 public class FileShareTest {
@@ -49,7 +50,7 @@ public class FileShareTest {
 				}
 			});
 		}
-		final FriendManager manager = new FriendManager(instance.getSingleMap("users"));
+		final FriendManager manager = new FriendManager(instance.getSingleMap("users"), new SecureMessageHandler());
 		manager.signOn(port);
 		System.out.println("signed on properly");
 		Scanner scan = new Scanner(System.in);

@@ -36,7 +36,7 @@ public class DumbCLI {
 		LinkedList<URI> startURIs = new LinkedList<URI>();
 		for (int i = 1; i < args.length; i++) {
 			try {
-				startURIs.add(new URI("udp://localhost:" + args[i]));
+				startURIs.add(new URI("udp://" + args[i]));
 			} catch (URISyntaxException e) {
 				e.printStackTrace();
 			}

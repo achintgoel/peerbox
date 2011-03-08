@@ -5,7 +5,6 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.peerbox.dht.CompositeDataFilter;
-import org.peerbox.dht.CompositeKey;
 import org.peerbox.dht.DistributedMap;
 import org.peerbox.dht.LocalDataStore;
 import org.peerbox.dht.MapDataFilter;
@@ -23,7 +22,6 @@ import org.peerbox.kademlia.messages.StoreResponse;
 import org.peerbox.rpc.RPCEvent;
 import org.peerbox.rpc.RPCHandler;
 import org.peerbox.rpc.RPCResponseListener;
-
 
 import com.google.gson.Gson;
 

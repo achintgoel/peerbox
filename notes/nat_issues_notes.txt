@@ -1,0 +1,12 @@
+Currently we have no support for automatic NAT/router traversal for either the UDP or TCP traffic. Also, we have no way of identifying our 
+public external IP address (as this is necessary for the User Distributed Map).
+
+Potential technologies to use/look into in the future include:
+
+STUN (for UDP packet traversal)
+NAT-PNP and UPNP (for automatic port forwarding via routers that support it)
+  - Azureas has some good libraries
+  
+The concept of the User Distributed Map could potentially be integrated directly with Kademlia -
+ eliminating the need to have prior knowledge of our IP address (but how would we sign our identity to our location?)
+ 

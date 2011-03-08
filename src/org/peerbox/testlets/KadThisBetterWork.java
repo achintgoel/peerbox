@@ -13,6 +13,7 @@ public class KadThisBetterWork implements Runnable {
 	static int port;
 	static boolean first;
 	static int successes;
+	static URI lastURI;
 	
 	public static void main(String[] args) {
 		port = 7012;
@@ -34,14 +35,11 @@ public class KadThisBetterWork implements Runnable {
 
 	@Override
 	public void run() {
-		NetworkInstance instance = new NetworkInstance(RPCHandler.getUDPInstance(port++));
+		RPCHandler handler = RPCHandler.getUDPInstance(port++);
+		NetworkInstance instance = new NetworkInstance(handler);
 		if (!first) {
 			LinkedList<URI> startURIs = new LinkedList<URI>();
-			try {
-				startURIs.add(new URI("udp://localhost:" + (port - 2)));
-			} catch (URISyntaxException e) {
-				e.printStackTrace();
-			}
+			startURIs.add(lastURI);
 			System.out.println("Next node created " + port);
 			instance.bootstrap(startURIs, new BootstrapListener() {
 	
@@ -66,5 +64,6 @@ public class KadThisBetterWork implements Runnable {
 		} else {
 			first = false;
 		}
+		lastURI = handler.getLocalURI();
 	}
 }
