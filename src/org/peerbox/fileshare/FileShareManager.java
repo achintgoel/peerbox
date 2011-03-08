@@ -27,27 +27,34 @@ public class FileShareManager {
 	
 	protected File mySharedDirectory;
 	protected HashMap<String, FileRequestInfo> requestIDtoFileRequest; 
+	protected final RPCHandler rpcHandler;
+	protected final String rpcServiceName;
 	
-	public FileShareManager(String sharedPathName) {
+	public FileShareManager(String sharedPathName, RPCHandler rpcHandler) {
 		mySharedDirectory = new File(sharedPathName);
 		requestIDtoFileRequest = new HashMap<String, FileRequestInfo>();
+		rpcServiceName = "fileshare";
+		this.rpcHandler = rpcHandler;
+		rpcHandler.registerServiceListener(rpcServiceName, new FileshareRequestListener(this));
 	}
 	
 	public RPCHandler getRPC() {
-		return null; //TODO
+		return rpcHandler;
 	}
 	
 	//TODO: handle OS specific slashes
 	public FileInfo[] getSharedContents(String relativePath) {
 		File requestDir = null;
 		if(!relativePath.isEmpty()) {
-			requestDir = new File(mySharedDirectory.getAbsolutePath().concat(relativePath));
+			//TODO: make sure that path exists and is a directory!!
+			requestDir = new File(mySharedDirectory.getAbsolutePath().concat("/"+relativePath));
 		}
 		else {
+			System.out.println("requesting a file");
 			requestDir = new File(mySharedDirectory.getAbsolutePath());
 		}
 		try {
-			if(requestDir.getCanonicalPath().startsWith(mySharedDirectory.getAbsolutePath())) {
+			if(requestDir.getCanonicalPath().startsWith(mySharedDirectory.getAbsolutePath()) && requestDir.isDirectory()) {
 				FileFilter f = null;
 				File[] contents = requestDir.listFiles(f);
 				FileInfo[] contentInfo = new FileInfo[contents.length];
@@ -92,14 +99,15 @@ public class FileShareManager {
 	}
 	
 	public void getSharedDirectory(String relativePath, Friend friend, ResponseListener<SharedDirectoryResponse> response) {
-		SharedDirectoryRequest request = new SharedDirectoryRequest(friend, relativePath);
+		System.out.println("relativePath is:"+relativePath);
+		SharedDirectoryRequest request = new SharedDirectoryRequest(relativePath);
 		this.sendRequestRPC(friend, request, SharedDirectoryResponse.class, response);
 	}
 
-	public void getFile(String relativePath, Friend friend, FileInfo file, ResponseListener<FileResponse> response) {
-		//TODO: figure out how to get from friend info
-		FileRequest request = new FileRequest(null, friend, file, relativePath);
-		this.sendRequestRPC(friend, request, FileResponse.class, response);
+	public void getFile(String relativePath, Friend fromfriend, Friend tofriend, FileInfo file, ResponseListener<FileResponse> response) {
+		//TODO: figure out how to get friend sending request
+		FileRequest request = new FileRequest(file, relativePath);
+		this.sendRequestRPC(tofriend, request, FileResponse.class, response);
 	}
 	public void setRequestIDtoFileRequest(String relativePath, String requestID, final String filename, long expiration, URI requestFrom) {
 		File requestDir = new File(mySharedDirectory.getAbsolutePath().concat(relativePath));
@@ -114,7 +122,7 @@ public class FileShareManager {
 		});
 		if(files.length == 1) {
 			try {
-				FileRequestInfo fileInfo = new FileRequestInfo(requestFrom, expiration, files[0].getCanonicalPath());
+				FileRequestInfo fileInfo = new FileRequestInfo(expiration, files[0].getCanonicalPath());
 				requestIDtoFileRequest.put(requestID, fileInfo);
 			} catch (IOException e) {
 				e.printStackTrace();
@@ -137,6 +145,7 @@ public class FileShareManager {
 
 	}
 	public void setFilePath(String filePath) {
+		//TODO: make sure filepath will exist!!!
 		mySharedDirectory = new File(filePath);
 		requestIDtoFileRequest.clear();
 	}

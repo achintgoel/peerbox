@@ -1,5 +1,6 @@
 package org.peerbox.fileshare;
 
+ 
 
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -39,6 +40,7 @@ public class FileshareRequestListener implements ServiceRequestListener{
 				SharedDirectoryRequest fnr = gson.fromJson(root, SharedDirectoryRequest.class);
 				FileInfo[] contents = manager.getSharedContents(fnr.getSharedRelativePath());
 				if(contents == null){
+					response = new SharedDirectoryResponse(null);
 					//response = new FindNodeResponse(ni.getBuckets().getNearestNodes(fnr.getTargetIdentifier(), ni.getConfiguration().getK()));
 				}
 				else{

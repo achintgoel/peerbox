@@ -7,7 +7,7 @@ public class Friend {
 	protected String alias;
 	protected URI address;
 	protected PublicKey pubKey;
-	protected FriendManager manager;
+	protected transient FriendManager manager;
 	
 	public Friend(FriendManager fm, String al, URI address, PublicKey pub) {
 		manager = fm;

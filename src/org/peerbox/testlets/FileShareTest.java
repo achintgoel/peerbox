@@ -8,6 +8,11 @@ import java.security.spec.X509EncodedKeySpec;
 import java.util.LinkedList;
 import java.util.Scanner;
 
+import org.peerbox.fileshare.FileInfo;
+import org.peerbox.fileshare.FileShareManager;
+import org.peerbox.fileshare.ResponseListener;
+import org.peerbox.fileshare.messages.SharedDirectoryResponse;
+import org.peerbox.friendpeer.Friend;
 import org.peerbox.friendpeer.FriendManager;
 import org.peerbox.kademlia.BootstrapListener;
 import org.peerbox.kademlia.NetworkInstance;
@@ -33,7 +38,8 @@ public class FileShareTest {
 				e.printStackTrace();
 			}
 		}		
-		final NetworkInstance instance = new NetworkInstance(RPCHandler.getUDPInstance(port));
+		final RPCHandler rpcHandle = RPCHandler.getUDPInstance(port);
+		final NetworkInstance instance = new NetworkInstance(rpcHandle);
 		System.out.println("Network instance created: " + instance.getLocalNodeIdentifier());
 
 		if (startURIs.size() > 0) {
@@ -52,7 +58,8 @@ public class FileShareTest {
 		}
 		final FriendManager manager = new FriendManager(instance.getSingleMap("users"), new SecureMessageHandler());
 		manager.signOn(port);
-		System.out.println("signed on properly");
+		System.out.println("Signed on properly");
+		final FileShareManager fsm = new FileShareManager("/home/rajiv/Desktop", rpcHandle);
 		Scanner scan = new Scanner(System.in);
 		int count = 0;
 		while(true){
@@ -60,13 +67,58 @@ public class FileShareTest {
 				String function = scan.next();
 				if(function.equals("addFriend") && scan.hasNextBigInteger()) {
 					X509EncodedKeySpec pubKeySpec = new X509EncodedKeySpec(scan.nextBigInteger().toByteArray());
-					KeyFactory keyFactory = KeyFactory.getInstance("DSA");
-					PublicKey pubKey = keyFactory.generatePublic(pubKeySpec);
-					manager.createFriend("newFriend"+count, null, pubKey);
-					count++;
+					 KeyFactory keyFactory = KeyFactory.getInstance("DSA");
+					 PublicKey pubKey = keyFactory.generatePublic(pubKeySpec);
+					 manager.createFriend("newFriend"+count, null, pubKey);
+					 count++;
 				}
 				if(function.equals("printBuddys")) {
 					manager.printBuddyList();
+				}
+				if(function.equals("setSharedDirectory")  && scan.hasNext()) {
+					fsm.setFilePath(scan.next());
+				}
+				if(function.equals("getSharedContents")  && scan.hasNext()) {
+					Friend target = manager.getPublicKey(scan.next());
+					if(target != null) {
+						
+						String relativePath = "";
+						if(scan.hasNext()){
+							System.out.println("HIIIII");
+							relativePath = scan.next();
+						}
+
+						fsm.getSharedDirectory(relativePath, target, new ResponseListener<SharedDirectoryResponse>() {
+
+							@Override
+							public void onFailure() {
+								// TODO Auto-generated method stub
+								System.out.println("Shared contents failed!!!");
+							}
+
+							@Override
+							public void onResponseReceived(
+									SharedDirectoryResponse response) {
+								// TODO Auto-generated method stub
+								System.out.println("Received a response!!!!");
+								if(response.getContents() != null) {
+									FileInfo[] contents = response.getContents();
+									for(int i=0; i<contents.length;i++){
+										System.out.println(contents[i].getName());
+									}
+								}
+								else{
+									System.out.println("The directory asked for does not exist!");
+								}
+								
+							}
+							
+						});
+					}
+					else {
+						System.out.println("alias not found!!!");
+					}
+					
 				}
 			} catch(Exception e) {
 				e.printStackTrace();

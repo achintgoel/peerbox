@@ -124,11 +124,7 @@ public class FileshareServer extends SimpleChannelUpstreamHandler{
 			sendError(ctx, INTERNAL_SERVER_ERROR);
 		}
 	}
-	
-	//TODO: using URI, figure out actual file path (in our case, figure our the file path from the request id at the end)
-	private String sanitizeUri(String uri) {
-		return null;
-	}
+
 	
 	private void sendError(ChannelHandlerContext ctx, HttpResponseStatus status) {
 		         HttpResponse response = new DefaultHttpResponse(HTTP_1_1, status);
