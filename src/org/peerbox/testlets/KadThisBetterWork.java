@@ -1,6 +1,7 @@
 package org.peerbox.testlets;
 
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.LinkedList;
 
 import org.peerbox.kademlia.BootstrapListener;
@@ -15,13 +16,23 @@ public class KadThisBetterWork implements Runnable {
 	static URI lastURI;
 	
 	public static void main(String[] args) {
-		if(args.length > 0){
+		if(args.length == 1){
+			first = true;
 			port = Integer.parseInt(args[0]);
 		}
+		else if(args.length == 2){
+			port = Integer.parseInt(args[0]);
+			try {
+				lastURI = new URI("udp://" + args[1]);
+			} catch (URISyntaxException e) {
+				e.printStackTrace();
+			}
+			first = false;
+		}
 		else{
+			first = true;
 			port = 7000;
 		}
-		first = true;
 		successes = 0;
 		
 		

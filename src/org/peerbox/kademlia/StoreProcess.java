@@ -37,7 +37,7 @@ public class StoreProcess {
 		this.request = request;
 		this.callback = responseListener;
 		this.recipients = null;
-		this.threshhold = 1;
+		this.threshhold = networkInstance.getConfiguration().getAlpha();
 		this.successes = 0;
 		this.failures = 0;
 	}
@@ -64,7 +64,6 @@ public class StoreProcess {
 
 			public void onResponseReceived(FindNodeResponse response) {
 				recipients = response.getNearbyNodes();
-				threshhold = recipients.size()/2;
 				performStore();
 			}
 			
