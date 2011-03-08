@@ -114,6 +114,9 @@ public class FindProcess<FRT extends FindResponse> {
 		    });
 			computeUnsearchedNodes();
 		}
+		if(unsearchedNodes.isEmpty()){
+			attemptDone();
+		}
 	}
 	
 	private void attemptDone() {

@@ -64,20 +64,26 @@ public class DumbCLI {
 				String function = scan.next();
 				if(function.equals("ping") && scan.hasNextBigInteger()){
 					BigInteger ID = scan.nextBigInteger();
-					instance.ping(instance.getBuckets().findNodeByIdentifier
-								(Identifier.fromBytes(ID.toByteArray())),
-								new ResponseListener<PingResponse>(){
-	
-						@Override
-						public void onFailure() {
-							System.out.println("Ping failed");
-						}
-	
-						@Override
-						public void onResponseReceived(PingResponse response) {
-							System.out.println("Ping Successful");
-						}					
-					});
+					Node pingNode = instance.getBuckets().findNodeByIdentifier(Identifier.fromBytes(ID.toByteArray()));
+					if(pingNode == null){
+						System.out.println("Could not ping as the node not found in the buckets");
+					}
+					else{
+						instance.ping(instance.getBuckets().findNodeByIdentifier
+									(Identifier.fromBytes(ID.toByteArray())),
+									new ResponseListener<PingResponse>(){
+		
+							@Override
+							public void onFailure() {
+								System.out.println("Ping failed");
+							}
+		
+							@Override
+							public void onResponseReceived(PingResponse response) {
+								System.out.println("Ping Successful");
+							}					
+						});
+					}
 				}
 				else if(function.equals("findNode") && scan.hasNextBigInteger()){
 					BigInteger ID = scan.nextBigInteger();				
@@ -110,7 +116,8 @@ public class DumbCLI {
 					instance.findValue(new Key(key1, key2), new ResponseListener<FindValueResponse>(){
 	
 						@Override
-						public void onFailure() {						
+						public void onFailure() {	
+							System.out.println("Did not find Value");
 						}
 	
 						@Override
