@@ -132,6 +132,7 @@ public class DumbCLI {
 					String key1 = scan.next();
 					String key2 = scan.next();
 					String value = scan.next();
+					System.out.println("Attempting to store: " + key1 + " + " + key2 + ":" + value);
 					instance.storeValue(new Key(key1, key2), value, true, new ResponseListener<StoreResponse>(){
 	
 						@Override

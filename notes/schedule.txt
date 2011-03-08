@@ -10,8 +10,8 @@ Monday Night:
  
 Tuesday Night:
  x Store / StoreFilter components (Rajiv)
- - Expose Kad as DHT maps (Rajiv)
- - Bring everything for launching Kad instances (Rajiv)
+ x Expose Kad as DHT maps (Rajiv)
+ x Bring everything for launching Kad instances (Rajiv)
  - Finish other ToDos in Kad (Vineet)
  - TCP Networking for FileShare (Achint)
  - Implement StoreFilter for Kademlia (Achint)

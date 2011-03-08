@@ -26,7 +26,7 @@ public class KadThisBetterWork implements Runnable {
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}
-			new Thread(new KadThisBetterWork()).run();
+			new KadThisBetterWork().run();
 		}
 		
 	}
@@ -49,7 +49,7 @@ public class KadThisBetterWork implements Runnable {
 					System.out.println("Next Node Bootstrap Complete");
 					successes++;
 					System.out.println("successes = " + successes);
-					if (successes == 99) {
+					if (successes == 999) {
 						System.out.println("They all bootstrapped successfully!!!!!!");
 					}
 					
