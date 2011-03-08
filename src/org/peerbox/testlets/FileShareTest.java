@@ -60,10 +60,10 @@ public class FileShareTest {
 				String function = scan.next();
 				if(function.equals("addFriend") && scan.hasNextBigInteger()) {
 					X509EncodedKeySpec pubKeySpec = new X509EncodedKeySpec(scan.nextBigInteger().toByteArray());
-					 KeyFactory keyFactory = KeyFactory.getInstance("DSA");
-					 PublicKey pubKey = keyFactory.generatePublic(pubKeySpec);
-					 manager.createFriend("newFriend"+count, null, pubKey);
-					 count++;
+					KeyFactory keyFactory = KeyFactory.getInstance("DSA");
+					PublicKey pubKey = keyFactory.generatePublic(pubKeySpec);
+					manager.createFriend("newFriend"+count, null, pubKey);
+					count++;
 				}
 				if(function.equals("printBuddys")) {
 					manager.printBuddyList();

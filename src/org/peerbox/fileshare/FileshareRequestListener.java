@@ -1,10 +1,8 @@
 package org.peerbox.fileshare;
 
- 
 
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.util.Calendar;
 import java.util.UUID;
 
 import org.peerbox.fileshare.messages.FileRequest;
@@ -15,7 +13,6 @@ import org.peerbox.fileshare.messages.SharedDirectoryResponse;
 import org.peerbox.network.http.HttpStaticFileServer;
 import org.peerbox.rpc.RPCEvent;
 import org.peerbox.rpc.ServiceRequestListener;
-
 
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;

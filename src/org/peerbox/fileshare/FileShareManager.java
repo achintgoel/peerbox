@@ -7,8 +7,6 @@ import java.io.FileFilter;
 import java.io.FilenameFilter;
 import java.io.IOException;
 import java.net.URI;
-import java.util.Calendar;
-import java.util.Date;
 import java.util.HashMap;
 
 import org.peerbox.fileshare.messages.FileRequest;
@@ -21,7 +19,6 @@ import org.peerbox.friendpeer.Friend;
 import org.peerbox.rpc.RPCEvent;
 import org.peerbox.rpc.RPCHandler;
 import org.peerbox.rpc.RPCResponseListener;
-
 
 import com.google.gson.Gson;
 
@@ -79,8 +76,6 @@ public class FileShareManager {
 		final Gson gson = new Gson();
 		String requestData = gson.toJson(request);
 		getRPC().sendRequest(targetFriend.getNetworkAddress(), "fileshare", requestData, new RPCResponseListener() {
-			@SuppressWarnings("unchecked")
-			@Override
 			public void onResponseReceived(RPCEvent event) {
 				try {
 					callback.onResponseReceived((T) gson.fromJson(event.getDataString(), responseClass));
