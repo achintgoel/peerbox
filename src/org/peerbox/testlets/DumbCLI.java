@@ -117,7 +117,7 @@ public class DumbCLI {
 	
 						@Override
 						public void onFailure() {	
-							System.out.println("Did not find Value");
+							System.out.println("Did not find Value at all");
 						}
 	
 						@Override
