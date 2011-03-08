@@ -57,4 +57,8 @@ public class Node implements Identifiable{
 	public int hashCode() {
 		return nodeID.hashCode();
 	}
+
+	public boolean isComplete() {
+		return nodeID != null && uri != null;
+	}
 }

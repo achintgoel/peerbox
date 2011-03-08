@@ -119,6 +119,9 @@ public class Buckets implements NodeStatusListener {
 	 * @param newNode
 	 */
 	public void add(final Node newNode) {
+		if (!newNode.isComplete()) {
+			return;
+		}
 		if (newNode.getIdentifier().equals(networkInstance.getLocalNodeIdentifier())) {
 			return;
 		}
@@ -175,7 +178,9 @@ public class Buckets implements NodeStatusListener {
 	}
 	
 	public void remove(Node node){
-  		System.out.println("Removing Node: " + node.getIdentifier());
+		if (!node.isComplete()) {
+			return;
+		}
 		buckets.get(calculateBucketNumber(node)).remove(node.getIdentifier());
 	}
 }

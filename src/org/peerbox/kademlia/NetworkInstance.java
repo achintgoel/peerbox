@@ -224,7 +224,7 @@ public class NetworkInstance {
 				if (response.getMyNodeId() == null) {
 					responseListener.onFailure();
 				}
-				if (targetNode.getIdentifier() != null && !response.getMyNodeId().equals(targetNode.getIdentifier())) {
+				if (targetNode.isComplete() && !response.getMyNodeId().equals(targetNode.getIdentifier())) {
 					responseListener.onFailure();
 				} else {
 					responseListener.onResponseReceived(response);
