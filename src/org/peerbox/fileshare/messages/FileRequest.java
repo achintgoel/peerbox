@@ -5,17 +5,14 @@ import org.peerbox.friendpeer.Friend;
 
 
 public class FileRequest extends Request{
-	protected Friend targetFriend;
 	protected FileInfo file;
 	protected String relativePath;
 	
 	final static public String COMMAND = "get_file";
 	
-	public FileRequest(Friend fromFriend, Friend targetFriend, FileInfo file, String relativePath) {
+	public FileRequest(FileInfo file, String relativePath) {
 		super();
 		this.relativePath = relativePath;
-		this.fromFriend = fromFriend;
-		this.targetFriend = targetFriend;
 		this.file = file;
 		this.command = COMMAND;
 	}

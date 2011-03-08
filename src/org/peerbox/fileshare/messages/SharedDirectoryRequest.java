@@ -5,23 +5,15 @@ import org.peerbox.friendpeer.Friend;
 
 
 public class SharedDirectoryRequest extends Request{
-	protected Friend targetFriend;
 	protected String sharedRelativePath;
 
 	final static public String COMMAND = "get_shared";
-	public SharedDirectoryRequest(Friend targetFriend, String relativePath) {
-		this.targetFriend = targetFriend;
+	public SharedDirectoryRequest(String relativePath) {
 		this.sharedRelativePath = relativePath;
 		this.command = COMMAND;
 	}
 	protected SharedDirectoryRequest(){
 		
-	}
-	public Friend getTargetFriend() {
-		return targetFriend;
-	}
-	public void setTagetFriend(Friend tagetFriend) {
-		this.targetFriend = tagetFriend;
 	}
 
 	public String getCommand() {
