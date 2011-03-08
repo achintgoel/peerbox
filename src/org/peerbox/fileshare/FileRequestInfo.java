@@ -1,7 +1,6 @@
 package org.peerbox.fileshare;
 
 import java.net.URI;
-import java.util.Date;
 
 public class FileRequestInfo {
 	protected URI fromURI;

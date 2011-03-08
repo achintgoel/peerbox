@@ -1,7 +1,6 @@
 package org.peerbox.testlets;
 
 import java.net.URI;
-import java.net.URISyntaxException;
 import java.util.LinkedList;
 
 import org.peerbox.kademlia.BootstrapListener;
@@ -65,5 +64,6 @@ public class KadThisBetterWork implements Runnable {
 			first = false;
 		}
 		lastURI = handler.getLocalURI();
+		System.out.println(lastURI);
 	}
 }
