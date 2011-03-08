@@ -64,7 +64,6 @@ public class DumbCLI {
 				String function = scan.next();
 				if(function.equals("ping") && scan.hasNextBigInteger()){
 					BigInteger ID = scan.nextBigInteger();
-					System.out.println(ID);
 					instance.ping(instance.getBuckets().findNodeByIdentifier
 								(Identifier.fromBytes(ID.toByteArray())),
 								new ResponseListener<PingResponse>(){

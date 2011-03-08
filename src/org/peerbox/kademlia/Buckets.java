@@ -139,13 +139,11 @@ public class Buckets implements NodeStatusListener {
 				networkInstance.ping(firstNode, new ResponseListener<PingResponse>(){
 					@Override
 					public void onFailure() {
-						currentBucket.remove(firstNode.getIdentifier());
 						currentBucket.put(newNode.getIdentifier(), newNode);
 					}
 					@Override
 					public void onResponseReceived(PingResponse response) {
-						currentBucket.remove(firstNode);
-						currentBucket.put(firstNode.getIdentifier(), firstNode);
+						currentBucket.get(firstNode.getIdentifier());
 					}					
 				});
 			}
@@ -176,6 +174,7 @@ public class Buckets implements NodeStatusListener {
 	}
 	
 	public void remove(Node node){
-		buckets.get(calculateBucketNumber(node)).remove(node);
+  		System.out.println("Removing Node: " + node.getIdentifier());
+		buckets.get(calculateBucketNumber(node)).remove(node.getIdentifier());
 	}
 }
