@@ -10,7 +10,6 @@ while [ $i -lt $# ] ; do
 	let i=$i+"1"
 done
 
-echo $args
 if [ $1 = "-m" ] ; then
 	java org.peerbox.testlets.KadThisBetterWork $args
 elif [ $1 = "-s" ] ; then
@@ -18,4 +17,3 @@ elif [ $1 = "-s" ] ; then
 elif [ $1 = "-f" ] ; then
 	java org.peerbox.testlets.FileShareTest $args
 fi
-echo $2
