@@ -1,6 +1,7 @@
 package org.peerbox.kademlia;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -21,7 +22,7 @@ public class FindProcess<FRT extends FindResponse> {
 	protected final int maxRequests;
 	protected final int searchSetSize;				
 	protected final Set<Node> prevQueried;			// previously queried nodes
-	protected final TreeSet<Node> nearestSet;		// nodes that have been found through all searches
+	protected final Set<Node> nearestSet;		// nodes that have been found through all searches
 	protected final Set<Node> current;				// nodes currently being queried but haven't replied
 	protected final FindRequest findRequest;						// target being searched for
 	protected final NetworkInstance networkInstance;
@@ -41,7 +42,7 @@ public class FindProcess<FRT extends FindResponse> {
 		searchSetSize = networkInstance.getConfiguration().getK() * 2;
 		findRequest = request;
 		prevQueried = new HashSet<Node>();
-		nearestSet = new TreeSet<Node>(new IdentifiableDistanceComparator(findRequest.getTargetIdentifier()));
+		nearestSet = Collections.synchronizedSet(new TreeSet<Node>(new IdentifiableDistanceComparator(findRequest.getTargetIdentifier())));
 		nearestSet.addAll(networkInstance.getBuckets().getNearestNodes(findRequest.getTargetIdentifier(), searchSetSize));
 		current = new HashSet<Node>();
 		callback = responseListener;
@@ -147,6 +148,9 @@ public class FindProcess<FRT extends FindResponse> {
 /*		while(nearestSet.size() > nearestSetSize){
 			nearestSet.remove(nearestSet.last());				
 		}*/
+		//If we iterate over nearest set, remember to do so in a synchronized block
+		//synchronized(nearestSet) { }
+		
 		// find the unsearched nodes by removing the previously queried from the nearest set
 		LinkedList<Node> unsearchedNodes = new LinkedList<Node>();
 		int iteration = 0;

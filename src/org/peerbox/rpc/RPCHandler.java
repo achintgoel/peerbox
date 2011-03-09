@@ -29,7 +29,7 @@ public class RPCHandler {
 	protected RPCHandler() {
 		registeredServices = new HashMap<String, ServiceRequestListener>();
 		waitingRequests = Collections.synchronizedMap(new HashMap<String, RPCWaitingRequest>());
-		timeoutTimer = new Timer("rpcTimeoutTimer", true);
+		timeoutTimer = new Timer(true);
 	}
 	
 	public static RPCHandler getUDPInstance(int port) {
@@ -63,7 +63,11 @@ public class RPCHandler {
 		};
 		waitingRequests.put(uuid, new RPCWaitingRequest(requestMessage, recipient, responseListener, timeoutTask));
 		messageSender.sendData(recipient, gson.toJson(requestMessage));
-		timeoutTimer.schedule(timeoutTask, 1000 * TIMEOUT_SECS);
+		try {
+			timeoutTimer.schedule(timeoutTask, 1000 * TIMEOUT_SECS);
+		} catch (IllegalStateException e) {
+			//This is OK; timer was already canceled because the response beat setting 
+		}
 	}
 	
 	IncomingMessageListener newListener() {
