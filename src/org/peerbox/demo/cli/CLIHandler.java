@@ -1,5 +1,7 @@
 package org.peerbox.demo.cli;
 
-public class CLIHandler {
-
+public interface CLIHandler {
+	
+	
+	public void handleCommand(String[] args, ExtendableCLI cli);
 }
