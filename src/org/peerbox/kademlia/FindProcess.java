@@ -40,7 +40,7 @@ public class FindProcess<FRT extends FindResponse> {
 		findRequest = request;
 		prevQueried = new HashSet<Node>();
 		nearestSet = new TreeSet<Node>(new IdentifiableDistanceComparator(findRequest.getTargetIdentifier()));
-		nearestSet.addAll(networkInstance.getBuckets().getNearestNodes(findRequest.getTargetIdentifier(), networkInstance.getConfiguration().getK()));
+		nearestSet.addAll(networkInstance.getBuckets().getNearestNodes(findRequest.getTargetIdentifier(), nearestSetSize));
 		current = new HashSet<Node>();
 		callback = responseListener;
 		this.responseClass = responseClass;
