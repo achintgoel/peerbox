@@ -57,7 +57,7 @@ public class FileShareTest {
 			});
 		}
 		final FriendManager manager = new FriendManager(instance.getSingleMap("users"), new SecureMessageHandler());
-		manager.signOn(port);
+		manager.signOn(rpcHandle.getLocalURI());
 		System.out.println("Signed on properly");
 		final FileShareManager fsm = new FileShareManager("/home/rajiv/Desktop", rpcHandle);
 		Scanner scan = new Scanner(System.in);
@@ -79,7 +79,7 @@ public class FileShareTest {
 					fsm.setFilePath(scan.next());
 				}
 				if(function.equals("getSharedContents")  && scan.hasNext()) {
-					Friend target = manager.getPublicKey(scan.next());
+					Friend target = manager.getFriend(scan.next());
 					if(target != null) {
 						
 						String relativePath = "";
