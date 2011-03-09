@@ -1,4 +1,4 @@
-package org.peerbox.friendpeer;
+package org.peerbox.friend;
 
 import java.math.BigInteger;
 import java.net.URI;

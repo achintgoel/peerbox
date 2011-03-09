@@ -1,7 +1,7 @@
 package org.peerbox.fileshare.messages;
 
 import org.peerbox.fileshare.FileInfo;
-import org.peerbox.friendpeer.Friend;
+import org.peerbox.friend.Friend;
 
 
 public class FileRequest extends Request{

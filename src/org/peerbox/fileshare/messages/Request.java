@@ -1,6 +1,6 @@
 package org.peerbox.fileshare.messages;
 
-import org.peerbox.friendpeer.Friend;
+import org.peerbox.friend.Friend;
 import org.peerbox.kademlia.messages.Message;
 
 

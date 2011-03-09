@@ -15,7 +15,7 @@ import org.peerbox.fileshare.messages.Request;
 import org.peerbox.fileshare.messages.Response;
 import org.peerbox.fileshare.messages.SharedDirectoryRequest;
 import org.peerbox.fileshare.messages.SharedDirectoryResponse;
-import org.peerbox.friendpeer.Friend;
+import org.peerbox.friend.Friend;
 import org.peerbox.rpc.RPCEvent;
 import org.peerbox.rpc.RPCHandler;
 import org.peerbox.rpc.RPCResponseListener;

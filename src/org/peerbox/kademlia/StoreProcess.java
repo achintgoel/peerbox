@@ -16,7 +16,7 @@ import org.peerbox.kademlia.messages.StoreResponse;
  */
 public class StoreProcess {
 	
-	protected int threshhold;
+	protected int threshold;
 	protected final NetworkInstance networkInstance;
 	protected final StoreRequest request;
 	protected final ResponseListener<StoreResponse> callback;
@@ -37,7 +37,7 @@ public class StoreProcess {
 		this.request = request;
 		this.callback = responseListener;
 		this.recipients = null;
-		this.threshhold = networkInstance.getConfiguration().getAlpha();
+		this.threshold = networkInstance.getConfiguration().getAlpha();
 		this.successes = 0;
 		this.failures = 0;
 	}
@@ -71,6 +71,9 @@ public class StoreProcess {
 	}
 	
 	private void performStore(){
+		if(recipients.size() > 0 && recipients.size() < threshold){
+			threshold = recipients.size();
+		}
 		for(Node node : recipients){
 			networkInstance.sendRequestRPC(node, request, StoreResponse.class, new ResponseListener<StoreResponse>(){
 
@@ -88,7 +91,7 @@ public class StoreProcess {
 				
 				private void makeCallback(){
 					if(successes + failures == recipients.size()){
-						if(successes >= threshhold){
+						if(successes >= threshold){
 							callback.onResponseReceived(new StoreResponse(true));
 						}
 						else{

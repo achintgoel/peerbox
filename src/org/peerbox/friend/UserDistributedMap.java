@@ -1,4 +1,4 @@
-package org.peerbox.friendpeer;
+package org.peerbox.friend;
 
 import java.net.URI;
 import java.net.URISyntaxException;

@@ -81,7 +81,7 @@ public class RPCHandler {
 				final RPCMessage rpcMessage = gson.fromJson(message.getDataString(), RPCMessage.class);
 				if (!rpcMessage.getVersion().equals(VERSION)) {
 					// Unsupported Message Version
-					System.out.println("Unsupported Message Version");   
+					// System.out.println("Unsupported Message Version");   
 				}
 				if (rpcMessage.getRequest() != null) {
 					ServiceRequestListener service = registeredServices.get(rpcMessage.getService());
@@ -140,7 +140,7 @@ public class RPCHandler {
 						});
 					}
 					else{
-						System.out.println("No matching request found for the received response");
+						// System.out.println("No matching request found for the received response");
 					}
 				}
 			} catch (JsonParseException e) {
