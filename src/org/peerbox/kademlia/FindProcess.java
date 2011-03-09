@@ -31,6 +31,10 @@ public class FindProcess<FRT extends FindResponse> {
 	protected FRT foundResponse;
 	protected final boolean stopOnFound;
 	protected boolean done;
+
+	//NOTE: this should be done differently maybe a FindProcessResponse<FRT> object should be sent to the callback
+	protected List<Node> foundTrueNodes;
+	protected List<Node> foundFalseNodes;
 	
 	
 	private FindProcess(NetworkInstance ni, FindRequest request, boolean stopOnFound, Class<FRT> responseClass, ResponseListener<FRT> responseListener){
@@ -48,6 +52,8 @@ public class FindProcess<FRT extends FindResponse> {
 		lastResponse = null;
 		foundResponse = null;
 		done = false;
+		foundTrueNodes = new LinkedList<Node>();
+		foundFalseNodes = new LinkedList<Node>();
 	}
 	
 	/**
@@ -58,13 +64,14 @@ public class FindProcess<FRT extends FindResponse> {
 	 * @param request the request to be sent
 	 * @param responseListener callback
 	 */
-	public static <T extends FindResponse> void execute(NetworkInstance ni, FindRequest request, boolean stopOnFound, Class<T> responseClass, ResponseListener<T> responseListener){
+	public static <T extends FindResponse> FindProcess execute(NetworkInstance ni, FindRequest request, boolean stopOnFound, Class<T> responseClass, ResponseListener<T> responseListener){
 		FindProcess<T> sh = new FindProcess<T>(ni, request, stopOnFound, responseClass, responseListener);
 		LinkedList<Node> unsearchedNodes = sh.computeUnsearchedNodes();
 		if(unsearchedNodes.isEmpty()){
 			responseListener.onFailure();
 		}
 		sh.nextIteration(unsearchedNodes);
+		return sh;
 	}
 	
 	
@@ -89,6 +96,7 @@ public class FindProcess<FRT extends FindResponse> {
 	    			networkInstance.getBuckets().addAll(response.getNearbyNodes());
 	          		current.remove(nextRequestDestination);
 		          	if(response.isFound()){
+	          			foundTrueNodes.add(nextRequestDestination);
 		          		if(stopOnFound){
 		          			if(!done)
 		          				callback.onResponseReceived(response);
@@ -101,6 +109,7 @@ public class FindProcess<FRT extends FindResponse> {
 		          	}
 		          	// otherwise add the nodes to the nearestSet and to the k-buckets 
 		          	else{
+		          		foundFalseNodes.add(nextRequestDestination);
 						lastResponse = response;
 						attemptDone(computeUnsearchedNodes());
 		          	}
@@ -156,5 +165,14 @@ public class FindProcess<FRT extends FindResponse> {
 			iteration++;
 		}
 		return unsearchedNodes;		
+	}
+	
+	
+	public List<Node> getFoundTrueNodes(){
+		return foundTrueNodes;
+	}
+	
+	public List<Node> getFoundFalseNodes(){
+		return foundFalseNodes;
 	}
 }
