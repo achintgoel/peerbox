@@ -11,11 +11,13 @@ import java.util.Scanner;
 import org.peerbox.fileshare.FileInfo;
 import org.peerbox.fileshare.FileShareManager;
 import org.peerbox.fileshare.ResponseListener;
+import org.peerbox.fileshare.messages.FileResponse;
 import org.peerbox.fileshare.messages.SharedDirectoryResponse;
 import org.peerbox.friendpeer.Friend;
 import org.peerbox.friendpeer.FriendManager;
 import org.peerbox.kademlia.BootstrapListener;
 import org.peerbox.kademlia.NetworkInstance;
+import org.peerbox.network.http.HttpClient;
 import org.peerbox.rpc.RPCHandler;
 import org.peerbox.security.SecureMessageHandler;
 
@@ -32,7 +34,7 @@ public class FileShareTest {
 		LinkedList<URI> startURIs = new LinkedList<URI>();
 		for (int i = 1; i < args.length; i++) {
 			try {
-				startURIs.add(new URI("udp://localhost:" + args[i]));
+				startURIs.add(new URI("udp://"+args[i]));
 			} catch (URISyntaxException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
@@ -84,7 +86,7 @@ public class FileShareTest {
 						
 						String relativePath = "";
 						if(scan.hasNext()){
-							System.out.println("HIIIII");
+							//System.out.println("HIIIII");
 							relativePath = scan.next();
 						}
 
@@ -100,7 +102,7 @@ public class FileShareTest {
 							public void onResponseReceived(
 									SharedDirectoryResponse response) {
 								// TODO Auto-generated method stub
-								System.out.println("Received a response!!!!");
+								//System.out.println("Received a response!!!!");
 								if(response.getContents() != null) {
 									FileInfo[] contents = response.getContents();
 									for(int i=0; i<contents.length;i++){
@@ -116,9 +118,38 @@ public class FileShareTest {
 						});
 					}
 					else {
-						System.out.println("alias not found!!!");
+						System.out.println("ALIAS NOT FOUND");
 					}
 					
+				}
+				if(function.equals("getFile") && scan.hasNext()) {
+					Friend target = manager.getFriend(scan.next());
+					if(target != null) {
+						final String file;
+						if(scan.hasNext()) {
+							file = scan.next();
+							fsm.getFile("", target, file, new ResponseListener<FileResponse>() {
+
+								@Override
+								public void onFailure() {
+									
+									
+								}
+
+								@Override
+								public void onResponseReceived(
+										FileResponse response) {
+									System.out.println("RECEIVED RESPONSE TO FILE REQUEST");
+									HttpClient http_client = new HttpClient(response.getFileLocURI(), file);
+									
+								}
+								
+							});
+						}
+					}
+					else {
+						System.out.println("ALIAS NOT FOUND");
+					}
 				}
 			} catch(Exception e) {
 				e.printStackTrace();

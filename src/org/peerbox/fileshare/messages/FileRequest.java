@@ -5,12 +5,12 @@ import org.peerbox.friendpeer.Friend;
 
 
 public class FileRequest extends Request{
-	protected FileInfo file;
+	protected String file;
 	protected String relativePath;
 	
 	final static public String COMMAND = "get_file";
 	
-	public FileRequest(FileInfo file, String relativePath) {
+	public FileRequest(String file, String relativePath) {
 		super();
 		this.relativePath = relativePath;
 		this.file = file;
@@ -20,11 +20,11 @@ public class FileRequest extends Request{
 		
 	}
 	
-	public FileInfo getFile() {
+	public String getFile() {
 		return file;
 	}
 
-	public void setFile(FileInfo file) {
+	public void setFile(String file) {
 		this.file = file;
 	}
 
