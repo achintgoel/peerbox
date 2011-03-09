@@ -2,6 +2,7 @@ package org.peerbox.kademlia;
 
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
@@ -25,7 +26,7 @@ public class FindProcess<FRT extends FindResponse> {
 	protected final FindRequest findRequest;						// target being searched for
 	protected final NetworkInstance networkInstance;
 	protected final ResponseListener<FRT> callback;
-	protected TreeSet<Node> unsearchedNodes;
+	protected LinkedList<Node> unsearchedNodes;
 	protected final Class<FRT> responseClass;
 	protected FRT lastResponse;
 	protected FRT foundResponse;
@@ -44,7 +45,7 @@ public class FindProcess<FRT extends FindResponse> {
 		current = new HashSet<Node>();
 		callback = responseListener;
 		this.responseClass = responseClass;
-		unsearchedNodes = (TreeSet) nearestSet.clone();
+		unsearchedNodes = new LinkedList<Node>(nearestSet);
 		this.stopOnFound = stopOnFound;
 		lastResponse = null;
 		foundResponse = null;
@@ -75,17 +76,18 @@ public class FindProcess<FRT extends FindResponse> {
 		// Until upto maxRequests are made
 		while(current.size() < maxRequests && !unsearchedNodes.isEmpty()){
 			// send the findRequest RPC to the first one in the unsearched nodes
-			final Node nextRequestDestination = unsearchedNodes.first();
+			final Node nextRequestDestination = unsearchedNodes.poll();		
+						// poll retrieves and removes the first element
 		  	prevQueried.add(nextRequestDestination);
 		  	current.add(nextRequestDestination);
 			networkInstance.sendRequestRPC(nextRequestDestination, findRequest, responseClass, new ResponseListener<FRT>(){
 		    	// event that a message was received
 		    	public void onResponseReceived(FRT response) {
 		    		// if the reply contains the target then trigger identifier found
+	          		nearestSet.addAll(response.getNearbyNodes());
+	    			networkInstance.getBuckets().addAll(response.getNearbyNodes());
+	          		current.remove(nextRequestDestination);
 		          	if(response.isFound()){
-		          		nearestSet.addAll(response.getNearbyNodes());
-		    			networkInstance.getBuckets().addAll(response.getNearbyNodes());
-		          		current.remove(nextRequestDestination);
 		          		if(stopOnFound){
 		          			if(!done)
 		          				callback.onResponseReceived(response);
@@ -93,15 +95,14 @@ public class FindProcess<FRT extends FindResponse> {
 		          		}
 		          		else{
 		          			foundResponse = response;
+		        			computeUnsearchedNodes();
 		          			attemptDone();
 		          		}
 		          	}
 		          	// otherwise add the nodes to the nearestSet and to the k-buckets 
 		          	else{
-		          		nearestSet.addAll(response.getNearbyNodes());
-		    			networkInstance.getBuckets().addAll(response.getNearbyNodes());
-		          		current.remove(nextRequestDestination);
 						lastResponse = response;
+						computeUnsearchedNodes();
 						attemptDone();
 		          	}
 		      	}		    	
@@ -112,16 +113,11 @@ public class FindProcess<FRT extends FindResponse> {
 		      		attemptDone();
 		      	}
 		    });
-			computeUnsearchedNodes();
-		}
-		if(unsearchedNodes.isEmpty()){
-			attemptDone();
 		}
 	}
 	
 	private void attemptDone() {
 		if(!done) {
-			computeUnsearchedNodes();
 			// if no new unsearched nodes and queue is over means the requested value wasn't found
 			if(unsearchedNodes.isEmpty() && current.isEmpty()) {
 				FRT response = foundResponse == null ? lastResponse : foundResponse;
@@ -146,11 +142,20 @@ public class FindProcess<FRT extends FindResponse> {
 	
 	private void computeUnsearchedNodes(){			
 		// resize the nearestSet by removing the last elements
-		while(nearestSet.size() > nearestSetSize){
+/*		while(nearestSet.size() > nearestSetSize){
 			nearestSet.remove(nearestSet.last());				
-		}
+		}*/
 		// find the unsearched nodes by removing the previously queried from the nearest set
-		unsearchedNodes = (TreeSet<Node>) nearestSet.clone();
-		unsearchedNodes.removeAll(prevQueried);		
+		LinkedList<Node> temp = new LinkedList<Node>();
+		int iteration = 0;
+		for(Node node : nearestSet){
+			if(iteration == nearestSetSize)
+				break;
+			if(!prevQueried.contains(node)){
+				temp.add(node);				
+			}
+			iteration++;
+		}
+		unsearchedNodes = temp;		
 	}
 }
