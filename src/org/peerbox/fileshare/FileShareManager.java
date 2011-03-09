@@ -104,12 +104,12 @@ public class FileShareManager {
 		this.sendRequestRPC(friend, request, SharedDirectoryResponse.class, response);
 	}
 
-	public void getFile(String relativePath, Friend fromfriend, Friend tofriend, FileInfo file, ResponseListener<FileResponse> response) {
+	public void getFile(String relativePath, Friend tofriend, String file, ResponseListener<FileResponse> response) {
 		//TODO: figure out how to get friend sending request
 		FileRequest request = new FileRequest(file, relativePath);
 		this.sendRequestRPC(tofriend, request, FileResponse.class, response);
 	}
-	public void setRequestIDtoFileRequest(String relativePath, String requestID, final String filename, long expiration, URI requestFrom) {
+	public void setRequestIDtoFileRequest(String relativePath, String requestID, final String filename, long expiration) {
 		File requestDir = new File(mySharedDirectory.getAbsolutePath().concat(relativePath));
 		File[] files = requestDir.listFiles(new FilenameFilter() {
 			public boolean accept(File arg0, String arg1) {
