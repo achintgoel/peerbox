@@ -59,6 +59,12 @@ public class FriendManager {
 //		System.out.println("This friends uri is "+friend.getNetworkAddress().toString());
 		
 	}
+	public void removeFriend(String alias) {
+		if(aliasToFriendMap.get(alias) != null) {
+			keyToFriendMap.remove(aliasToFriendMap.get(alias).getPubKey());
+			aliasToFriendMap.remove(alias);
+		}
+	}
 	
 	void updateFriend(String oldAlias, String newAlias, Friend friend) {
 		aliasToFriendMap.remove(oldAlias);
@@ -70,20 +76,19 @@ public class FriendManager {
 			public void valueComplete(final ValueEvent<URI> val){
 				if(val.exists()){
 					friend.setAddress(val.getValue());
-					System.out.println("new URI of friend is: "+friend.getNetworkAddress().toString());
+					System.out.println("Found address of friend: "+friend.getNetworkAddress().toString());
 				}
 				else {
-					System.out.println("New uri retrieval didnt work!!");
+					System.out.println("Unable to find address of friend");
 				}
-					
-			//TO DO: else do something
 			}
 		});
 	}
 	
 	public void printBuddyList(){
+		//TODO: Print the buddys nicely
 		for(Entry<PublicKey, Friend> buddyInfo : keyToFriendMap.entrySet()) {
-			System.out.println("alias: "+buddyInfo.getValue().getAlias()+" URI: "+buddyInfo.getValue().getNetworkAddress()+" Public Key:"+new BigInteger(buddyInfo.getKey().getEncoded())+"/n");
+			System.out.println("Alias: "+buddyInfo.getValue().getAlias()+" Address: "+buddyInfo.getValue().getNetworkAddress()+"/n");
 		}
 	}
 
