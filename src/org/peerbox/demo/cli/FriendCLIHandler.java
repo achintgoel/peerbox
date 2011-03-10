@@ -30,12 +30,12 @@ public class FriendCLIHandler implements CLIHandler{
 				help();
 				return;
 			}
-			String alias = args[2];
-			BigInteger key = new BigInteger(args[3]);
-			X509EncodedKeySpec pubKeySpec = new X509EncodedKeySpec(key.toByteArray());
-			KeyFactory keyFactory;
-			PublicKey publicKey;
 			try {
+				String alias = args[2];
+				BigInteger key = new BigInteger(args[3]);
+				X509EncodedKeySpec pubKeySpec = new X509EncodedKeySpec(key.toByteArray());
+				KeyFactory keyFactory;
+				PublicKey publicKey;
 				keyFactory = KeyFactory.getInstance("DSA");
 				publicKey = keyFactory.generatePublic(pubKeySpec);
 				friend_manager.createFriend(alias, null, publicKey);
@@ -48,6 +48,8 @@ public class FriendCLIHandler implements CLIHandler{
 				// TODO Auto-generated catch block
 				//e.printStackTrace();
 				cli.out().println("Generated key is invalid");
+			} catch (NumberFormatException e) {
+				cli.out().println("Public Key provided has invalid format");
 			}
 			
 		}
