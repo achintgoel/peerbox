@@ -35,7 +35,7 @@ public class HttpClient {
 		
 		//Start the connection attempt
 		System.out.println("trying to connect to host:"+uri.toString());
-		ChannelFuture future = bootstrap.connect(new InetSocketAddress(host, port), new InetSocketAddress("localhost", 8020));
+		ChannelFuture future = bootstrap.connect(new InetSocketAddress(host, port));
 		Channel channel = future.awaitUninterruptibly().getChannel();
 		
 		if(!future.isSuccess()) {

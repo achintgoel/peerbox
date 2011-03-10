@@ -95,7 +95,13 @@ public class FriendManager {
 			int i = 1;
 			System.out.println("Your friends:");
 			for(Entry<PublicKey, Friend> buddyInfo : keyToFriendMap.entrySet()) {
-				System.out.printf("\t%d. %s (%s)", i, buddyInfo.getValue().getAlias(), buddyInfo.getValue().getNetworkAddress().toString());
+				String uri;
+				if (buddyInfo.getValue().isAlive()) {
+					uri = buddyInfo.getValue().getNetworkAddress().toString();
+				} else {
+					uri = "offline";
+				}
+				System.out.printf("\t%d. %s (%s)", i, buddyInfo.getValue().getAlias(), uri);
 				i++;
 			}
 		}	

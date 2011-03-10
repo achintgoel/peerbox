@@ -44,6 +44,10 @@ public class Friend {
 	public FriendManager getManager() {
 		return manager;
 	}
+	
+	public boolean isAlive() {
+		return address != null;
+	}
 
 	
 }

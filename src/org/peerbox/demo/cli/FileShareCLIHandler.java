@@ -59,6 +59,10 @@ public class FileShareCLIHandler implements CLIHandler{
 			}
 			final String alias = args[2];
 			Friend friend = friend_manager.getFriend(alias);
+			if (!friend.isAlive()) {
+				System.out.println("friend is offline");
+				return;
+			}
 			if(friend != null) {
 				String relativePath = "";
 				if(args.length == 4) {
@@ -108,6 +112,10 @@ public class FileShareCLIHandler implements CLIHandler{
 			}
 			final String alias = args[2];
 			Friend friend = friend_manager.getFriend(alias);
+			if (!friend.isAlive()) {
+				System.out.println("friend is offline");
+				return;
+			}
 			if(friend != null) {
 				final String filePath = args[3];
 				final File file = new File(filePath);
