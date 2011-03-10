@@ -1,6 +1,7 @@
 package org.peerbox.demo.cli;
 
 import java.io.File;
+import java.io.PrintStream;
 
 import org.peerbox.fileshare.FileInfo;
 import org.peerbox.fileshare.FileShareManager;
@@ -9,7 +10,6 @@ import org.peerbox.fileshare.messages.FileResponse;
 import org.peerbox.fileshare.messages.SharedDirectoryResponse;
 import org.peerbox.friend.Friend;
 import org.peerbox.friend.FriendManager;
-import org.peerbox.network.http.HttpClient;
 import org.peerbox.network.http.HttpClientListener;
 
 public class FileShareCLIHandler implements CLIHandler{
@@ -24,13 +24,13 @@ public class FileShareCLIHandler implements CLIHandler{
 	public void handleCommand(final String[] args, final ExtendableCLI cli) {
 		// TODO Auto-generated method stub
 		if(args.length < 2) {
-			help();
+			help(cli.out());
 			return;
 		}
 		String function = args[1];
 		if(function.equalsIgnoreCase("share")) {
 			if(args.length != 3) {
-				help();
+				help(cli.out());
 				return;
 			}
 			String folder = args[2];
@@ -42,7 +42,7 @@ public class FileShareCLIHandler implements CLIHandler{
 		}
 		else if(function.equalsIgnoreCase("downloadTo")) {
 			if(args.length != 3) {
-				help();
+				help(cli.out());
 				return;
 			}
 			String folder = args[2];
@@ -54,7 +54,7 @@ public class FileShareCLIHandler implements CLIHandler{
 		}
 		else if(function.equalsIgnoreCase("browse")) {
 			if(args.length < 3 || args.length > 4) {
-				help();
+				help(cli.out());
 				return;
 			}
 			final String alias = args[2];
@@ -103,7 +103,7 @@ public class FileShareCLIHandler implements CLIHandler{
 		}
 		else if(function.equalsIgnoreCase("get")) {
 			if(args.length != 4) {
-				help();
+				help(cli.out());
 				return;
 			}
 			final String alias = args[2];
@@ -168,8 +168,8 @@ public class FileShareCLIHandler implements CLIHandler{
 		
 	}
 	
-	public void help() {
-		System.out.println("Invalid command.");
+	public void help(PrintStream out) {
+		out.println("Invalid command.");
 	}
 
 }
