@@ -1,6 +1,6 @@
 package org.peerbox.demo.cli;
 
-import java.math.BigInteger;
+import java.io.PrintStream;
 import java.security.KeyFactory;
 import java.security.NoSuchAlgorithmException;
 import java.security.PublicKey;
@@ -22,14 +22,14 @@ public class FriendCLIHandler implements CLIHandler{
 	public void handleCommand(String[] args, ExtendableCLI cli) {
 		// TODO Auto-generated method stub
 		if(args.length < 2) {
-			help();
+			help(cli.out());
 			return;
 		}
 		String function = args[1];
 		if(function.equalsIgnoreCase("add")) {
 			
 			if(args.length != 4) {
-				help();
+				help(cli.out());
 				return;
 			}
 			try {
@@ -42,12 +42,8 @@ public class FriendCLIHandler implements CLIHandler{
 				friend_manager.createFriend(alias, null, publicKey);
 				cli.out().println("Added "+alias+" to buddy list");
 			} catch (NoSuchAlgorithmException e) {
-				// TODO Auto-generated catch block
-				//e.printStackTrace();
 				cli.out().println("Unable to generate key based on algorithm specified");
 			} catch (InvalidKeySpecException e) {
-				// TODO Auto-generated catch block
-				//e.printStackTrace();
 				cli.out().println("Specified key is invalid. Please check with your friend.");
 			} catch (NumberFormatException e) {
 				cli.out().println("Specified key is invalid. Please check with your friend.");
@@ -55,7 +51,7 @@ public class FriendCLIHandler implements CLIHandler{
 			
 		} else if(function.equalsIgnoreCase("delete")) {
 			if(args.length != 3) {
-				help();
+				help(cli.out());
 				return;
 			}
 			String alias = args[2];
@@ -69,23 +65,27 @@ public class FriendCLIHandler implements CLIHandler{
 			
 		} else if(function.equalsIgnoreCase("list")) {
 			if(args.length > 2) {
-				help();
+				help(cli.out());
 				return;
 			}
 			friend_manager.printBuddyList();
 		} else if (function.equalsIgnoreCase("signOn") || function.equalsIgnoreCase("myKey")) {
 			if (args.length > 2) {
-				help();
+				help(cli.out());
 				return;
 			}
 			friend_manager.signOn();
 		} else {
-			help();
+			help(cli.out());
 		}
 		
 	}
-	public void help(){
-		System.out.println("Illegal Command");
+	public void help(PrintStream out){
+		out.println("Function:\t Command");
+		out.println("Add Friend:\t add [alias] [public key]");
+		out.println("Sign On:\t signon");
+		out.println("List Friends:\t list");
+		out.println("Delete Friend:\t delete [alias]");
 	}
 
 }

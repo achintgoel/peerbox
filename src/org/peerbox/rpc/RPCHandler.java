@@ -25,6 +25,7 @@ public class RPCHandler {
 	final protected Timer timeoutTimer;
 	final protected Gson gson = new Gson();
 	final protected Map<String, RPCWaitingRequest> waitingRequests;
+	protected URI myURI;
 	
 	protected RPCHandler() {
 		registeredServices = new HashMap<String, ServiceRequestListener>();
@@ -39,7 +40,15 @@ public class RPCHandler {
 	}
 	
 	public URI getLocalURI() {
-		return messageSender.getLocalURI();
+		if (myURI == null) {
+			return messageSender.getLocalURI();
+		} else {
+			return myURI;
+		}
+	}
+	
+	public void setLocalURI(URI uri) {
+		this.myURI = uri;
 	}
 	
 	public void registerServiceListener(String serviceName, ServiceRequestListener serviceListener) {

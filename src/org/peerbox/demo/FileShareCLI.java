@@ -1,6 +1,7 @@
 package org.peerbox.demo;
 
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -50,6 +51,12 @@ public class FileShareCLI {
 						@Override
 						public void onResponseReceived(RPCEvent event) {
 							bindIP = event.getDataString();
+							System.out.println(bindIP);
+							try {
+								rpc.setLocalURI(new URI("udp://" + bindIP + bindPort));
+							} catch (URISyntaxException e) {
+								printUsageAndExit();
+							}
 							createInstance(rpc);
 						}
 
