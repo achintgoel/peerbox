@@ -21,7 +21,7 @@ public class FileShareCLIHandler implements CLIHandler{
 		this.friend_manager = fr_manager;
 	}
 	@Override
-	public void handleCommand(String[] args, final ExtendableCLI cli) {
+	public void handleCommand(final String[] args, final ExtendableCLI cli) {
 		// TODO Auto-generated method stub
 		if(args.length < 2) {
 			help();
@@ -38,6 +38,18 @@ public class FileShareCLIHandler implements CLIHandler{
 				cli.out().println("Sharing folder located at "+folder);
 			} else {
 				cli.out().println("No directory exists at "+folder+".  Please specify another folder to share");
+			}
+		}
+		else if(function.equalsIgnoreCase("downloadTo")) {
+			if(args.length != 3) {
+				help();
+				return;
+			}
+			String folder = args[2];
+			if(fileshare.setDownloadFilePath(folder)) {
+				cli.out().println("Download folder located at "+folder);
+			} else {
+				cli.out().println("No directory exists at "+folder+".  Please specify another folder to download files to");
 			}
 		}
 		else if(function.equalsIgnoreCase("browse")) {
@@ -70,7 +82,11 @@ public class FileShareCLIHandler implements CLIHandler{
 							}
 						}
 						else{
-							cli.out().println("The shared directory does not exist");
+							if(args.length == 4) {
+								cli.out().println("The shared directory does not exist");
+							} else {
+								cli.out().println(alias+" is not sharing a directory");
+							}
 						}
 						
 					}
@@ -104,33 +120,37 @@ public class FileShareCLIHandler implements CLIHandler{
 							FileResponse response) {
 						//System.out.println("RECEIVED RESPONSE TO FILE REQUEST");
 						//TODO: Pass full download path
-						fileshare.download(response.getFileLocURI(), file.getName(), new HttpClientListener() {
+						if(response.getFileLocURI() == null) {
+							cli.out().println("The requested file "+file.getName()+" is not available");
+						} else {
+							fileshare.download(response.getFileLocURI(), file.getName(), new HttpClientListener() {
 
-							@Override
-							public void finished() {
-								// TODO Auto-generated method stub
-								
-							}
+								@Override
+								public void finished() {
+									// TODO Auto-generated method stub
+									cli.out().println("Successfully downloaded file "+file.getName());
+								}
 
-							@Override
-							public void downloadError() {
-								// TODO Auto-generated method stub
-								
-							}
+								@Override
+								public void downloadError() {
+									// TODO Auto-generated method stub
+									cli.out().println("Unable to download reqested file "+file.getName());
+								}
 
-							@Override
-							public void started() {
-								// TODO Auto-generated method stub
-								
-							}
+								@Override
+								public void started() {
+									// TODO Auto-generated method stub
+									cli.out().println("Started downloading requested file "+file.getName());
+								}
 
-							@Override
-							public void localFileError() {
-								// TODO Auto-generated method stub
-								
-							}
-							
-						});
+								@Override
+								public void localFileError() {
+									// TODO Auto-generated method stub
+									cli.out().println("Unable to open file to download to");
+								}
+
+							});
+						}
 						
 					}
 					

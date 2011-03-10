@@ -18,6 +18,7 @@ import org.peerbox.fileshare.messages.SharedDirectoryResponse;
 import org.peerbox.friend.Friend;
 import org.peerbox.network.http.HttpClient;
 import org.peerbox.network.http.HttpClientListener;
+import org.peerbox.network.http.HttpStaticFileServer;
 import org.peerbox.rpc.RPCEvent;
 import org.peerbox.rpc.RPCHandler;
 import org.peerbox.rpc.RPCResponseListener;
@@ -43,6 +44,7 @@ public class FileShareManager {
 		requestIDtoFileRequest = new HashMap<String, FileRequestInfo>();
 		rpcServiceName = "fileshare";
 		this.rpcHandler = rpcHandler;
+		new HttpStaticFileServer(30000, this);
 		rpcHandler.registerServiceListener(rpcServiceName, new FileshareRequestListener(this));
 	}
 	
@@ -120,12 +122,12 @@ public class FileShareManager {
 		FileRequest request = new FileRequest(file, relativePath);
 		this.sendRequestRPC(tofriend, request, FileResponse.class, response);
 	}
-	public void setRequestIDtoFileRequest(String relativePath, String requestID, final String filename, long expiration) {
+	public boolean setRequestIDtoFileRequest(String relativePath, String requestID, final String filename, long expiration) {
 		if (filename == null || requestID == null) {
-			return;
+			return false;
 		}
 		if (mySharedDirectory == null) {
-			return;
+			return false;
 		}
 		File requestDir = new File(mySharedDirectory.getAbsolutePath().concat(relativePath));
 		File[] files = requestDir.listFiles(new FilenameFilter() {
@@ -141,10 +143,14 @@ public class FileShareManager {
 			try {
 				FileRequestInfo fileInfo = new FileRequestInfo(expiration, files[0].getCanonicalPath());
 				requestIDtoFileRequest.put(requestID, fileInfo);
+				return true;
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
+		} else {
+			return false;
 		}
+		return false;
 	}
 	public String getFilePath(URI uri) {
 		String requestID = uri.getPath();
@@ -188,13 +194,30 @@ public class FileShareManager {
 		requestIDtoFileRequest.clear();
 		return true;
 	}
+	public boolean setDownloadFilePath(String filePath) {
+		if (filePath == null) {
+			myDownloadDirectory = null;
+			return true;
+		}
+		
+		//TODO: make sure filepath will exist!!!
+		File desiredSharedDirectory = new File(filePath);
+		if(!desiredSharedDirectory.isDirectory()) {
+			return false;
+		}
+		else {
+			myDownloadDirectory = desiredSharedDirectory;
+		}
+		return true;
+	}
 
 	public void download(URI fileLocURI, String name, HttpClientListener httpClientListener) {
 		if (myDownloadDirectory == null) {
 			System.out.println("No download directory specified");
 			return;
 		}
-		new HttpClient(fileLocURI, myDownloadDirectory + name, httpClientListener);
+		File downloadPath = new File(myDownloadDirectory.getAbsolutePath().concat("/"+name));
+		new HttpClient(fileLocURI, downloadPath, httpClientListener);
 	}
 	
 }
