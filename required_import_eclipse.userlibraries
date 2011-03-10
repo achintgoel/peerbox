@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="MacRoman" standalone="no"?>
+<eclipse-userlibraries version="2">
+    <library name="Apache Commons Codec" systemlibrary="false">
+        <archive javadoc="file:/Users/rajiv/Documents/UCLA/2011 Winter/CS114/peerbox/lib/commons-codec-1.4/apidocs/" path="/peerbox/lib/commons-codec-1.4/commons-codec-1.4.jar" source="/Users/rajiv/Documents/UCLA/2011 Winter/CS114/peerbox/lib/commons-codec-1.4/commons-codec-1.4-sources.jar"/>
+    </library>
+    <library name="Gson" systemlibrary="false">
+        <archive javadoc="jar:file:/Users/rajiv/Documents/UCLA/2011 Winter/CS114/peerbox/lib/google-gson-1.6/gson-1.6-javadoc.jar!/" path="/peerbox/lib/google-gson-1.6/gson-1.6.jar" source="/Users/rajiv/Documents/UCLA/2011 Winter/CS114/peerbox/lib/google-gson-1.6/gson-1.6-sources.jar"/>
+    </library>
+    <library name="JBoss Netty 3" systemlibrary="false">
+        <archive javadoc="file:/Users/rajiv/Documents/UCLA/2011 Winter/CS114/peerbox/lib/netty-3.2.4.Final/doc/api/" path="/peerbox/lib/netty-3.2.4.Final/jar/netty-3.2.4.Final.jar" source="/Users/rajiv/Documents/UCLA/2011 Winter/CS114/peerbox/lib/netty-3.2.4.Final/jar/netty-3.2.4.Final-sources.jar"/>
+    </library>
+</eclipse-userlibraries>
