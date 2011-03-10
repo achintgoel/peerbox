@@ -12,10 +12,12 @@ public class Identifier implements Identifiable {
 	}
 	
 	protected Identifier(BigInteger value) {
+		//TODO: check that the number of bytes is valid
 		this.value = value;
 	}
 	
 	public BigInteger getIntegerValue() {
+		//TODO: check that the number of bytes is valid
 		return value;
 	}
 	

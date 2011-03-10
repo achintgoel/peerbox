@@ -3,15 +3,46 @@ package org.peerbox.demo;
 import java.net.URI;
 import java.util.List;
 
+import org.peerbox.kademlia.BootstrapListener;
+import org.peerbox.kademlia.NetworkInstance;
 import org.peerbox.rpc.RPCHandler;
 
 public class KadInstance implements Runnable {
-	public KadInstance(String bindIP, int bindPort, List<URI> bootstrapURI){		
+	private String bindIP;
+	private int bindPort;
+	private RPCHandler rpc;
+	private List<URI> bootstrapURI;
+	private NetworkInstance networkInstance;
+	
+	public KadInstance(String bindIP, int bindPort, List<URI> bootstrapURI){
+		this.bindIP = bindIP;
+		this.bindPort = bindPort;
+		this.bootstrapURI = bootstrapURI;
+		//DEMO TODO: change to bindIP
+		rpc = RPCHandler.getUDPInstance(bindPort);
+		networkInstance = new NetworkInstance(rpc);
 	}
 
 	public KadInstance(RPCHandler rpc, String bindIP, int bindPort,	List<URI> bootstrapURI) {
+		this.rpc = rpc;
+		this.bindPort = bindPort;
+		this.bindIP = bindIP;
+		this.bootstrapURI = bootstrapURI;
+		networkInstance = new NetworkInstance(rpc);
 	}
 
-	public void run() {		
+	public void run() {
+		networkInstance.bootstrap(bootstrapURI, new BootstrapListener(){
+
+			@Override
+			public void onBootstrapFailure() {
+				System.out.println("Node started successfully at " + bindIP + ":" + bindPort);
+			}
+
+			@Override
+			public void onBootstrapSuccess() {
+				System.out.println("Node bootstrap at " + bindIP + ":" + bindPort + " failed");				
+			}			
+		});
 	}
 }

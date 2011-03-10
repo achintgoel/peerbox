@@ -163,7 +163,7 @@ public class DumbCLI {
 					System.exit(0);
 				}
 				else if(function.equals("printBuckets")){
-					instance.getBuckets().print();
+					instance.getBuckets().print(System.out);
 				}
 				else{
 					System.out.println("Wrong Command");				
