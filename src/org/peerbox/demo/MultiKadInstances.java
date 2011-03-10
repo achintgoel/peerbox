@@ -1,6 +1,7 @@
 package org.peerbox.demo;
 
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -68,14 +69,16 @@ public class MultiKadInstances {
 				e.printStackTrace();
 			}
 			KadInstance kadInstance;
+			int bindPort = firstBindPort + i;
 			if(rpc == null){
-				kadInstance = new KadInstance(bindIP, firstBindPort + i, bootstrapURI);
+				kadInstance = new KadInstance(bindIP, bindPort, bootstrapURI);
 			}
 			else{
-				kadInstance = new KadInstance(rpc, bindIP, firstBindPort + i, bootstrapURI);
+				kadInstance = new KadInstance(rpc, bindIP, bindPort, bootstrapURI);
 			}
-			kadInstances.put(firstBindPort + i, kadInstance);
+			kadInstances.put(bindPort, kadInstance);
 			new Thread(kadInstance).run();
+			bootstrapURI.add(kadInstance.getURI());
 		}		
 	}
 

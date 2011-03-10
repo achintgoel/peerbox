@@ -32,17 +32,25 @@ public class KadInstance implements Runnable {
 	}
 
 	public void run() {
+		if(bootstrapURI.isEmpty()){
+			System.out.println("Node started successfully at " + bindIP + ":" + bindPort);
+			return;
+		}
 		networkInstance.bootstrap(bootstrapURI, new BootstrapListener(){
 
 			@Override
 			public void onBootstrapFailure() {
-				System.out.println("Node started successfully at " + bindIP + ":" + bindPort);
+				System.out.println("Node bootstrap at " + bindIP + ":" + bindPort + " failed");
 			}
 
 			@Override
 			public void onBootstrapSuccess() {
-				System.out.println("Node bootstrap at " + bindIP + ":" + bindPort + " failed");				
+				System.out.println("Node started successfully at " + bindIP + ":" + bindPort);				
 			}			
 		});
+	}
+	
+	public URI getURI(){
+		return rpc.getLocalURI();
 	}
 }
