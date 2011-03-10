@@ -17,11 +17,11 @@ public class HttpResponseHandler extends SimpleChannelUpstreamHandler{
 	protected RandomAccessFile downloadFile;
 	protected HttpClientListener listener;
 	
-	public HttpResponseHandler(String downloadFilePath, HttpClientListener listener) {
+	public HttpResponseHandler(File downloadFilePath, HttpClientListener listener) {
 		super();
 		this.listener = listener;
 		try {
-			downloadFile = new RandomAccessFile(new File(downloadFilePath), "rw");
+			downloadFile = new RandomAccessFile(new File(downloadFilePath.getAbsolutePath()), "rw");
 		} catch (FileNotFoundException e) {
 			listener.localFileError();
 		}
@@ -34,17 +34,17 @@ public class HttpResponseHandler extends SimpleChannelUpstreamHandler{
 			}
 			HttpResponse response = (HttpResponse) e.getMessage();
 			 
-			System.out.println("STATUS: " + response.getStatus());
-			System.out.println("VERSION: " + response.getProtocolVersion());
-			System.out.println();
+			//System.out.println("STATUS: " + response.getStatus());
+			//System.out.println("VERSION: " + response.getProtocolVersion());
+			//System.out.println();
 
 			if (!response.getHeaderNames().isEmpty()) {
 				for (String name: response.getHeaderNames()) {
 					for (String value: response.getHeaders(name)) {
-						System.out.println("HEADER: " + name + " = " + value);
+						//System.out.println("HEADER: " + name + " = " + value);
 					}
 				}
-				System.out.println();
+				//System.out.println();
 			}
 
 			if (response.getStatus().getCode() == 200) {

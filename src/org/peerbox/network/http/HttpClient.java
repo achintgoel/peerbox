@@ -1,5 +1,6 @@
 package org.peerbox.network.http;
 
+import java.io.File;
 import java.net.InetSocketAddress;
 import java.net.URI;
 import java.util.concurrent.Executors;
@@ -15,7 +16,7 @@ import org.jboss.netty.handler.codec.http.HttpRequest;
 import org.jboss.netty.handler.codec.http.HttpVersion;
 
 public class HttpClient {
-	public HttpClient(URI uri, String downloadFilePath, HttpClientListener listener) {
+	public HttpClient(URI uri, File downloadFilePath, HttpClientListener listener) {
 		
 		String scheme = uri.getScheme() == null? "http" : uri.getScheme();
 		String host = uri.getHost() == null? "localhost" : uri.getHost();
