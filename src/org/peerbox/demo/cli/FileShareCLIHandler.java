@@ -78,7 +78,11 @@ public class FileShareCLIHandler implements CLIHandler{
 						if(response.getContents() != null) {
 							FileInfo[] contents = response.getContents();
 							for(int i=0; i<contents.length;i++){
-								System.out.println(contents[i].getName());
+								String directory = "";
+								if(contents[i].getType().equals("directory")){
+									directory = "/";
+								}
+								cli.out().println(directory+contents[i].getName());
 							}
 						}
 						else{
