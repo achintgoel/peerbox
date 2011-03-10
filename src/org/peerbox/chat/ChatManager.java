@@ -19,8 +19,9 @@ public class ChatManager implements ServiceRequestListener {
 	
 	public void sendMessage(final String alias, String message) {
 		Friend friend = friendMan.getFriend(alias);
-		if (friend == null) {
+		if (friend == null || !friend.isAlive()) {
 			System.out.println("No friend " + alias);
+			return;
 		}
 		rpc.sendRequest(friend.getNetworkAddress(), "chat", message, new RPCResponseListener() {
 			@Override
