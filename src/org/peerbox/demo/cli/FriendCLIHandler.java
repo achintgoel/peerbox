@@ -7,6 +7,7 @@ import java.security.PublicKey;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.X509EncodedKeySpec;
 
+import org.peerbox.friend.Friend;
 import org.peerbox.friend.FriendManager;
 
 public class FriendCLIHandler implements CLIHandler{
@@ -59,7 +60,8 @@ public class FriendCLIHandler implements CLIHandler{
 				return;
 			}
 			String alias = args[2];
-			if(friend_manager.getFriend(alias) != null) {
+			Friend friend = friend_manager.getFriend(alias);
+			if(friend != null) {
 				friend_manager.removeFriend(alias);
 			}
 			else {

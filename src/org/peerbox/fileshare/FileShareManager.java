@@ -50,7 +50,7 @@ public class FileShareManager {
 			requestDir = new File(mySharedDirectory.getAbsolutePath().concat("/"+relativePath));
 		}
 		else {
-			System.out.println("requesting a file");
+			//System.out.println("requesting a file");
 			requestDir = new File(mySharedDirectory.getAbsolutePath());
 		}
 		try {
@@ -99,7 +99,7 @@ public class FileShareManager {
 	}
 	
 	public void getSharedDirectory(String relativePath, Friend friend, ResponseListener<SharedDirectoryResponse> response) {
-		System.out.println("relativePath is:"+relativePath);
+		//System.out.println("relativePath is:"+relativePath);
 		SharedDirectoryRequest request = new SharedDirectoryRequest(relativePath);
 		this.sendRequestRPC(friend, request, SharedDirectoryResponse.class, response);
 	}
@@ -135,7 +135,7 @@ public class FileShareManager {
 			requestID = requestID.substring(1);
 			FileRequestInfo fri = requestIDtoFileRequest.get(requestID);
 			if(fri != null) {
-				System.out.println("expiration:"+fri.getExpiration()+" current time:"+System.currentTimeMillis()/1000);
+				//System.out.println("expiration:"+fri.getExpiration()+" current time:"+System.currentTimeMillis()/1000);
 				if(fri.getExpiration() > (System.currentTimeMillis()/1000)){
 					return requestIDtoFileRequest.get(requestID).getFilePath();
 				}
@@ -146,7 +146,13 @@ public class FileShareManager {
 	}
 	public void setFilePath(String filePath) {
 		//TODO: make sure filepath will exist!!!
-		mySharedDirectory = new File(filePath);
+		File desiredSharedDirectory = new File(filePath);
+		if(!desiredSharedDirectory.isDirectory()) {
+			System.out.println("The path "+filePath+" does not point to a valid directory");
+		}
+		else {
+			mySharedDirectory = desiredSharedDirectory;
+		}
 		requestIDtoFileRequest.clear();
 	}
 	
