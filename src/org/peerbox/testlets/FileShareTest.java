@@ -59,9 +59,9 @@ public class FileShareTest {
 			});
 		}
 		final FriendManager manager = new FriendManager(instance.getSingleMap("users"), new SecureMessageHandler());
-		manager.signOn(rpcHandle.getLocalURI());
+		manager.signOn();
 		System.out.println("Signed on properly");
-		final FileShareManager fsm = new FileShareManager("/home/rajiv/Desktop", rpcHandle);
+		final FileShareManager fsm = new FileShareManager(rpcHandle, "/home/rajiv/Desktop");
 		Scanner scan = new Scanner(System.in);
 		int count = 0;
 		while(true){
@@ -78,7 +78,7 @@ public class FileShareTest {
 					manager.printBuddyList();
 				}
 				if(function.equals("setSharedDirectory")  && scan.hasNext()) {
-					fsm.setFilePath(scan.next());
+					fsm.setSharedFilePath(scan.next());
 				}
 				if(function.equals("getSharedContents")  && scan.hasNext()) {
 					Friend target = manager.getFriend(scan.next());

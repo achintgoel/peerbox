@@ -1,5 +1,7 @@
 package org.peerbox.demo.cli;
 
+import java.io.File;
+
 import org.peerbox.fileshare.FileInfo;
 import org.peerbox.fileshare.FileShareManager;
 import org.peerbox.fileshare.ResponseListener;
@@ -31,10 +33,14 @@ public class FileShareCLIHandler implements CLIHandler{
 				return;
 			}
 			String folder = args[2];
-			fileshare.setFilePath(folder);
+			if(fileshare.setSharedFilePath(folder)) {
+				cli.out().println("Sharing folder located at "+folder);
+			} else {
+				cli.out().println("No directory exists at "+folder+".  Please specify another folder to share");
+			}
 		}
 		else if(function.equalsIgnoreCase("browse")) {
-			if(args.length != 3) {
+			if(args.length < 3 || args.length > 4) {
 				help();
 				return;
 			}
@@ -82,12 +88,9 @@ public class FileShareCLIHandler implements CLIHandler{
 			final String alias = args[2];
 			Friend friend = friend_manager.getFriend(alias);
 			if(friend != null) {
-				final String fileName = args[3];
-				String relativePath = "";
-				if(args.length == 5) {
-					relativePath = args[3];
-				}
-				fileshare.getFile(relativePath, friend, fileName, new ResponseListener<FileResponse>() {
+				final String filePath = args[3];
+				final File file = new File(filePath);
+				fileshare.getFile(file.getParent(), friend, file.getName(), new ResponseListener<FileResponse>() {
 
 					@Override
 					public void onFailure() {
@@ -99,7 +102,7 @@ public class FileShareCLIHandler implements CLIHandler{
 					public void onResponseReceived(
 							FileResponse response) {
 						//System.out.println("RECEIVED RESPONSE TO FILE REQUEST");
-						HttpClient http_client = new HttpClient(response.getFileLocURI(), fileName);
+						HttpClient http_client = new HttpClient(response.getFileLocURI(), file.getName());
 						
 					}
 					
@@ -114,7 +117,7 @@ public class FileShareCLIHandler implements CLIHandler{
 	}
 	
 	public void help() {
-		System.out.println("Illegal Command");
+		System.out.println("Invalid command.");
 	}
 
 }

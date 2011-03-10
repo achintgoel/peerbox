@@ -33,6 +33,7 @@ public class SecureMessageHandler {
 		try {
 			sig = Signature.getInstance("SHA1withDSA");
 			keyGen = KeyPairGenerator.getInstance("DSA");
+			keyGen.initialize(512);
 			pair = keyGen.generateKeyPair();
 			sig.initSign(this.pair.getPrivate());
 		} catch (NoSuchAlgorithmException e) {

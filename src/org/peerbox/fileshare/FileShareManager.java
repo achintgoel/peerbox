@@ -30,8 +30,12 @@ public class FileShareManager {
 	protected final RPCHandler rpcHandler;
 	protected final String rpcServiceName;
 	
-	public FileShareManager(String sharedPathName, RPCHandler rpcHandler) {
-		mySharedDirectory = new File(sharedPathName);
+	public FileShareManager(RPCHandler rpcHandler) {
+		this(rpcHandler, null);
+	}
+	
+	public FileShareManager(RPCHandler rpcHandler, String sharedPathName) {
+		mySharedDirectory = mySharedDirectory != null ? new File(sharedPathName) : null;
 		requestIDtoFileRequest = new HashMap<String, FileRequestInfo>();
 		rpcServiceName = "fileshare";
 		this.rpcHandler = rpcHandler;
@@ -44,6 +48,9 @@ public class FileShareManager {
 	
 	//TODO: handle OS specific slashes
 	public FileInfo[] getSharedContents(String relativePath) {
+		if (mySharedDirectory == null) {
+			return null;
+		}
 		File requestDir = null;
 		if(!relativePath.isEmpty()) {
 			//TODO: make sure that path exists and is a directory!!
@@ -110,6 +117,12 @@ public class FileShareManager {
 		this.sendRequestRPC(tofriend, request, FileResponse.class, response);
 	}
 	public void setRequestIDtoFileRequest(String relativePath, String requestID, final String filename, long expiration) {
+		if (filename == null || requestID == null) {
+			return;
+		}
+		if (mySharedDirectory == null) {
+			return;
+		}
 		File requestDir = new File(mySharedDirectory.getAbsolutePath().concat(relativePath));
 		File[] files = requestDir.listFiles(new FilenameFilter() {
 			public boolean accept(File arg0, String arg1) {
@@ -144,16 +157,32 @@ public class FileShareManager {
 		return null;
 
 	}
-	public void setFilePath(String filePath) {
+	
+	/**
+	 * Sets the shared file directory.
+	 * If filePath is null, removes the file share.
+	 * If filePath is invalid, keeps existing share.
+	 * Resets any pending file requests if file share is changed.
+	 * @param filePath
+	 * @return
+	 */
+	public boolean setSharedFilePath(String filePath) {
+		if (filePath == null) {
+			mySharedDirectory = null;
+			requestIDtoFileRequest.clear();
+			return true;
+		}
+		
 		//TODO: make sure filepath will exist!!!
 		File desiredSharedDirectory = new File(filePath);
 		if(!desiredSharedDirectory.isDirectory()) {
-			System.out.println("The path "+filePath+" does not point to a valid directory");
+			return false;
 		}
 		else {
 			mySharedDirectory = desiredSharedDirectory;
 		}
 		requestIDtoFileRequest.clear();
+		return true;
 	}
 	
 }

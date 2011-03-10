@@ -2,7 +2,6 @@ package org.peerbox.friend;
 
 import java.math.BigInteger;
 import java.net.URI;
-import java.net.URISyntaxException;
 import java.security.KeyPair;
 import java.security.PrivateKey;
 import java.security.PublicKey;
@@ -10,6 +9,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map.Entry;
 
+import org.apache.commons.codec.binary.Base64;
 import org.peerbox.dht.DistributedMap;
 import org.peerbox.dht.ValueEvent;
 import org.peerbox.dht.ValueListener;
@@ -23,12 +23,14 @@ public class FriendManager {
 	protected SecureMessageHandler secure;
 	protected PublicKey myPubKey;
 	protected PrivateKey myPrivKey;
+	protected URI myURI;
 	
-	public FriendManager(DistributedMap<String, String> map, SecureMessageHandler secure) {
+	public FriendManager(DistributedMap<String, String> map, SecureMessageHandler secure, URI myURI) {
 		keyToFriendMap = new HashMap<PublicKey, Friend>();
 		aliasToFriendMap = new HashMap<String, Friend>();
 		
 		this.secure = secure;
+		this.myURI = myURI;
 		KeyPair keypair = secure.getKeyPair();
 		myPubKey = keypair.getPublic();
 		myPrivKey = keypair.getPrivate();
@@ -45,10 +47,10 @@ public class FriendManager {
 		return keyToFriendMap.get(key);
 	}
 	
-	public void signOn(URI myURI){
+	public void signOn(){
 		userTable.put(myPubKey, myURI);
-		System.out.println("Public Key: "+new BigInteger(myPubKey.getEncoded()));
 		
+		System.out.println("Public Key: "+ Base64.encodeBase64URLSafeString(myPubKey.getEncoded()));		
 	}
 	
 	public void createFriend(String alias, URI address, PublicKey key) {
@@ -87,9 +89,16 @@ public class FriendManager {
 	
 	public void printBuddyList(){
 		//TODO: Print the buddys nicely
-		for(Entry<PublicKey, Friend> buddyInfo : keyToFriendMap.entrySet()) {
-			System.out.println("Alias: "+buddyInfo.getValue().getAlias()+" Address: "+buddyInfo.getValue().getNetworkAddress()+"/n");
-		}
+		if (keyToFriendMap.isEmpty()) {
+			System.out.println("No friends added yet. Stop being such a loner.");
+		} else {
+			int i = 1;
+			System.out.println("Your friends:");
+			for(Entry<PublicKey, Friend> buddyInfo : keyToFriendMap.entrySet()) {
+				System.out.printf("\t%d. %s (%s)", i, buddyInfo.getValue().getAlias(), buddyInfo.getValue().getNetworkAddress().toString());
+				i++;
+			}
+		}	
 	}
 
 	public Collection<Friend> getAllFriends() {

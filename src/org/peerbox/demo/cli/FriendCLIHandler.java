@@ -7,6 +7,7 @@ import java.security.PublicKey;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.X509EncodedKeySpec;
 
+import org.apache.commons.codec.binary.Base64;
 import org.peerbox.friend.Friend;
 import org.peerbox.friend.FriendManager;
 
@@ -33,8 +34,7 @@ public class FriendCLIHandler implements CLIHandler{
 			}
 			try {
 				String alias = args[2];
-				BigInteger key = new BigInteger(args[3]);
-				X509EncodedKeySpec pubKeySpec = new X509EncodedKeySpec(key.toByteArray());
+				X509EncodedKeySpec pubKeySpec = new X509EncodedKeySpec(Base64.decodeBase64(args[3]));
 				KeyFactory keyFactory;
 				PublicKey publicKey;
 				keyFactory = KeyFactory.getInstance("DSA");
@@ -48,13 +48,12 @@ public class FriendCLIHandler implements CLIHandler{
 			} catch (InvalidKeySpecException e) {
 				// TODO Auto-generated catch block
 				//e.printStackTrace();
-				cli.out().println("Generated key is invalid");
+				cli.out().println("Specified key is invalid. Please check with your friend.");
 			} catch (NumberFormatException e) {
-				cli.out().println("Public Key provided has invalid format");
+				cli.out().println("Specified key is invalid. Please check with your friend.");
 			}
 			
-		}
-		else if(function.equalsIgnoreCase("delete")) {
+		} else if(function.equalsIgnoreCase("delete")) {
 			if(args.length != 3) {
 				help();
 				return;
@@ -65,18 +64,22 @@ public class FriendCLIHandler implements CLIHandler{
 				friend_manager.removeFriend(alias);
 			}
 			else {
-				cli.out().println("The friend "+alias+" does not exist");
+				cli.out().println("The friend "+alias+" does not exist. Imaginary friend?");
 			}
 			
-		}
-		else if(function.equalsIgnoreCase("list")) {
+		} else if(function.equalsIgnoreCase("list")) {
 			if(args.length > 2) {
 				help();
 				return;
 			}
 			friend_manager.printBuddyList();
-		}
-		else {
+		} else if (function.equalsIgnoreCase("signOn") || function.equalsIgnoreCase("myKey")) {
+			if (args.length > 2) {
+				help();
+				return;
+			}
+			friend_manager.signOn();
+		} else {
 			help();
 		}
 		

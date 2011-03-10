@@ -29,12 +29,17 @@ public class ExtendableCLI {
 	
 	public void executeCommand(String args[]) {
 		if (args.length >= 1) {
-			CLIHandler handler = handlers.get(args[1]);
+			CLIHandler handler = handlers.get(args[0]);
 			if (handler != null) {
 				try {
 					handler.handleCommand(args, this);
 				} catch(Exception e) {
+					e.printStackTrace(); //TODO: REMOVE
 					out().println("Error executing command.");
+				}
+			} else {
+				if (!args[0].isEmpty()) {
+					out().println("Command not found.");
 				}
 			}
 		}
@@ -78,8 +83,7 @@ public class ExtendableCLI {
 			
 			String[] result = Arrays.copyOf(actual, actual.length + args.length - 1);
 			System.arraycopy(args, 1, result, actual.length, args.length - 1);
-			
-			cli.executeCommand(args);
+			cli.executeCommand(result);
 		}
 		
 	}

@@ -56,7 +56,7 @@ public class FileshareRequestListener implements ServiceRequestListener{
 				//URI uri = new URI("http://")
 				//TODO: set the expiration date properly
 				//TODO: take out hard coded file response URI
-				manager.setRequestIDtoFileRequest(fnr.getRelativePath(), requestId, fnr.getFile(), (System.currentTimeMillis()/1000) + 10);
+				manager.setRequestIDtoFileRequest(fnr.getRelativePath() == null ? "/" : fnr.getRelativePath(), requestId, fnr.getFile(), (System.currentTimeMillis()/1000) + 10);
 				HttpStaticFileServer httpserver = new HttpStaticFileServer(8012, manager);
 				try {
 					response = new FileResponse(new URI("http://localhost:8012/"+requestId));
