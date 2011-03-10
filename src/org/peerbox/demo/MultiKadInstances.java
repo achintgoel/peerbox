@@ -64,7 +64,7 @@ public class MultiKadInstances {
 	private static void createInstances(RPCHandler rpc) {
 		for (int i = 0; i < numInstances; i++) {
 			try {
-				Thread.sleep(1000);
+				Thread.sleep(1500);
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}
