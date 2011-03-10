@@ -61,14 +61,14 @@ public class FindProcess<FRT extends FindResponse> {
 	 * @param request the request to be sent
 	 * @param responseListener callback
 	 */
-	public static <T extends FindResponse> FindProcess execute(NetworkInstance ni, FindRequest request, boolean stopOnFound, Class<T> responseClass, ResponseListener<T> responseListener){
+	public static <T extends FindResponse> void execute(NetworkInstance ni, FindRequest request, boolean stopOnFound, Class<T> responseClass, ResponseListener<T> responseListener){
 		FindProcess<T> sh = new FindProcess<T>(ni, request, stopOnFound, responseClass, responseListener);
 		LinkedList<Node> unsearchedNodes = sh.computeUnsearchedNodes();
 		if(unsearchedNodes.isEmpty()){
 			responseListener.onFailure();
+			return;
 		}
 		sh.nextIteration(unsearchedNodes);
-		return sh;
 	}
 	
 	
@@ -94,9 +94,11 @@ public class FindProcess<FRT extends FindResponse> {
 	          		current.remove(nextRequestDestination);
 		          	if(response.isFound()){
 		          		if(stopOnFound){
-		          			if(!done)
+		          			if(!done) {
+		          				done = true;
 		          				callback.onResponseReceived(response);
-		          			done = true;
+		          			}
+		          			
 		          		}
 		          		else{
 		          			foundResponse = response;
@@ -131,9 +133,11 @@ public class FindProcess<FRT extends FindResponse> {
 					int k = networkInstance.getConfiguration().getK();
 					List<Node> kNearbyNodes = nearbyNodes.subList(0, nearestSet.size() > k ? k : nearestSet.size());
 					response.setNearbyNodes(kNearbyNodes);
+					done = true;
 					callback.onResponseReceived(response);	
 				}
 				else {
+					done = true;
 		  			callback.onFailure();
 		  		}
 			}
