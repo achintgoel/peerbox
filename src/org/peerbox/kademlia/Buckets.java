@@ -1,5 +1,6 @@
 package org.peerbox.kademlia;
 
+import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedHashMap;
@@ -164,15 +165,15 @@ public class Buckets implements NodeStatusListener {
 		return buckets.get(bucketNumber).get(identifier);
 	}
 	
-	public void print(){
+	public void print(PrintStream out){
 		for (int i = 0; i < buckets.size(); i++) {
 			LinkedHashMap<Identifier, Node> bucket = buckets.get(i);
 			if (!bucket.isEmpty()) {
-				System.out.println("Bucket No : " + i);
+				out.println("Bucket No : " + i);
 				for (Entry<Identifier, Node> entry : bucket.entrySet()) {
-					System.out.println("   ID = " + entry.getKey() + ", URI = " + (entry.getValue()).getNetworkURI());
+					out.println("   ID = " + entry.getKey() + ",\t\t URI = " + (entry.getValue()).getNetworkURI());
 				}
-				System.out.println();
+				out.println();
 			}
 		}
 	}
