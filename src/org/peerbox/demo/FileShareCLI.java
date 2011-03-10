@@ -53,7 +53,7 @@ public class FileShareCLI {
 							bindIP = event.getDataString();
 							System.out.println(bindIP);
 							try {
-								rpc.setLocalURI(new URI("udp://" + bindIP + bindPort));
+								rpc.setLocalURI(new URI("udp://" + bindIP + ":" + bindPort));
 							} catch (URISyntaxException e) {
 								printUsageAndExit();
 							}
@@ -77,8 +77,12 @@ public class FileShareCLI {
 	
 	private static void createInstance(RPCHandler rpc){
 		if(rpc == null){
-			// DEMO TODO: RPC Handler takes URI
 			rpc = RPCHandler.getUDPInstance(bindPort);
+			try {
+				rpc.setLocalURI(new URI("udp://" + bindIP + ":" + bindPort));
+			} catch (URISyntaxException e) {
+				System.out.println("Illegal URI syntax");
+			}
 		}		
 		networkInstance = new NetworkInstance(rpc);
 		if(!bootstrapURI.isEmpty()){

@@ -1,6 +1,7 @@
 package org.peerbox.demo;
 
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.List;
 
 import org.peerbox.kademlia.BootstrapListener;
@@ -18,8 +19,12 @@ public class KadInstance implements Runnable {
 		this.bindIP = bindIP;
 		this.bindPort = bindPort;
 		this.bootstrapURI = bootstrapURI;
-		//DEMO TODO: change to bindIP
 		rpc = RPCHandler.getUDPInstance(bindPort);
+		try {
+			rpc.setLocalURI(new URI("udp://" + bindIP + ":" + bindPort));
+		} catch (URISyntaxException e) {
+			System.out.println("Illegal URI Syntax");
+		}
 		networkInstance = new NetworkInstance(rpc);
 	}
 
