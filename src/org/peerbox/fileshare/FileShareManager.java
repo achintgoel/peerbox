@@ -16,6 +16,8 @@ import org.peerbox.fileshare.messages.Response;
 import org.peerbox.fileshare.messages.SharedDirectoryRequest;
 import org.peerbox.fileshare.messages.SharedDirectoryResponse;
 import org.peerbox.friend.Friend;
+import org.peerbox.network.http.HttpClient;
+import org.peerbox.network.http.HttpClientListener;
 import org.peerbox.rpc.RPCEvent;
 import org.peerbox.rpc.RPCHandler;
 import org.peerbox.rpc.RPCResponseListener;
@@ -29,13 +31,15 @@ public class FileShareManager {
 	protected HashMap<String, FileRequestInfo> requestIDtoFileRequest; 
 	protected final RPCHandler rpcHandler;
 	protected final String rpcServiceName;
+	protected File myDownloadDirectory;
 	
 	public FileShareManager(RPCHandler rpcHandler) {
-		this(rpcHandler, null);
+		this(rpcHandler, null, null);
 	}
 	
-	public FileShareManager(RPCHandler rpcHandler, String sharedPathName) {
-		mySharedDirectory = mySharedDirectory != null ? new File(sharedPathName) : null;
+	public FileShareManager(RPCHandler rpcHandler, String sharedPathName, String downloadPath) {
+		mySharedDirectory = sharedPathName != null ? new File(sharedPathName) : null;
+		myDownloadDirectory = downloadPath != null ? new File(downloadPath) : null;
 		requestIDtoFileRequest = new HashMap<String, FileRequestInfo>();
 		rpcServiceName = "fileshare";
 		this.rpcHandler = rpcHandler;
@@ -183,6 +187,14 @@ public class FileShareManager {
 		}
 		requestIDtoFileRequest.clear();
 		return true;
+	}
+
+	public void download(URI fileLocURI, String name, HttpClientListener httpClientListener) {
+		if (myDownloadDirectory == null) {
+			System.out.println("No download directory specified");
+			return;
+		}
+		new HttpClient(fileLocURI, myDownloadDirectory + name, httpClientListener);
 	}
 	
 }

@@ -10,6 +10,7 @@ import org.peerbox.fileshare.messages.SharedDirectoryResponse;
 import org.peerbox.friend.Friend;
 import org.peerbox.friend.FriendManager;
 import org.peerbox.network.http.HttpClient;
+import org.peerbox.network.http.HttpClientListener;
 
 public class FileShareCLIHandler implements CLIHandler{
 	
@@ -102,7 +103,34 @@ public class FileShareCLIHandler implements CLIHandler{
 					public void onResponseReceived(
 							FileResponse response) {
 						//System.out.println("RECEIVED RESPONSE TO FILE REQUEST");
-						HttpClient http_client = new HttpClient(response.getFileLocURI(), file.getName());
+						//TODO: Pass full download path
+						fileshare.download(response.getFileLocURI(), file.getName(), new HttpClientListener() {
+
+							@Override
+							public void finished() {
+								// TODO Auto-generated method stub
+								
+							}
+
+							@Override
+							public void downloadError() {
+								// TODO Auto-generated method stub
+								
+							}
+
+							@Override
+							public void started() {
+								// TODO Auto-generated method stub
+								
+							}
+
+							@Override
+							public void localFileError() {
+								// TODO Auto-generated method stub
+								
+							}
+							
+						});
 						
 					}
 					

@@ -15,7 +15,7 @@ import org.jboss.netty.handler.codec.http.HttpRequest;
 import org.jboss.netty.handler.codec.http.HttpVersion;
 
 public class HttpClient {
-	public HttpClient(URI uri, String file) {
+	public HttpClient(URI uri, String downloadFilePath, HttpClientListener listener) {
 		
 		String scheme = uri.getScheme() == null? "http" : uri.getScheme();
 		String host = uri.getHost() == null? "localhost" : uri.getHost();
@@ -30,7 +30,7 @@ public class HttpClient {
 						Executors.newCachedThreadPool()));
 		
 		//Set up the event pipeline factory
-		bootstrap.setPipelineFactory(new HttpClientPipelineFactory(false, file));
+		bootstrap.setPipelineFactory(new HttpClientPipelineFactory(false, new HttpResponseHandler(downloadFilePath, listener)));
 		
 		//Start the connection attempt
 		System.out.println("trying to connect to host:"+uri.toString());

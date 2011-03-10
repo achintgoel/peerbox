@@ -7,10 +7,10 @@ import org.jboss.netty.handler.codec.http.HttpContentDecompressor;
 
 public class HttpClientPipelineFactory implements ChannelPipelineFactory{
 	private final boolean ssl;
-	protected String filename;
-	public HttpClientPipelineFactory(boolean ssl, String file) {
+	protected HttpResponseHandler responseHandler;
+	public HttpClientPipelineFactory(boolean ssl, HttpResponseHandler responseHandler) {
 		this.ssl = ssl;
-		this.filename = file;
+		this.responseHandler = responseHandler;
 	}
 	@Override
 	public ChannelPipeline getPipeline() throws Exception {
@@ -20,7 +20,7 @@ public class HttpClientPipelineFactory implements ChannelPipelineFactory{
 		pipeline.addLast("codec", new HttpClientCodec());
 		pipeline.addLast("inflater", new HttpContentDecompressor());
 		
-		pipeline.addLast("handler", new HttpResponseHandler(filename));
+		pipeline.addLast("handler", responseHandler);
 		return pipeline;
 		//return null;
 	}

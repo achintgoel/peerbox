@@ -10,70 +10,77 @@ import org.jboss.netty.channel.MessageEvent;
 import org.jboss.netty.channel.SimpleChannelUpstreamHandler;
 import org.jboss.netty.handler.codec.http.HttpChunk;
 import org.jboss.netty.handler.codec.http.HttpResponse;
-import org.jboss.netty.util.CharsetUtil;
 
 public class HttpResponseHandler extends SimpleChannelUpstreamHandler{
 	
-	private boolean readingChunks;
+	private boolean saveChunks;
 	protected RandomAccessFile downloadFile;
+	protected HttpClientListener listener;
 	
-	public HttpResponseHandler(String filename) {
+	public HttpResponseHandler(String downloadFilePath, HttpClientListener listener) {
 		super();
+		this.listener = listener;
 		try {
-			downloadFile = new RandomAccessFile(new File("/home/rajiv/Downloads/"+filename), "rw");
+			downloadFile = new RandomAccessFile(new File(downloadFilePath), "rw");
 		} catch (FileNotFoundException e) {
-			// TODO Auto-generated catch block
-			System.out.println("RANDOM ACCESS FILE DID NOT INITIALIZE PROPERLY!!!");
-			e.printStackTrace();
+			listener.localFileError();
 		}
 	}
 	
 	public void messageReceived(ChannelHandlerContext ctx, MessageEvent e) throws Exception {
-		if(!readingChunks) {
+		if(!saveChunks) {
+			if (!(e.getMessage() instanceof HttpResponse)) {
+				return;
+			}
 			HttpResponse response = (HttpResponse) e.getMessage();
-			  
-			              System.out.println("STATUS: " + response.getStatus());
-			              System.out.println("VERSION: " + response.getProtocolVersion());
-			              System.out.println();
-			  
-			              if (!response.getHeaderNames().isEmpty()) {
-			                  for (String name: response.getHeaderNames()) {
-			                	  for (String value: response.getHeaders(name)) {
-			                          System.out.println("HEADER: " + name + " = " + value);
-			                      }
-			                  }
-			                  System.out.println();
-			              }
-			  
-			              if (response.getStatus().getCode() == 200 && response.isChunked()) {
-			                  readingChunks = true;
-			                  System.out.println("STARTING TO RECEIVE CHUNKED CONTENT");
-			              } else {
-			                  ChannelBuffer content = response.getContent();
-			                  if (content.readable()) {
-			                	  downloadFile.write(content.array());
-			                	  downloadFile.close();
-			                	  /*
-			                      System.out.println("CONTENT {");
-			                      System.out.println(content.toString(CharsetUtil.UTF_8));
-			                      System.out.println("} END OF CONTENT");
-			                      */
-			                	  
-			                  }
-			              }
-		}
-		else {
+			 
+			System.out.println("STATUS: " + response.getStatus());
+			System.out.println("VERSION: " + response.getProtocolVersion());
+			System.out.println();
+
+			if (!response.getHeaderNames().isEmpty()) {
+				for (String name: response.getHeaderNames()) {
+					for (String value: response.getHeaders(name)) {
+						System.out.println("HEADER: " + name + " = " + value);
+					}
+				}
+				System.out.println();
+			}
+
+			if (response.getStatus().getCode() == 200) {
+				listener.started();
+				if (!response.isChunked()) {
+					ChannelBuffer content = response.getContent();
+					if (content.readable()) {
+						downloadFile.write(content.array());
+						downloadFile.close();
+						listener.finished();
+					}
+				} else {
+					saveChunks = true;
+				}
+				
+					/*
+		      System.out.println("CONTENT {");
+		      System.out.println(content.toString(CharsetUtil.UTF_8));
+		      System.out.println("} END OF CONTENT");
+					 */
+
+			} else {
+				listener.downloadError();
+			}
+		} else {
 			//TODO: save content to file on file system
 			HttpChunk chunk = (HttpChunk) e.getMessage();
-			              if (chunk.isLast()) {
-			                  readingChunks = false;
-			                  downloadFile.close();
-			                  System.out.println("ENDED RECEIVING CHUNKED CONTENT");
-			              } else {
-			            	  downloadFile.write(chunk.getContent().array());
-			                  //System.out.print(chunk.getContent().toString(CharsetUtil.UTF_8));
-			                  //System.out.flush();
-			              }
+			if (chunk.isLast()) {
+				saveChunks = false;
+				downloadFile.close();
+				listener.finished();
+			} else {
+				downloadFile.write(chunk.getContent().array());
+				//System.out.print(chunk.getContent().toString(CharsetUtil.UTF_8));
+				//System.out.flush();
+			}
 		}
 	}
 	
