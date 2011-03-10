@@ -5,6 +5,8 @@ import java.net.URISyntaxException;
 import java.util.LinkedList;
 import java.util.List;
 
+import org.peerbox.chat.ChatManager;
+import org.peerbox.demo.cli.ChatCLIHandler;
 import org.peerbox.demo.cli.ExtendableCLI;
 import org.peerbox.demo.cli.FileShareCLIHandler;
 import org.peerbox.demo.cli.FriendCLIHandler;
@@ -102,11 +104,13 @@ public class FileShareCLI {
 		}
 		friendManager = new FriendManager(networkInstance.getSingleMap("users"), new SecureMessageHandler(), rpc.getLocalURI());
 		fileShareManager = new FileShareManager(rpc);
+		ChatManager chat = new ChatManager(rpc, friendManager);
 		
 		ExtendableCLI cli = new ExtendableCLI();
 		cli.registerHandler("friend", new FriendCLIHandler(friendManager));
 		cli.registerHandler("fileshare", new FileShareCLIHandler(fileShareManager, friendManager));
 		cli.registerHandler("kad", new KadCLIHandler(networkInstance));
+		cli.registerHandler("msg", new ChatCLIHandler(chat));
 		cli.registerAlias("addFriend", "friend add");
 		cli.start();
 	}

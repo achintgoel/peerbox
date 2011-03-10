@@ -75,7 +75,7 @@ public class MessageServerHandler extends SimpleChannelUpstreamHandler {
     	InetSocketAddress addr = (InetSocketAddress) e.getRemoteAddress();
     	URI uri;
     	try {
-			uri = new URI(protocol + "://" + addr.getHostName() + ":" + addr.getPort());
+			uri = new URI(protocol + "://" + addr.getAddress().getHostAddress() + ":" + addr.getPort());
 		} catch (URISyntaxException e1) {
 			e1.printStackTrace();
 			uri = null;
