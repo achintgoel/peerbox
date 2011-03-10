@@ -10,6 +10,7 @@ import org.peerbox.demo.cli.FriendCLIHandler;
 import org.peerbox.demo.cli.KadCLIHandler;
 import org.peerbox.fileshare.FileShareManager;
 import org.peerbox.friend.FriendManager;
+import org.peerbox.kademlia.BootstrapListener;
 import org.peerbox.kademlia.NetworkInstance;
 import org.peerbox.rpc.RPCEvent;
 import org.peerbox.rpc.RPCHandler;
@@ -73,6 +74,21 @@ public class FileShareCLI {
 			rpc = RPCHandler.getUDPInstance(bindPort);
 		}		
 		networkInstance = new NetworkInstance(rpc);
+		if(!bootstrapURI.isEmpty()){
+			networkInstance.bootstrap(bootstrapURI, new BootstrapListener(){
+	
+				@Override
+				public void onBootstrapFailure() {
+					System.out.println("Peerbox could not start");
+				}
+	
+				@Override
+				public void onBootstrapSuccess() {
+					System.out.println("Welcome to peerbox");				
+				}
+				
+			});
+		}
 		friendManager = new FriendManager(networkInstance.getSingleMap("users"), new SecureMessageHandler(), rpc.getLocalURI());
 		fileShareManager = new FileShareManager(rpc);
 		
@@ -81,7 +97,6 @@ public class FileShareCLI {
 		cli.registerHandler("fileshare", new FileShareCLIHandler(fileShareManager, friendManager));
 		cli.registerHandler("kad", new KadCLIHandler(networkInstance));
 		cli.registerAlias("addFriend", "friend add");
-		System.out.println("Welcome to peerbox");
 		cli.start();
 	}
 	
