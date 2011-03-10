@@ -8,7 +8,7 @@ public class IPAddressService implements ServiceRequestListener {
 
 	@Override
 	public void onRequestRecieved(RPCEvent e) {
-		e.respond(e.getSenderURI().toString());
+		e.respond(e.getSenderURI().getHost());
 	}
 	
 	public static void main(String[] args) {
