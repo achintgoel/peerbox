@@ -60,7 +60,10 @@ public class FileShareManager {
 		File requestDir = null;
 		if(!relativePath.isEmpty()) {
 			//TODO: make sure that path exists and is a directory!!
-			requestDir = new File(mySharedDirectory.getAbsolutePath().concat("/"+relativePath));
+			if(File.separatorChar != '/') {
+				relativePath = relativePath.replaceAll("/", File.separator);
+			}
+			requestDir = new File(mySharedDirectory.getAbsolutePath().concat(File.separator+relativePath));
 		}
 		else {
 			//System.out.println("requesting a file");
@@ -128,6 +131,9 @@ public class FileShareManager {
 		}
 		if (mySharedDirectory == null) {
 			return false;
+		}
+		if(File.separatorChar != '/') {
+			relativePath = relativePath.replaceAll("/", File.separator);
 		}
 		File requestDir = new File(mySharedDirectory.getAbsolutePath().concat(relativePath));
 		File[] files = requestDir.listFiles(new FilenameFilter() {
@@ -216,7 +222,8 @@ public class FileShareManager {
 			System.out.println("No download directory specified");
 			return;
 		}
-		File downloadPath = new File(myDownloadDirectory.getAbsolutePath().concat("/"+name));
+		
+		File downloadPath = new File(myDownloadDirectory.getAbsolutePath().concat(File.separator+name));
 		new HttpClient(fileLocURI, downloadPath, httpClientListener);
 	}
 	
