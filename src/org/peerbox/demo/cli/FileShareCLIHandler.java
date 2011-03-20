@@ -118,8 +118,19 @@ public class FileShareCLIHandler implements CLIHandler{
 			}
 			if(friend != null) {
 				final String filePath = args[3];
-				final File file = new File(filePath);
-				fileshare.getFile(file.getParent(), friend, file.getName(), new ResponseListener<FileResponse>() {
+				int index = filePath.lastIndexOf("/");
+				final String relativePath;
+				final String fileName;
+				if(index == -1) {
+					relativePath = "";
+					fileName = filePath;
+				}
+				else {
+					relativePath = filePath.substring(0, index);
+					fileName = filePath.substring(index+1);
+				}
+				//final File file = new File(filePath);
+				fileshare.getFile(relativePath, friend, fileName, new ResponseListener<FileResponse>() {
 
 					@Override
 					public void onFailure() {
@@ -133,26 +144,26 @@ public class FileShareCLIHandler implements CLIHandler{
 						//System.out.println("RECEIVED RESPONSE TO FILE REQUEST");
 						//TODO: Pass full download path
 						if(response.getFileLocURI() == null) {
-							cli.out().println("The requested file "+file.getName()+" is not available");
+							cli.out().println("The requested file "+fileName+" is not available");
 						} else {
-							fileshare.download(response.getFileLocURI(), file.getName(), new HttpClientListener() {
+							fileshare.download(response.getFileLocURI(), fileName, new HttpClientListener() {
 
 								@Override
 								public void finished() {
 									// TODO Auto-generated method stub
-									cli.out().println("Successfully downloaded file "+file.getName());
+									cli.out().println("Successfully downloaded file "+fileName);
 								}
 
 								@Override
 								public void downloadError() {
 									// TODO Auto-generated method stub
-									cli.out().println("Unable to download reqested file "+file.getName());
+									cli.out().println("Unable to download reqested file "+fileName);
 								}
 
 								@Override
 								public void started() {
 									// TODO Auto-generated method stub
-									cli.out().println("Started downloading requested file "+file.getName());
+									cli.out().println("Started downloading requested file "+fileName);
 								}
 
 								@Override

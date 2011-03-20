@@ -135,7 +135,7 @@ public class FileShareManager {
 		if(File.separatorChar != '/') {
 			relativePath = relativePath.replace("/", File.separator);
 		}
-		File requestDir = new File(mySharedDirectory.getAbsolutePath().concat(relativePath));
+		File requestDir = new File(mySharedDirectory.getAbsolutePath().concat(File.separator+relativePath));
 		File[] files = requestDir.listFiles(new FilenameFilter() {
 			public boolean accept(File arg0, String arg1) {
 				if(filename.equals(arg1))
