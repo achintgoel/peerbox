@@ -61,7 +61,7 @@ public class FileShareManager {
 		if(!relativePath.isEmpty()) {
 			//TODO: make sure that path exists and is a directory!!
 			if(File.separatorChar != '/') {
-				relativePath = relativePath.replaceAll("/", File.separator);
+				relativePath = relativePath.replace("/", File.separator);
 			}
 			requestDir = new File(mySharedDirectory.getAbsolutePath().concat(File.separator+relativePath));
 		}
@@ -133,7 +133,7 @@ public class FileShareManager {
 			return false;
 		}
 		if(File.separatorChar != '/') {
-			relativePath = relativePath.replaceAll("/", File.separator);
+			relativePath = relativePath.replace("/", File.separator);
 		}
 		File requestDir = new File(mySharedDirectory.getAbsolutePath().concat(relativePath));
 		File[] files = requestDir.listFiles(new FilenameFilter() {
@@ -145,7 +145,7 @@ public class FileShareManager {
 			}
 			
 		});
-		if(files.length == 1) {
+		if(files != null && files.length == 1) {
 			try {
 				FileRequestInfo fileInfo = new FileRequestInfo(expiration, files[0].getCanonicalPath());
 				requestIDtoFileRequest.put(requestID, fileInfo);

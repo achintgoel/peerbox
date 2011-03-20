@@ -59,7 +59,7 @@ public class FileShareCLIHandler implements CLIHandler{
 			}
 			final String alias = args[2];
 			Friend friend = friend_manager.getFriend(alias);
-			if (!friend.isAlive()) {
+			if (friend == null || !friend.isAlive()) {
 				System.out.println("friend is offline");
 				return;
 			}
@@ -172,6 +172,10 @@ public class FileShareCLIHandler implements CLIHandler{
 			else {
 				cli.out().println("The friend "+alias+" does not exist");
 			}
+		}
+		else {
+			help(cli.out());
+			return;
 		}
 		
 	}
