@@ -177,7 +177,11 @@ public class FileShareCLIHandler implements CLIHandler{
 	}
 	
 	public void help(PrintStream out) {
-		out.println("Invalid command.");
+		out.println("Function:\t Command");
+		out.println("Share Directory:\t share [directory]");
+		out.println("Browse Friend's Shared Directory:\t browse [alias] [relative path]");
+		out.println("Download Files To:\t downloadTo [directory]");
+		out.println("Download File:\t get [alias] [file path]");
 	}
 
 }
