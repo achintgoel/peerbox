@@ -1,6 +1,5 @@
 package org.peerbox.network;
 
-import java.math.BigInteger;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map.Entry;
