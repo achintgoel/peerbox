@@ -2,12 +2,12 @@ package org.peerbox.chat;
 
 import org.peerbox.friend.Friend;
 import org.peerbox.friend.FriendManager;
-import org.peerbox.rpc.RPCEvent;
 import org.peerbox.rpc.RPCHandler;
+import org.peerbox.rpc.RPCEvent;
 import org.peerbox.rpc.RPCResponseListener;
-import org.peerbox.rpc.ServiceRequestListener;
+import org.peerbox.rpc.RPCServiceRequestListener;
 
-public class ChatManager implements ServiceRequestListener {
+public class ChatManager implements RPCServiceRequestListener {
 	protected RPCHandler rpc;
 	protected FriendManager friendMan;
 	

@@ -1,4 +1,4 @@
-package org.peerbox.testlets;
+package org.peerbox.kademlia;
 
 import static org.junit.Assert.fail;
 

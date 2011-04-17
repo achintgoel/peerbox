@@ -1,4 +1,4 @@
-package org.peerbox.network;
+package org.peerbox.network.udp;
 
 import java.net.SocketAddress;
 import java.util.HashMap;

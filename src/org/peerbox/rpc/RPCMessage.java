@@ -6,11 +6,11 @@ public class RPCMessage {
 	protected String id;
 	protected String request;
 	protected String response;
-	
+
 	protected RPCMessage() {
-		
+
 	}
-	
+
 	/**
 	 * 
 	 * @param version
@@ -26,23 +26,23 @@ public class RPCMessage {
 		this.request = request;
 		this.response = response;
 	}
-	
+
 	public String getVersion() {
 		return pbox;
 	}
-	
+
 	public String getService() {
 		return service;
 	}
-	
+
 	public String getId() {
 		return id;
 	}
-	
+
 	public String getRequest() {
 		return request;
 	}
-	
+
 	public String getResponse() {
 		return response;
 	}

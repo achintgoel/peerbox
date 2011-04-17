@@ -1,4 +1,4 @@
-package org.peerbox.network;
+package org.peerbox.network.udp;
 
 import java.util.Iterator;
 import java.util.LinkedHashMap;

@@ -1,6 +1,4 @@
-package org.peerbox.network;
-
-import java.util.ArrayList;
+package org.peerbox.network.udp;
 
 import org.jboss.netty.buffer.ChannelBuffer;
 

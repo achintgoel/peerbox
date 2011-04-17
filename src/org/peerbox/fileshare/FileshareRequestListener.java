@@ -13,14 +13,14 @@ import org.peerbox.fileshare.messages.SharedDirectoryRequest;
 import org.peerbox.fileshare.messages.SharedDirectoryResponse;
 import org.peerbox.network.http.HttpStaticFileServer;
 import org.peerbox.rpc.RPCEvent;
-import org.peerbox.rpc.ServiceRequestListener;
+import org.peerbox.rpc.RPCServiceRequestListener;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
 
-public class FileshareRequestListener implements ServiceRequestListener{
+public class FileshareRequestListener implements RPCServiceRequestListener{
 	protected final Gson gson = new Gson();
 	protected FileShareManager manager;
 	

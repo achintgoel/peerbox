@@ -6,7 +6,9 @@ import java.util.List;
 
 import org.peerbox.kademlia.BootstrapListener;
 import org.peerbox.kademlia.NetworkInstance;
+import org.peerbox.network.udp.UDPMessageServer;
 import org.peerbox.rpc.RPCHandler;
+import org.peerbox.rpc.json.JsonRPCHandler;
 
 public class KadInstance implements Runnable {
 	private String bindIP;
@@ -19,7 +21,7 @@ public class KadInstance implements Runnable {
 		this.bindIP = bindIP;
 		this.bindPort = bindPort;
 		this.bootstrapURI = bootstrapURI;
-		rpc = RPCHandler.getUDPInstance(bindPort);
+		rpc = new JsonRPCHandler(new UDPMessageServer(bindPort));
 		try {
 			rpc.setLocalURI(new URI("udp://" + bindIP + ":" + bindPort));
 		} catch (URISyntaxException e) {

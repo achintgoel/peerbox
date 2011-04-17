@@ -15,9 +15,11 @@ import org.peerbox.fileshare.FileShareManager;
 import org.peerbox.friend.FriendManager;
 import org.peerbox.kademlia.BootstrapListener;
 import org.peerbox.kademlia.NetworkInstance;
-import org.peerbox.rpc.RPCEvent;
+import org.peerbox.network.udp.UDPMessageServer;
 import org.peerbox.rpc.RPCHandler;
+import org.peerbox.rpc.RPCEvent;
 import org.peerbox.rpc.RPCResponseListener;
+import org.peerbox.rpc.json.JsonRPCHandler;
 import org.peerbox.security.SecureMessageHandler;
 
 public class FileShareCLI {
@@ -47,7 +49,7 @@ public class FileShareCLI {
 				}
 				else{
 					bindPort = Integer.parseInt(args[0]);
-					rpc = RPCHandler.getUDPInstance(bindPort);
+					rpc = new JsonRPCHandler(new UDPMessageServer(bindPort));
 					rpc.sendRequest(new URI("udp://peerbox.org:20000"), "ipaddress", "", new RPCResponseListener(){
 
 						@Override
@@ -79,7 +81,7 @@ public class FileShareCLI {
 	
 	private static void createInstance(RPCHandler rpc){
 		if(rpc == null){
-			rpc = RPCHandler.getUDPInstance(bindPort);
+			rpc = new JsonRPCHandler(new UDPMessageServer(bindPort));
 			try {
 				rpc.setLocalURI(new URI("udp://" + bindIP + ":" + bindPort));
 			} catch (URISyntaxException e) {

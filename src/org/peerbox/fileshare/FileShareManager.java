@@ -19,8 +19,8 @@ import org.peerbox.friend.Friend;
 import org.peerbox.network.http.HttpClient;
 import org.peerbox.network.http.HttpClientListener;
 import org.peerbox.network.http.HttpStaticFileServer;
-import org.peerbox.rpc.RPCEvent;
 import org.peerbox.rpc.RPCHandler;
+import org.peerbox.rpc.RPCEvent;
 import org.peerbox.rpc.RPCResponseListener;
 
 import com.google.gson.Gson;

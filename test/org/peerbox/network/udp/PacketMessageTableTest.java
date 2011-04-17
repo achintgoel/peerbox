@@ -1,13 +1,10 @@
-package org.peerbox.testlets;
+package org.peerbox.network.udp;
 
-import java.math.BigInteger;
 import java.util.Random;
-
 
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-import org.peerbox.network.PacketMessageTable;
 
 public class PacketMessageTableTest {
 

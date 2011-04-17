@@ -20,7 +20,7 @@ import org.peerbox.kademlia.messages.PingResponse;
  */
 public class Buckets implements NodeStatusListener {
 	protected List<LinkedHashMap<Identifier, Node>> buckets;
-	final protected NetworkInstance networkInstance;
+	final protected Kademlia networkInstance;
 	final int k;
 	
 	
@@ -28,7 +28,7 @@ public class Buckets implements NodeStatusListener {
 	 * Constructor
 	 * @param instance
 	 */
-	public Buckets(NetworkInstance instance) {
+	public Buckets(Kademlia instance) {
 		networkInstance = instance;
 		k = networkInstance.getConfiguration().getK();
 		int b = networkInstance.getConfiguration().getB();
@@ -165,6 +165,7 @@ public class Buckets implements NodeStatusListener {
 		return buckets.get(bucketNumber).get(identifier);
 	}
 	
+	//TODO: Remove
 	public void print(PrintStream out){
 		for (int i = 0; i < buckets.size(); i++) {
 			LinkedHashMap<Identifier, Node> bucket = buckets.get(i);

@@ -1,14 +1,15 @@
 package org.peerbox.demo;
 
 import java.net.URI;
-import java.net.URISyntaxException;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 
+import org.peerbox.network.udp.UDPMessageServer;
 import org.peerbox.rpc.RPCEvent;
 import org.peerbox.rpc.RPCHandler;
 import org.peerbox.rpc.RPCResponseListener;
+import org.peerbox.rpc.json.JsonRPCHandler;
 
 public class MultiKadInstances {
 	private static int numInstances;
@@ -37,7 +38,7 @@ public class MultiKadInstances {
 				}
 				else{
 					firstBindPort = Integer.parseInt(args[1]);
-					rpc = RPCHandler.getUDPInstance(firstBindPort);
+					rpc = new JsonRPCHandler(new UDPMessageServer(firstBindPort));
 					rpc.sendRequest(new URI("udp://peerbox.org:20000"), "ipaddress", "", new RPCResponseListener(){
 
 						@Override

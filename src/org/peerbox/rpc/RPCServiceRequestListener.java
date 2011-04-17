@@ -1,5 +1,5 @@
 package org.peerbox.rpc;
 
-public interface ServiceRequestListener {
+public interface RPCServiceRequestListener {
 	public void onRequestRecieved(RPCEvent e);
 }

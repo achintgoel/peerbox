@@ -11,7 +11,7 @@ import org.peerbox.kademlia.messages.Response;
 import org.peerbox.kademlia.messages.StoreRequest;
 import org.peerbox.kademlia.messages.StoreResponse;
 import org.peerbox.rpc.RPCEvent;
-import org.peerbox.rpc.ServiceRequestListener;
+import org.peerbox.rpc.RPCServiceRequestListener;
 
 
 import com.google.gson.Gson;
@@ -23,7 +23,7 @@ import com.google.gson.JsonParser;
  * The listener to handle the received kademlia requests
  *
  */
-public class KademliaRequestListener implements ServiceRequestListener {
+public class KademliaRequestListener implements RPCServiceRequestListener {
 	
 	protected final Gson gson = new Gson();
 	protected final NetworkInstance ni;

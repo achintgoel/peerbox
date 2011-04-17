@@ -19,8 +19,8 @@ import org.peerbox.kademlia.messages.Request;
 import org.peerbox.kademlia.messages.Response;
 import org.peerbox.kademlia.messages.StoreRequest;
 import org.peerbox.kademlia.messages.StoreResponse;
-import org.peerbox.rpc.RPCEvent;
 import org.peerbox.rpc.RPCHandler;
+import org.peerbox.rpc.RPCEvent;
 import org.peerbox.rpc.RPCResponseListener;
 
 import com.google.gson.Gson;
@@ -30,28 +30,15 @@ import com.google.gson.Gson;
  * An instance of a local node that is actively/inactively involved in a  particular Kademlia overlay network.
  * Primary Kademlia Controller
  */
-public class NetworkInstance {
-	protected Identifier localIdentifier;
+public class NetworkInstance implements Kademlia {
 	protected final Buckets buckets;
-	protected final Gson gson;
-	protected final String rpcServiceName;
-	protected final LocalDataStore localDataStore;
-	protected final RPCHandler rpcHandler;
 	protected final CompositeDataFilter compositeDataFilter;
+	protected final Gson gson;
+	protected final LocalDataStore localDataStore;
+	protected Identifier localIdentifier;
 	protected final PrimaryDHT primaryDHT;
-	
-	public NetworkInstance(RPCHandler rpcHandler) {
-		gson = new Gson();
-		rpcServiceName = "kad";
-		compositeDataFilter = new CompositeDataFilter();
-		localDataStore = new LocalDataStore();
-		this.rpcHandler = rpcHandler;
-		rpcHandler.registerServiceListener(rpcServiceName, new KademliaRequestListener(this));
-		localIdentifier = Identifier.generateRandom(); // Possibly remember for future restarts
-		buckets = new Buckets(this);
-		primaryDHT = new PrimaryDHT(this);
-	}
-	
+	protected final RPCHandler rpcHandler;
+	protected final String rpcServiceName;
 	
 	// TODO: this constructor only for testing of buckets
 	protected NetworkInstance(byte[] bytes){
@@ -65,30 +52,112 @@ public class NetworkInstance {
 		primaryDHT = new PrimaryDHT(this);
 	}
 	
-	public void registerDataFilter(String primaryKey, MapDataFilter<String, String> dataFilter) {
-		compositeDataFilter.registerDataFilter(primaryKey, dataFilter);
+	
+	public NetworkInstance(RPCHandler rpcHandler) {
+		gson = new Gson();
+		rpcServiceName = "kad";
+		compositeDataFilter = new CompositeDataFilter();
+		localDataStore = new LocalDataStore();
+		this.rpcHandler = rpcHandler;
+		rpcHandler.registerServiceListener(rpcServiceName, new KademliaRequestListener(this));
+		localIdentifier = Identifier.generateRandom(); // Possibly remember for future restarts
+		buckets = new Buckets(this);
+		primaryDHT = new PrimaryDHT(this);
+	}
+	
+	@Override
+	public void bootstrap(List<URI> friends, BootstrapListener bootstrapListener) {
+		//TODO: Check if bootstrap has occured before allowing other operations
+		BootstrapProcess.execute(this, friends, bootstrapListener);
 	}	
 	
-	LocalDataStore getLocalDataStore() {
-		return localDataStore;
+	@Override
+	public void findNode(Identifier targetNodeId, boolean stopOnFound, ResponseListener<FindNodeResponse> responseListener) {
+		FindNodeRequest request = new FindNodeRequest(getLocalNodeIdentifier(), targetNodeId);
+		FindProcess.execute(this, request, stopOnFound, FindNodeResponse.class, responseListener);
+	}
+	
+	@Override
+	public void findNode(Identifier targetNodeId, ResponseListener<FindNodeResponse> responseListener) {
+		findNode(targetNodeId, true, responseListener);
+	}
+	
+	/**
+	 * Find Value retrieves stored values in the DHT by a given key (and filters with registered data filters)
+	 * If Value is invalid according to filters, it would appear not to be found.
+	 * Current Assumption: If key/value pair is in local network, skip querying network for the value.
+	 * Is this a valid assumption? Should it be an option?
+	 * 
+	 * TODO: Cache found Key/Value Pairs
+	 * @param targetKey
+	 * @param responseListener
+	 */
+	@Override
+	public void findValue(final Key targetKey, final ResponseListener<FindValueResponse> responseListener) {
+		String value = getLocalDataStore().get(targetKey);
+		if (value != null && compositeDataFilter.isValid(targetKey, value)) {
+			responseListener.onResponseReceived(new FindValueResponse(value, new LinkedList<Node>()));
+			//NOTE: should we include nearby nodes since we have the value locally?
+			return;
+		}
+		
+		FindValueRequest request = new FindValueRequest(getLocalNodeIdentifier(), targetKey);
+		FindProcess.execute(this, request, true, FindValueResponse.class, new ResponseListener<FindValueResponse>() {
+
+			@Override
+			public void onFailure() {
+				responseListener.onFailure();
+			}
+
+			@Override
+			public void onResponseReceived(FindValueResponse response) {
+				if (response.isFound()) {
+					if (compositeDataFilter.isValid(targetKey, response.getFoundValue())) {
+						responseListener.onResponseReceived(response);
+					} else {
+						responseListener.onResponseReceived(new FindValueResponse(response.getNearbyNodes()));
+					}
+				} else {
+					responseListener.onResponseReceived(response);
+				}
+			}
+			
+		});
+	}
+	
+	@Override
+	public Buckets getBuckets() {
+		return buckets;
 	}
 	
 	CompositeDataFilter getCompositeDataFilter() {
 		return compositeDataFilter;
 	}
 	
+	@Override
 	public Configuration getConfiguration() {
 		return new Configuration();
 	}
 	
+	LocalDataStore getLocalDataStore() {
+		return localDataStore;
+	}
+	
+	@Override
 	public Identifier getLocalNodeIdentifier() {
 		return localIdentifier;
 	}
-	
+
+	@Override
 	public DistributedMap<Key, String> getPrimaryDHT() {
 		return primaryDHT;
 	}
 	
+	public RPCHandler getRPC() {
+		return rpcHandler;
+	}
+	
+	@Override
 	public DistributedMap<String, String> getSingleMap(final String mapKey) {
 		return new DistributedMap<String, String>() {
 			@Override
@@ -101,6 +170,71 @@ public class NetworkInstance {
 				primaryDHT.put(new Key(mapKey, key), value);
 			}
 		};
+	}
+	
+	@Override
+	//Maybe put in Node
+	public void ping(final Node targetNode, final ResponseListener<PingResponse> responseListener) {
+		PingRequest request = new PingRequest(getLocalNodeIdentifier(), targetNode.getIdentifier());
+		this.sendRequestRPC(targetNode, request, PingResponse.class, new ResponseListener<PingResponse>() {
+			@Override
+			public void onFailure() {
+				responseListener.onFailure();
+			}
+
+			@Override
+			public void onResponseReceived(PingResponse response) {
+				if (response.getMyNodeId() == null) {
+					responseListener.onFailure();
+				}
+				if (targetNode.isComplete() && !response.getMyNodeId().equals(targetNode.getIdentifier())) {
+					responseListener.onFailure();
+				} else {
+					responseListener.onResponseReceived(response);
+				}
+			}
+		});
+	}
+	
+	@Override
+	public void registerDataFilter(String primaryKey, MapDataFilter<String, String> dataFilter) {
+		compositeDataFilter.registerDataFilter(primaryKey, dataFilter);
+	}
+	
+	/**
+	 * Stores the Key/Value pair in the local data store and then replicates the data across the network.
+	 * Verifies valid according to data filters prior to storing. Calls failure callback if invalid.
+	 * Replication is done via sending
+	 * 
+	 * TODO: Expiration and re-publication of stored values
+	 * @param key
+	 * @param value
+	 * @param responseListener
+	 * @param publish
+	 */
+	@Override
+	public void storeValue(Key key, String value, boolean publish, ResponseListener<StoreResponse> responseListener) {
+		if (!storeValueLocal(key, value)) {
+			responseListener.onFailure();
+			return;
+		}
+		StoreRequest request = new StoreRequest(getLocalNodeIdentifier(), key, value);
+		StoreProcess.execute(this, request, responseListener);
+	}
+	
+	/**
+	 * Stores Key/Value pair in local data store if pair passes filtering.
+	 * @param key
+	 * @param value
+	 * @return Whether store succeeded (filtering passed)
+	 */
+	@Override
+	public boolean storeValueLocal(Key key, String value) {
+		if (!compositeDataFilter.isValid(key, value)) {
+			return false;
+		}
+		getLocalDataStore().put(key, value);
+		return true;
 	}
 	
 	protected <T extends Response> void sendRequestRPC(final Node destination, Request request, final Class<T> responseClass, final ResponseListener<T> callback) {
@@ -121,124 +255,5 @@ public class NetworkInstance {
 				
 			}
 		});
-	}
-	
-	public RPCHandler getRPC() {
-		return rpcHandler;
-	}
-
-	public Buckets getBuckets() {
-		return buckets;
-	}
-	
-	public void findNode(Identifier targetNodeId, boolean stopOnFound, ResponseListener<FindNodeResponse> responseListener) {
-		FindNodeRequest request = new FindNodeRequest(getLocalNodeIdentifier(), targetNodeId);
-		FindProcess.execute(this, request, stopOnFound, FindNodeResponse.class, responseListener);
-	}
-	
-	public void findNode(Identifier targetNodeId, ResponseListener<FindNodeResponse> responseListener) {
-		findNode(targetNodeId, true, responseListener);
-	}
-	
-	/**
-	 * Find Value retrieves stored values in the DHT by a given key (and filters with registered data filters)
-	 * If Value is invalid according to filters, it would appear not to be found.
-	 * Current Assumption: If key/value pair is in local network, skip querying network for the value.
-	 * Is this a valid assumption? Should it be an option?
-	 * 
-	 * TODO: Cache found Key/Value Pairs
-	 * @param targetKey
-	 * @param responseListener
-	 */
-	public void findValue(final Key targetKey, final ResponseListener<FindValueResponse> responseListener) {
-		String value = getLocalDataStore().get(targetKey);
-		if (value != null && compositeDataFilter.isValid(targetKey, value)) {
-			responseListener.onResponseReceived(new FindValueResponse(value, new LinkedList<Node>()));
-			//NOTE: should we include nearby nodes since we have the value locally?
-			return;
-		}
-		
-		FindValueRequest request = new FindValueRequest(getLocalNodeIdentifier(), targetKey);
-		FindProcess.execute(this, request, true, FindValueResponse.class, new ResponseListener<FindValueResponse>() {
-
-			@Override
-			public void onResponseReceived(FindValueResponse response) {
-				if (response.isFound()) {
-					if (compositeDataFilter.isValid(targetKey, response.getFoundValue())) {
-						responseListener.onResponseReceived(response);
-					} else {
-						responseListener.onResponseReceived(new FindValueResponse(response.getNearbyNodes()));
-					}
-				} else {
-					responseListener.onResponseReceived(response);
-				}
-			}
-
-			@Override
-			public void onFailure() {
-				responseListener.onFailure();
-			}
-			
-		});
-	}
-	/**
-	 * Stores the Key/Value pair in the local data store and then replicates the data across the network.
-	 * Verifies valid according to data filters prior to storing. Calls failure callback if invalid.
-	 * Replication is done via sending
-	 * 
-	 * TODO: Expiration and re-publication of stored values
-	 * @param key
-	 * @param value
-	 * @param responseListener
-	 * @param publish
-	 */
-	public void storeValue(Key key, String value, boolean publish, ResponseListener<StoreResponse> responseListener) {
-		if (!storeValueLocal(key, value)) {
-			responseListener.onFailure();
-			return;
-		}
-		StoreRequest request = new StoreRequest(getLocalNodeIdentifier(), key, value);
-		StoreProcess.execute(this, request, responseListener);
-	}
-	
-	/**
-	 * Stores Key/Value pair in local data store if pair passes filtering.
-	 * @param key
-	 * @param value
-	 * @return Whether store succeeded (filtering passed)
-	 */
-	public boolean storeValueLocal(Key key, String value) {
-		if (!compositeDataFilter.isValid(key, value)) {
-			return false;
-		}
-		getLocalDataStore().put(key, value);
-		return true;
-	}
-	
-	//Maybe put in Node
-	public void ping(final Node targetNode, final ResponseListener<PingResponse> responseListener) {
-		PingRequest request = new PingRequest(getLocalNodeIdentifier(), targetNode.getIdentifier());
-		this.sendRequestRPC(targetNode, request, PingResponse.class, new ResponseListener<PingResponse>() {
-			@Override
-			public void onResponseReceived(PingResponse response) {
-				if (response.getMyNodeId() == null) {
-					responseListener.onFailure();
-				}
-				if (targetNode.isComplete() && !response.getMyNodeId().equals(targetNode.getIdentifier())) {
-					responseListener.onFailure();
-				} else {
-					responseListener.onResponseReceived(response);
-				}
-			}
-
-			@Override
-			public void onFailure() {
-				responseListener.onFailure();
-			}
-		});
-	}
-	
-	public void bootstrap(List<URI> friends, BootstrapListener bootstrapListener) {
-		BootstrapProcess.execute(this, friends, bootstrapListener);
 	}
 }
