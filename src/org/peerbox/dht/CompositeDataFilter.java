@@ -5,6 +5,8 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
+import org.peerbox.kademlia.Value;
+
 public class CompositeDataFilter implements MapDataFilter<CompositeKey<String, String>, String> {
 	protected final Map<String, List<MapDataFilter<String, String>>> dataFilters;
 

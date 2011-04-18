@@ -21,9 +21,9 @@ public interface Kademlia {
 
 	Buckets getBuckets();
 
-	DistributedMap<Key, String> getPrimaryDHT();
+	DistributedMap<Key, Value> getPrimaryDHT();
 
-	DistributedMap<String, String> getSingleMap(String mapKey);
+	DistributedMap<String, Value> getSingleMap(String mapKey);
 
 	void findNode(Identifier targetNodeId, boolean stopOnFound,
 			ResponseListener<FindNodeResponse> responseListener);
@@ -34,10 +34,10 @@ public interface Kademlia {
 	void findValue(Key targetKey,
 			ResponseListener<FindValueResponse> responseListener);
 
-	void storeValue(Key key, String value, boolean publish,
+	void storeValue(Key key, Value value, boolean publish,
 			ResponseListener<StoreResponse> responseListener);
 
-	boolean storeValueLocal(Key key, String value);
+	boolean storeValueLocal(Key key, Value value, boolean original);
 
 	void ping(Node targetNode, ResponseListener<PingResponse> responseListener);
 

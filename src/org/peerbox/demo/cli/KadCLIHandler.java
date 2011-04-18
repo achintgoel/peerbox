@@ -8,6 +8,7 @@ import org.peerbox.kademlia.Key;
 import org.peerbox.kademlia.NetworkInstance;
 import org.peerbox.kademlia.Node;
 import org.peerbox.kademlia.ResponseListener;
+import org.peerbox.kademlia.Value;
 import org.peerbox.kademlia.messages.FindNodeResponse;
 import org.peerbox.kademlia.messages.FindValueResponse;
 import org.peerbox.kademlia.messages.PingResponse;
@@ -139,7 +140,7 @@ public class KadCLIHandler implements CLIHandler {
 			String key1 = args[2];
 			String key2 = args[3];
 			String value = args[4];
-			networkInstance.storeValue(new Key(key1, key2), value, true, new ResponseListener<StoreResponse>(){
+			networkInstance.storeValue(new Key(key1, key2), new Value(value), true, new ResponseListener<StoreResponse>(){
 				
 				@Override
 				public void onFailure() {

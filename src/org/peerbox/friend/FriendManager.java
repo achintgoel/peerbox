@@ -7,12 +7,14 @@ import java.security.PrivateKey;
 import java.security.PublicKey;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map.Entry;
 
 import org.apache.commons.codec.binary.Base64;
 import org.peerbox.dht.DistributedMap;
 import org.peerbox.dht.ValueEvent;
 import org.peerbox.dht.ValueListener;
+import org.peerbox.kademlia.Value;
 import org.peerbox.security.SecureMessageHandler;
 
 
@@ -25,7 +27,7 @@ public class FriendManager {
 	protected PrivateKey myPrivKey;
 	protected URI myURI;
 	
-	public FriendManager(DistributedMap<String, String> map, SecureMessageHandler secure, URI myURI) {
+	public FriendManager(DistributedMap<String, Value> map, SecureMessageHandler secure, URI myURI) {
 		keyToFriendMap = new HashMap<PublicKey, Friend>();
 		aliasToFriendMap = new HashMap<String, Friend>();
 		
@@ -74,10 +76,10 @@ public class FriendManager {
 	}
 	
 	public void updateFriendURI(final Friend friend) {
-		userTable.get(friend.getPubKey(), new ValueListener<URI>(){
-			public void valueComplete(final ValueEvent<URI> val){
-				if(val.exists()){
-					friend.setAddress(val.getValue());
+		userTable.get(friend.getPubKey(), new ValueListener<List<URI>>(){
+			public void valueComplete(final ValueEvent<List<URI>> val){
+				if(val.exists() && !val.getValue().isEmpty()){
+					friend.setAddress(val.getValue().get(0));
 					System.out.println("Found address of friend: "+friend.getNetworkAddress().toString());
 				}
 				else {

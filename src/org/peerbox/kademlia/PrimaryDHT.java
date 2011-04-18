@@ -1,5 +1,8 @@
 package org.peerbox.kademlia;
 
+import java.util.LinkedList;
+import java.util.List;
+
 import org.peerbox.dht.DistributedMap;
 import org.peerbox.dht.ValueEvent;
 import org.peerbox.dht.ValueListener;
@@ -7,7 +10,7 @@ import org.peerbox.kademlia.messages.FindValueResponse;
 import org.peerbox.kademlia.messages.StoreResponse;
 
 
-class PrimaryDHT implements DistributedMap<Key, String> {
+class PrimaryDHT implements DistributedMap<Key, Value> {
 	protected final NetworkInstance networkInstance;
 	
 	PrimaryDHT(NetworkInstance networkInstance) {
@@ -22,21 +25,21 @@ class PrimaryDHT implements DistributedMap<Key, String> {
 	 * @param valueListener
 	 */
 	@Override
-	public void get(Key key, final ValueListener<String> valueListener) {
+	public void get(Key key, final ValueListener<List<Value>> valueListener) {
 		networkInstance.findValue(key, new ResponseListener<FindValueResponse>() {
 
 			@Override
 			public void onResponseReceived(FindValueResponse response) {
 				if (response.isFound()) {
-					valueListener.valueComplete(new ValueEvent<String>(response.getFoundValue()));
+					valueListener.valueComplete(new ValueEvent<List<Value>>(response.getFoundValue()));
 				} else {
-					valueListener.valueComplete(new ValueEvent<String>());
+					valueListener.valueComplete(new ValueEvent<List<Value>>());
 				}	
 			}
 
 			@Override
 			public void onFailure() {
-				valueListener.valueComplete(new ValueEvent<String>());
+				valueListener.valueComplete(new ValueEvent<List<Value>>());
 			}
 			
 		});
@@ -50,7 +53,7 @@ class PrimaryDHT implements DistributedMap<Key, String> {
 	 * @param value
 	 */
 	@Override
-	public void put(Key key, String value) {
+	public void put(Key key, Value value) {
 		networkInstance.storeValue(key, value, true, new ResponseListener<StoreResponse>() {
 			@Override
 			public void onResponseReceived(StoreResponse response) {

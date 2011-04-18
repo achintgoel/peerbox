@@ -4,8 +4,8 @@
 	<classpathentry kind="src" path="test"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.6"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.junit.JUNIT_CONTAINER/4"/>
-	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/JBoss Netty 3"/>
-	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/Gson"/>
-	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/Apache Commons Codec"/>
+	<classpathentry kind="lib" path="/home/vineet/Peerbox/peerbox/lib/commons-codec-1.4/commons-codec-1.4.jar"/>
+	<classpathentry kind="lib" path="/home/vineet/Peerbox/peerbox/lib/google-gson-1.6/gson-1.6.jar"/>
+	<classpathentry kind="lib" path="/home/vineet/Peerbox/peerbox/lib/netty-3.2.4.Final/jar/netty-3.2.4.Final.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

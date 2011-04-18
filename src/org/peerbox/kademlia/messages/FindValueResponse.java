@@ -1,12 +1,14 @@
 package org.peerbox.kademlia.messages;
 
+import java.util.LinkedList;
 import java.util.List;
 
 import org.peerbox.kademlia.Node;
+import org.peerbox.kademlia.Value;
 
 
 public class FindValueResponse extends FindResponse {
-	protected String foundValue;
+	protected List<Value> foundValue;
 	
 	protected FindValueResponse() {
 		
@@ -18,13 +20,13 @@ public class FindValueResponse extends FindResponse {
 		this.nearbyNodes = nearestNodes;
 	}
 	
-	public FindValueResponse(String foundValue, List<Node> nearestNodes) {
+	public FindValueResponse(List<Value> foundValue, List<Node> nearestNodes) {
 		this.foundValue = foundValue;
 		this.found = true;
 		this.nearbyNodes = nearestNodes;
 	}
 	
-	public String getFoundValue() {
+	public List<Value> getFoundValue() {
 		return foundValue;
 	}
 }

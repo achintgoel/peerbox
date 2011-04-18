@@ -2,17 +2,18 @@ package org.peerbox.kademlia.messages;
 
 import org.peerbox.kademlia.Identifier;
 import org.peerbox.kademlia.Key;
+import org.peerbox.kademlia.Value;
 
 public class StoreRequest extends Request {
 	protected Key key;
-	protected String value; 
+	protected Value value; 
 	final static public String COMMAND = "store";
 	
 	protected StoreRequest() {
 		
 	}
 	
-	public StoreRequest(Identifier myNodeID, Key key, String value){
+	public StoreRequest(Identifier myNodeID, Key key, Value value){
 		this.myNodeId = myNodeID;
 		this.key = key;
 		this.value = value;
@@ -23,7 +24,7 @@ public class StoreRequest extends Request {
 		return key;
 	}
 	
-	public String getValue() {
+	public Value getValue() {
 		return value;
 	}
 }

@@ -1,5 +1,7 @@
 package org.peerbox.kademlia;
 
+import java.util.List;
+
 import org.peerbox.kademlia.messages.FindNodeRequest;
 import org.peerbox.kademlia.messages.FindNodeResponse;
 import org.peerbox.kademlia.messages.FindValueRequest;
@@ -57,7 +59,7 @@ public class KademliaRequestListener implements RPCServiceRequestListener {
 			}
 			else if(command.equals(FindValueRequest.COMMAND)){
 				FindValueRequest fvr = gson.fromJson(root, FindValueRequest.class);
-				String returnValue = ni.getLocalDataStore().get(fvr.getKey());
+				List<Value> returnValue = ni.getLocalDataStore().get(fvr.getKey());
 				if(returnValue == null) {
 					response = new FindValueResponse(ni.getBuckets().getNearestNodes(fvr.getTargetIdentifier(), ni.getConfiguration().getK()));
 				}
@@ -68,7 +70,7 @@ public class KademliaRequestListener implements RPCServiceRequestListener {
 			}
 			else if(command.equals(StoreRequest.COMMAND)){
 				StoreRequest sr = gson.fromJson(root, StoreRequest.class);
-				boolean success = ni.storeValueLocal(sr.getKey(), sr.getValue());
+				boolean success = ni.storeValueLocal(sr.getKey(), sr.getValue(), false);
 				response = new StoreResponse(success);
 				request = sr;
 			}
