@@ -1,6 +1,5 @@
 package org.peerbox.demo.cli;
 
-import java.io.File;
 import java.io.PrintStream;
 
 import org.peerbox.fileshare.FileInfo;

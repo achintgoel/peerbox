@@ -26,21 +26,20 @@ import org.peerbox.rpc.RPCResponseListener;
 
 import com.google.gson.Gson;
 
-
 /**
- * An instance of a local node that is actively/inactively involved in a  particular Kademlia overlay network.
- * Primary Kademlia Controller
+ * An instance of a local node that is actively/inactively involved in a
+ * particular Kademlia overlay network. Primary Kademlia Controller
  */
 public class NetworkInstance implements Kademlia {
 	protected final Buckets buckets;
 	protected final Gson gson;
 	protected final String rpcServiceName;
 	protected final LocalDataStore localDataStore;
-	protected Identifier localIdentifier;	
+	protected Identifier localIdentifier;
 	protected final RPCHandler rpcHandler;
 	protected final CompositeDataFilter compositeDataFilter;
 	protected final PrimaryDHT primaryDHT;
-	
+
 	public NetworkInstance(RPCHandler rpcHandler) {
 		gson = new Gson();
 		rpcServiceName = "kad";
@@ -48,48 +47,49 @@ public class NetworkInstance implements Kademlia {
 		localDataStore = new LocalDataStore();
 		this.rpcHandler = rpcHandler;
 		rpcHandler.registerServiceListener(rpcServiceName, new KademliaRequestListener(this));
-		localIdentifier = Identifier.generateRandom(); // Possibly remember for future restarts
+		localIdentifier = Identifier.generateRandom(); // Possibly remember for
+														// future restarts
 		buckets = new Buckets(this);
 		primaryDHT = new PrimaryDHT(this);
 	}
-	
-	
+
 	// TODO: this constructor only for testing of buckets
-	protected NetworkInstance(byte[] bytes){
+	protected NetworkInstance(byte[] bytes) {
 		gson = null;
 		rpcServiceName = "kad";
 		compositeDataFilter = null;
 		localDataStore = null;
 		this.rpcHandler = null;
-		localIdentifier = Identifier.fromBytes(bytes); // Possibly remember for future restarts	
+		localIdentifier = Identifier.fromBytes(bytes); // Possibly remember for
+														// future restarts
 		buckets = new Buckets(this);
 		primaryDHT = new PrimaryDHT(this);
 	}
-	
+
 	public void registerDataFilter(String primaryKey, MapDataFilter<String, String> dataFilter) {
 		compositeDataFilter.registerDataFilter(primaryKey, dataFilter);
-	}	
-	
+	}
+
 	LocalDataStore getLocalDataStore() {
 		return localDataStore;
 	}
-	
+
 	CompositeDataFilter getCompositeDataFilter() {
 		return compositeDataFilter;
 	}
-	
+
 	public Configuration getConfiguration() {
 		return new Configuration();
 	}
-	
+
 	public Identifier getLocalNodeIdentifier() {
 		return localIdentifier;
 	}
-	
+
 	public DistributedMap<Key, Value> getPrimaryDHT() {
 		return primaryDHT;
 	}
-	
+
 	public DistributedMap<String, Value> getSingleMap(final String mapKey) {
 		return new DistributedMap<String, Value>() {
 			@Override
@@ -103,8 +103,9 @@ public class NetworkInstance implements Kademlia {
 			}
 		};
 	}
-	
-	protected <T extends Response> void sendRequestRPC(final Node destination, Request request, final Class<T> responseClass, final ResponseListener<T> callback) {
+
+	protected <T extends Response> void sendRequestRPC(final Node destination, Request request,
+			final Class<T> responseClass, final ResponseListener<T> callback) {
 		String requestData = gson.toJson(request);
 		getRPC().sendRequest(destination.getNetworkURI(), rpcServiceName, requestData, new RPCResponseListener() {
 			public void onResponseReceived(RPCEvent event) {
@@ -119,11 +120,11 @@ public class NetworkInstance implements Kademlia {
 			public void onTimeout() {
 				buckets.remove(destination);
 				callback.onFailure();
-				
+
 			}
 		});
 	}
-	
+
 	public RPCHandler getRPC() {
 		return rpcHandler;
 	}
@@ -131,43 +132,48 @@ public class NetworkInstance implements Kademlia {
 	public Buckets getBuckets() {
 		return buckets;
 	}
-	
-	public void findNode(Identifier targetNodeId, boolean stopOnFound, ResponseListener<FindNodeResponse> responseListener) {
+
+	public void findNode(Identifier targetNodeId, boolean stopOnFound,
+			ResponseListener<FindNodeResponse> responseListener) {
 		FindNodeRequest request = new FindNodeRequest(getLocalNodeIdentifier(), targetNodeId);
 		FindProcess.execute(this, request, stopOnFound, FindNodeResponse.class, responseListener);
 	}
-	
+
 	public void findNode(Identifier targetNodeId, ResponseListener<FindNodeResponse> responseListener) {
 		findNode(targetNodeId, true, responseListener);
 	}
-	
+
 	/**
-	 * Find Value retrieves stored values in the DHT by a given key (and filters with registered data filters)
-	 * If Value is invalid according to filters, it would appear not to be found.
-	 * Current Assumption: If key/value pair is in local network, skip querying network for the value.
-	 * Is this a valid assumption? Should it be an option?
+	 * Find Value retrieves stored values in the DHT by a given key (and filters
+	 * with registered data filters) If Value is invalid according to filters,
+	 * it would appear not to be found. Current Assumption: If key/value pair is
+	 * in local network, skip querying network for the value. Is this a valid
+	 * assumption? Should it be an option?
 	 * 
 	 * TODO: Cache found Key/Value Pairs
+	 * 
 	 * @param targetKey
 	 * @param responseListener
 	 */
 	public void findValue(final Key targetKey, final ResponseListener<FindValueResponse> responseListener) {
 		List<Value> valueList = getLocalDataStore().get(targetKey);
 		Date lastRefreshed = getLocalDataStore().getLastRefreshed(targetKey);
-		if(valueList != null){
-			for(Value value : valueList){
+		if (valueList != null) {
+			for (Value value : valueList) {
 				if (!compositeDataFilter.isValid(targetKey, value.getValue())) {
 					valueList.remove(value);
 					getLocalDataStore().remove(targetKey, value);
-					//	NOTE: should we include nearby nodes since we have the value locally?
+					// NOTE: should we include nearby nodes since we have the
+					// value locally?
 				}
 			}
-			if(lastRefreshed.after(new Date(System.currentTimeMillis() - (getConfiguration().getRefreshInterval() * 1000)))){
+			if (lastRefreshed.after(new Date(System.currentTimeMillis()
+					- (getConfiguration().getRefreshInterval() * 1000)))) {
 				responseListener.onResponseReceived(new FindValueResponse(valueList, new LinkedList<Node>()));
 				return;
 			}
 		}
-		
+
 		FindValueRequest request = new FindValueRequest(getLocalNodeIdentifier(), targetKey);
 		FindProcess.execute(this, request, true, FindValueResponse.class, new ResponseListener<FindValueResponse>() {
 
@@ -175,12 +181,12 @@ public class NetworkInstance implements Kademlia {
 			public void onResponseReceived(FindValueResponse response) {
 				if (response.isFound()) {
 					List<Value> foundValues = response.getFoundValue();
-					for(Value value : foundValues){
+					for (Value value : foundValues) {
 						storeValueLocal(targetKey, value, false);
 					}
 					getLocalDataStore().updateLastRefreshed(targetKey);
 					foundValues = getLocalDataStore().get(targetKey);
-					if(foundValues.isEmpty()){
+					if (foundValues.isEmpty()) {
 						responseListener.onResponseReceived(new FindValueResponse(response.getNearbyNodes()));
 						return;
 					}
@@ -194,22 +200,25 @@ public class NetworkInstance implements Kademlia {
 			public void onFailure() {
 				responseListener.onFailure();
 			}
-			
+
 		});
 	}
+
 	/**
-	 * Stores the Key/Value pair in the local data store and then replicates the data across the network.
-	 * Verifies valid according to data filters prior to storing. Calls failure callback if invalid.
-	 * Replication is done via sending
+	 * Stores the Key/Value pair in the local data store and then replicates the
+	 * data across the network. Verifies valid according to data filters prior
+	 * to storing. Calls failure callback if invalid. Replication is done via
+	 * sending
 	 * 
 	 * TODO: Expiration and re-publication of stored values
+	 * 
 	 * @param key
 	 * @param value
 	 * @param responseListener
 	 * @param publish
 	 */
 	public void storeValue(Key key, Value value, boolean publish, ResponseListener<StoreResponse> responseListener) {
-		//TODO: do not store values more than 24 hours old
+		// TODO: do not store values more than 24 hours old
 		if (!storeValueLocal(key, value, true)) {
 			responseListener.onFailure();
 			return;
@@ -217,9 +226,10 @@ public class NetworkInstance implements Kademlia {
 		StoreRequest request = new StoreRequest(getLocalNodeIdentifier(), key, value);
 		StoreProcess.execute(this, request, responseListener);
 	}
-	
+
 	/**
 	 * Stores Key/Value pair in local data store if pair passes filtering.
+	 * 
 	 * @param key
 	 * @param value
 	 * @return Whether store succeeded (filtering passed)
@@ -231,8 +241,8 @@ public class NetworkInstance implements Kademlia {
 		getLocalDataStore().put(key, value, original);
 		return true;
 	}
-	
-	//Maybe put in Node
+
+	// Maybe put in Node
 	public void ping(final Node targetNode, final ResponseListener<PingResponse> responseListener) {
 		PingRequest request = new PingRequest(getLocalNodeIdentifier(), targetNode.getIdentifier());
 		this.sendRequestRPC(targetNode, request, PingResponse.class, new ResponseListener<PingResponse>() {
@@ -254,7 +264,7 @@ public class NetworkInstance implements Kademlia {
 			}
 		});
 	}
-	
+
 	public void bootstrap(List<URI> friends, BootstrapListener bootstrapListener) {
 		BootstrapProcess.execute(this, friends, bootstrapListener);
 	}
