@@ -7,17 +7,20 @@ import org.junit.Before;
 import org.junit.Test;
 
 public class PacketMessageTableTest {
-
+	Random random = new Random();
+	
 	@Before
 	public void setUp() throws Exception {
 	}
 
+	/**
+	 * Test that a message is removed after completion in jumbled order
+	 * @author vineet
+	 */
 	@Test
-	public void testPut() {
-		// to test that a message is removed after completion in jumbled order;
-		// ---------------------
+	public void testJumbledMessage() {
 		PacketMessageTable table = new PacketMessageTable(64, 256, 600);
-		Random random = new Random();
+		
 		Short bytes = ((Integer)random.nextInt()).shortValue();
 		table.setLength(bytes, 20);
 		for(int i = 0; i < 20; i+=2){
@@ -27,20 +30,33 @@ public class PacketMessageTableTest {
 			table.put(bytes, i, null);
 		}
 		Assert.assertEquals(0, table.getNumMessages());
-		
-		// to test that after adding more than 64 packets the size still stays 64
-		// ----------------
+	}
+	
+	
+	/**
+	 * Test that after adding more than 64 packets the size still stays 64
+	 * @author vineet
+	 */
+	@Test
+	public void testLotsOfPackets() {
+		PacketMessageTable table = new PacketMessageTable(64, 256, 600);
+		Short bytes;
 		for(Integer i = 0; i < 70; i++){
 			bytes = ((Integer)random.nextInt()).shortValue();
 			table.setLength(bytes, 2);
 			table.put(bytes, 0, null);
 		}
 		Assert.assertEquals(64, table.getNumMessages());
-		
-		
-		// to test that the timeout clears all the old messages but keeps new ones
-		// --------------------------------
-		table = new PacketMessageTable(64, 256, 1);
+	}
+	
+	/**
+	 * Test that the timeout clears all the old messages but keeps new ones
+	 * @author vineet
+	 */
+	@Test
+	public void testTimeout() {
+		Short bytes;
+		PacketMessageTable table = new PacketMessageTable(64, 256, 1);
 		for(int i = 0; i < 64; i++){
 			bytes = ((Integer)random.nextInt()).shortValue();
 			table.setLength(bytes, 2);
@@ -58,8 +74,6 @@ public class PacketMessageTableTest {
 			table.put(bytes, 0, null);
 		}
 		Assert.assertEquals(20, table.getNumMessages());
-		
-		
 	}
 
 }
