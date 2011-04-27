@@ -106,7 +106,7 @@ public class FriendManager {
 				System.out.printf("\t%d. %s (%s)", i, buddyInfo.getValue().getAlias(), uri);
 				i++;
 			}
-		}	
+		}
 	}
 
 	public Collection<Friend> getAllFriends() {

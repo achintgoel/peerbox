@@ -89,5 +89,4 @@ public class UserDistributedMap implements DistributedMap<PublicKey, URI>{
 		myDistributedMap.put(gson.toJson(key.getEncoded()), new Value(gson.toJson(signedMessage)));
 	}
 
-
 }

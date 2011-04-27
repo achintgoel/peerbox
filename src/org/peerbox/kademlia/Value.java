@@ -11,6 +11,10 @@ public class Value {
 		this.timestamp = new Date(System.currentTimeMillis());
 	}
 	
+	protected Value(){
+		
+	}
+	
 	public Value(String value, Date date){
 		this.value = value;
 		this.timestamp = date;

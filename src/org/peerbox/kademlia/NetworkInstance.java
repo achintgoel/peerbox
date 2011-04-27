@@ -44,7 +44,7 @@ public class NetworkInstance implements Kademlia {
 		gson = new Gson();
 		rpcServiceName = "kad";
 		compositeDataFilter = new CompositeDataFilter();
-		localDataStore = new LocalDataStore();
+		localDataStore = new LocalDataStore(getConfiguration().getExpiryInterval());
 		this.rpcHandler = rpcHandler;
 		rpcHandler.registerServiceListener(rpcServiceName, new KademliaRequestListener(this));
 		localIdentifier = Identifier.generateRandom(); // Possibly remember for
@@ -167,10 +167,12 @@ public class NetworkInstance implements Kademlia {
 					// value locally?
 				}
 			}
-			if (lastRefreshed.after(new Date(System.currentTimeMillis()
-					- (getConfiguration().getRefreshInterval() * 1000)))) {
-				responseListener.onResponseReceived(new FindValueResponse(valueList, new LinkedList<Node>()));
-				return;
+			if (lastRefreshed != null) {
+				if (lastRefreshed.after(new Date(System.currentTimeMillis()
+						- (getConfiguration().getRefreshInterval() * 1000)))) {
+					responseListener.onResponseReceived(new FindValueResponse(valueList, new LinkedList<Node>()));
+					return;
+				}
 			}
 		}
 

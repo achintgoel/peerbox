@@ -75,6 +75,7 @@ public class FileShareCLI {
 			}
 		}
 		catch(Exception e){
+			e.printStackTrace(System.out);
 			printUsageAndExit();
 		}
 	}
@@ -104,13 +105,14 @@ public class FileShareCLI {
 				
 			});
 		}
+
 		friendManager = new FriendManager(networkInstance.getSingleMap("users"), new SecureMessageHandler(), rpc.getLocalURI());
-		fileShareManager = new FileShareManager(rpc);
+//		fileShareManager = new FileShareManager(rpc);
 		ChatManager chat = new ChatManager(rpc, friendManager);
 		
 		ExtendableCLI cli = new ExtendableCLI();
 		cli.registerHandler("friend", new FriendCLIHandler(friendManager));
-		cli.registerHandler("fileshare", new FileShareCLIHandler(fileShareManager, friendManager));
+//		cli.registerHandler("fileshare", new FileShareCLIHandler(fileShareManager, friendManager));
 		cli.registerHandler("kad", new KadCLIHandler(networkInstance));
 		cli.registerHandler("msg", new ChatCLIHandler(chat));
 		cli.registerAlias("addFriend", "friend add");

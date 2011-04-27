@@ -13,6 +13,7 @@ public class Configuration {
 	final static int k = 20;
 	final static int MIN_PING_INTERVAL_SECS = 60;
 	final static int refreshInterval = 900;
+	final static int expiryInterval = 60;
 	
 	public int getK() {
 		return k;
@@ -28,5 +29,9 @@ public class Configuration {
 	
 	public int getRefreshInterval(){
 		return refreshInterval;
+	}
+
+	public int getExpiryInterval() {
+		return expiryInterval;
 	}
 }

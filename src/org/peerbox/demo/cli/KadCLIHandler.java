@@ -96,11 +96,11 @@ public class KadCLIHandler implements CLIHandler {
 														.getNetworkURI());
 							} else {
 								cli.out().println("Did not find Node");
-							}
+							}/*
 							cli.out().println("Nearest Nodes:-");
 							for (Node node : response.getNearbyNodes()) {
 								cli.out().println("\t" + node.getNetworkURI());
-							}
+							}*/
 						}
 					});
 		} else if (args[1].equalsIgnoreCase("findvalue")) {
@@ -120,15 +120,17 @@ public class KadCLIHandler implements CLIHandler {
 						public void onResponseReceived(
 								FindValueResponse response) {
 							if (response.isFound()) {
-								cli.out().println("Found Value is: "
-										+ response.getFoundValue());
+								cli.out().println("Found Values are:");
+								for (Value value: response.getFoundValue()){
+									cli.out().println("\t" + value.getValue() + "\t" + value.getTimestamp());
+								}
 							} else {
 								cli.out().println("Did not find the key pair");
-							}
+							}/*
 							cli.out().println("Nearest Nodes:-");
 							for (Node node : response.getNearbyNodes()) {
 								cli.out().println("\t" + node.getNetworkURI());
-							}
+							}*/
 						}
 					});
 
