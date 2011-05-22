@@ -5,9 +5,9 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map.Entry;
 import java.util.SortedSet;
 import java.util.TreeSet;
+import java.util.Map.Entry;
 
 import org.peerbox.kademlia.messages.PingResponse;
 
@@ -184,5 +184,37 @@ public class Buckets implements NodeStatusListener {
 			return;
 		}
 		buckets.get(calculateBucketNumber(node)).remove(node.getIdentifier());
+	}
+	
+	public Identifier getNearestNode(Identifiable obj){
+		int bucketNum = calculateBucketNumber(obj);
+		SortedSet<Node> nearSet = new TreeSet<Node>(new IdentifiableDistanceComparator(obj));	
+		nearSet.addAll(buckets.get(bucketNum).values());
+		if(nearSet == null || nearSet.isEmpty()){
+			return null;
+		}
+		return nearSet.first().getIdentifier();
+	}
+	
+	
+	/**
+	 * To get the count of the nodes between the current node and
+	 *  the node closest to obj
+	 * @param obj - 
+	 * @return the number of notes
+	 */
+	public int getCloserNodeCount(Identifiable obj){
+		int bucketNum = calculateBucketNumber(obj);
+		int nodeCount = 0;
+		for(int i = 0; i < bucketNum ; i++){
+			nodeCount += buckets.get(i).size();
+		}
+		Identifier closestNode = getNearestNode(obj);
+		for(Identifier id : buckets.get(bucketNum).keySet()){
+			if(Identifier.calculateDistance(networkInstance.getLocalNodeIdentifier(), closestNode).compareTo(Identifier.calculateDistance(networkInstance.getLocalNodeIdentifier(), id)) == 1){
+				nodeCount++;
+			}
+		}
+		return nodeCount;
 	}
 }

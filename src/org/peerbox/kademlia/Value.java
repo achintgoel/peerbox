@@ -1,31 +1,30 @@
 package org.peerbox.kademlia;
 
-import java.util.Date;
 
 public class Value {
-	private Date timestamp;
+	private long publicationTime;
 	private String value;
 	
 	public Value(String value){
 		this.value = value;
-		this.timestamp = new Date(System.currentTimeMillis());
+		this.publicationTime = System.currentTimeMillis();
 	}
 	
 	protected Value(){
 		
 	}
 	
-	public Value(String value, Date date){
+	public Value(String value, long date){
 		this.value = value;
-		this.timestamp = date;
+		this.publicationTime = date;
 	}
 	
 	public String getValue(){
 		return value;
 	}
 	
-	public Date getTimestamp(){
-		return timestamp;
+	public long getPublicationTime(){
+		return publicationTime;
 	}
 
 }

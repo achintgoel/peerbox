@@ -2,6 +2,7 @@ package org.peerbox.demo.cli;
 
 import java.io.PrintStream;
 import java.math.BigInteger;
+import java.util.Date;
 
 import org.peerbox.kademlia.Identifier;
 import org.peerbox.kademlia.Key;
@@ -122,7 +123,7 @@ public class KadCLIHandler implements CLIHandler {
 							if (response.isFound()) {
 								cli.out().println("Found Values are:");
 								for (Value value: response.getFoundValue()){
-									cli.out().println("\t" + value.getValue() + "\t" + value.getTimestamp());
+									cli.out().println("\t" + value.getValue() + "\t" + new Date(value.getPublicationTime()));
 								}
 							} else {
 								cli.out().println("Did not find the key pair");

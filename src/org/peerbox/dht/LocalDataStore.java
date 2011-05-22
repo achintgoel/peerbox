@@ -1,6 +1,6 @@
 package org.peerbox.dht;
 
-import java.util.Collection;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -20,36 +20,38 @@ import org.peerbox.kademlia.Value;
 public class LocalDataStore {
 
 	protected class StoredValueInfo {
-		public Date publishDate;
-		public Date lastRepublish;
+		public Calendar publishDate;
+		public Calendar lastRepublish;
+		public Calendar expiryDate;
 		public boolean original;
 
-		StoredValueInfo(Date publishDate, boolean original) {
+		StoredValueInfo(Calendar publishDate, Calendar expiryDate, boolean original) {
 			this.publishDate = publishDate;
 			this.original = original;
+			this.expiryDate = expiryDate;
 		}
 	}
 
 	protected final Map<CompositeKey<String, String>, HashMap<String, StoredValueInfo>> dataMap;
 	protected final Map<CompositeKey<String, String>, Date> lastRefreshed;
-	public int expiryInterval;
 
-	public LocalDataStore(int expiryInterval) {
+	public LocalDataStore() {
 		dataMap = new HashMap<CompositeKey<String, String>, HashMap<String, StoredValueInfo>>();
 		lastRefreshed = new HashMap<CompositeKey<String, String>, Date>();
-		this.expiryInterval = expiryInterval;
 	}
 
-	public void put(CompositeKey<String, String> ckey, Value value, boolean originalPublisher) {
-		if (value.getTimestamp().before(new Date(System.currentTimeMillis() - (expiryInterval * 1000)))) {
+	public void put(CompositeKey<String, String> ckey, Value value, boolean originalPublisher, long expiryInterval) {
+		if (!originalPublisher && (value.getPublicationTime() < (System.currentTimeMillis() - expiryInterval))){
 			return;
 		}
 		HashMap<String, StoredValueInfo> valueMap;
+		boolean original = false;
 		if (dataMap.containsKey(ckey)) {
 			valueMap = dataMap.get(ckey);
 			if (valueMap.containsKey(value.getValue())) {
-				Date originaldate = valueMap.get(value.getValue()).publishDate;
-				if (originaldate.before(value.getTimestamp())) {
+				Calendar originaldate = valueMap.get(value.getValue()).publishDate;
+				original = valueMap.get(value.getValue()).original;
+				if (originaldate == null || originaldate.before(value.getPublicationTime())) {
 					valueMap.remove(value.getValue());
 				} else {
 					return;
@@ -59,7 +61,16 @@ public class LocalDataStore {
 			valueMap = new HashMap<String, StoredValueInfo>();
 			dataMap.put(ckey, valueMap);
 		}
-		valueMap.put(value.getValue(), new StoredValueInfo(value.getTimestamp(), originalPublisher));
+		Calendar publishDate = Calendar.getInstance();
+		publishDate.setTimeInMillis(value.getPublicationTime());
+		if(originalPublisher || original){
+			valueMap.put(value.getValue(), new StoredValueInfo(publishDate, null, true));
+		}
+		else{
+			Calendar expiryDate = Calendar.getInstance();
+			expiryDate.setTimeInMillis(value.getPublicationTime() + expiryInterval);
+			valueMap.put(value.getValue(), new StoredValueInfo(publishDate, expiryDate, false));
+		}
 	}
 
 	public void updateLastRefreshed(CompositeKey<String, String> ckey) {
@@ -69,7 +80,7 @@ public class LocalDataStore {
 		if (lastRefreshed.containsKey(ckey)) {
 			lastRefreshed.remove(ckey);
 		}
-		lastRefreshed.put(ckey, new Date(System.currentTimeMillis()));
+		lastRefreshed.put(ckey, new Date());
 	}
 
 	public LinkedList<Value> get(CompositeKey<String, String> ckey) {
@@ -79,16 +90,18 @@ public class LocalDataStore {
 		LinkedList<Value> returnList = new LinkedList<Value>();
 		HashMap<String, StoredValueInfo> valueMap = dataMap.get(ckey);
 		Iterator<Entry<String, StoredValueInfo>> it = valueMap.entrySet().iterator();
-		while(it.hasNext()) {
+		while (it.hasNext()) {
 			Entry<String, StoredValueInfo> entry = (Entry<String, StoredValueInfo>) it.next();
-			if (entry.getValue().publishDate.after(new Date(System.currentTimeMillis() - (expiryInterval * 1000)))){
-				returnList.add(new Value(entry.getKey(), entry.getValue().publishDate));
-			}
-			else{
+			Calendar now = Calendar.getInstance();
+			now.setTimeInMillis(System.currentTimeMillis());
+			if (entry.getValue().original || (entry.getValue().expiryDate.after(now))) {
+				returnList.add(new Value(entry.getKey(), entry.getValue().publishDate.getTimeInMillis()));
+			} else if(!entry.getValue().original){
+//				System.out.println("removing "+ entry.getKey());
 				it.remove();
 			}
 		}
-		if(valueMap.isEmpty()){
+		if (valueMap.isEmpty()) {
 			dataMap.remove(ckey);
 			return null;
 		}

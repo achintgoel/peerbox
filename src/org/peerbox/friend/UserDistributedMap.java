@@ -39,7 +39,7 @@ public class UserDistributedMap implements DistributedMap<PublicKey, URI>{
 				if(valueEvent.exists() && !valueEvent.getValue().isEmpty()) {
 					Value newestValue = valueEvent.getValue().get(0);
 					for(Value value:valueEvent.getValue()){
-						if(newestValue.getTimestamp().before(value.getTimestamp())){
+						if(newestValue.getPublicationTime() < value.getPublicationTime()){
 							newestValue = value;
 						}
 					}

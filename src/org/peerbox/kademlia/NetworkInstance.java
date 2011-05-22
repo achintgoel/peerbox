@@ -39,12 +39,14 @@ public class NetworkInstance implements Kademlia {
 	protected final RPCHandler rpcHandler;
 	protected final CompositeDataFilter compositeDataFilter;
 	protected final PrimaryDHT primaryDHT;
+	protected final Configuration configuration;
 
 	public NetworkInstance(RPCHandler rpcHandler) {
+		configuration = new Configuration();
 		gson = new Gson();
 		rpcServiceName = "kad";
 		compositeDataFilter = new CompositeDataFilter();
-		localDataStore = new LocalDataStore(getConfiguration().getExpiryInterval());
+		localDataStore = new LocalDataStore();
 		this.rpcHandler = rpcHandler;
 		rpcHandler.registerServiceListener(rpcServiceName, new KademliaRequestListener(this));
 		localIdentifier = Identifier.generateRandom(); // Possibly remember for
@@ -55,6 +57,7 @@ public class NetworkInstance implements Kademlia {
 
 	// TODO: this constructor only for testing of buckets
 	protected NetworkInstance(byte[] bytes) {
+		configuration = new Configuration();
 		gson = null;
 		rpcServiceName = "kad";
 		compositeDataFilter = null;
@@ -79,7 +82,7 @@ public class NetworkInstance implements Kademlia {
 	}
 
 	public Configuration getConfiguration() {
-		return new Configuration();
+		return configuration;
 	}
 
 	public Identifier getLocalNodeIdentifier() {
@@ -188,7 +191,7 @@ public class NetworkInstance implements Kademlia {
 					}
 					getLocalDataStore().updateLastRefreshed(targetKey);
 					foundValues = getLocalDataStore().get(targetKey);
-					if (foundValues.isEmpty()) {
+					if (foundValues == null || foundValues.isEmpty()) {
 						responseListener.onResponseReceived(new FindValueResponse(response.getNearbyNodes()));
 						return;
 					}
@@ -240,7 +243,14 @@ public class NetworkInstance implements Kademlia {
 		if (!compositeDataFilter.isValid(key, value.getValue())) {
 			return false;
 		}
-		getLocalDataStore().put(key, value, original);
+		int closerNodes = buckets.getCloserNodeCount(key);
+		int expiryTime = configuration.getMaxExpiry();
+		if(closerNodes > configuration.getK()){
+			expiryTime *= Math.exp(configuration.getK()/closerNodes);
+			if(expiryTime < configuration.getMinExpiry())
+				expiryTime = configuration.getMinExpiry();
+		}
+		getLocalDataStore().put(key, value, original, expiryTime * 1000);		
 		return true;
 	}
 
