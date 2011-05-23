@@ -4,15 +4,16 @@ public class FileInfo {
 	protected String name;
 	protected String type;
 	protected long size;
-	
+
 	public FileInfo(String name, String type, long size) {
 		super();
 		this.name = name;
 		this.type = type;
 		this.size = size;
 	}
+
 	protected FileInfo() {
-		
+
 	}
 
 	public String getName() {

@@ -10,13 +10,13 @@ import org.peerbox.rpc.RPCServiceRequestListener;
 public class ChatManager implements RPCServiceRequestListener {
 	protected RPCHandler rpc;
 	protected FriendManager friendMan;
-	
+
 	public ChatManager(RPCHandler rpc, FriendManager friendMan) {
 		this.rpc = rpc;
 		this.friendMan = friendMan;
 		this.rpc.registerServiceListener("chat", this);
 	}
-	
+
 	public void sendMessage(final String alias, String message) {
 		Friend friend = friendMan.getFriend(alias);
 		if (friend == null || !friend.isAlive()) {
@@ -26,7 +26,7 @@ public class ChatManager implements RPCServiceRequestListener {
 		rpc.sendRequest(friend.getNetworkAddress(), "chat", message, new RPCResponseListener() {
 			@Override
 			public void onResponseReceived(RPCEvent event) {
-				
+
 			}
 
 			@Override
@@ -35,7 +35,7 @@ public class ChatManager implements RPCServiceRequestListener {
 			}
 		});
 	}
-	
+
 	@Override
 	public void onRequestRecieved(RPCEvent e) {
 		Friend friend = null;

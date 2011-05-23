@@ -29,7 +29,7 @@ public class JsonRPCHandler implements RPCHandler {
 	final protected Map<String, WaitingRequest> waitingRequests;
 	protected URI myURI;
 	final protected MessageServer messageServer;
-	
+
 	public JsonRPCHandler(MessageServer messageServer) {
 		this.messageServer = messageServer;
 		messageServer.setListener(newListener());
@@ -66,8 +66,8 @@ public class JsonRPCHandler implements RPCHandler {
 	public void sendRequest(URI recipient, String serviceName, String dataString,
 			final RPCResponseListener responseListener) {
 		final String uuid = UUID.randomUUID().toString(); // Is this safe to
-															// assume absolute
-															// local uniqueness?
+		// assume absolute
+		// local uniqueness?
 		RPCMessage requestMessage = new RPCMessage(VERSION, serviceName, uuid, dataString, null);
 		TimerTask timeoutTask = new TimerTask() {
 			@Override

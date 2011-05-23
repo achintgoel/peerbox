@@ -29,28 +29,26 @@ public class FileShareCLI {
 	private static NetworkInstance networkInstance;
 	private static FriendManager friendManager;
 	private static FileShareManager fileShareManager;
-	
+
 	public static void main(String[] args) {
 		final RPCHandler rpc;
-		try{
-			if(args.length >= 2){
-				for(int i = 1; i < args.length; i++){
-					bootstrapURI.add(new URI("udp://"+args[i]));
+		try {
+			if (args.length >= 2) {
+				for (int i = 1; i < args.length; i++) {
+					bootstrapURI.add(new URI("udp://" + args[i]));
 				}
 			}
-			if(args.length < 1){
+			if (args.length < 1) {
 				printUsageAndExit();
-			}
-			else if(args.length >= 1){
-				if(args[0].contains(":")){
+			} else if (args.length >= 1) {
+				if (args[0].contains(":")) {
 					bindIP = args[0].substring(0, args[0].indexOf(":"));
 					bindPort = Integer.parseInt(args[0].substring(args[0].indexOf(":") + 1));
 					createInstance(null);
-				}
-				else{
+				} else {
 					bindPort = Integer.parseInt(args[0]);
 					rpc = new JsonRPCHandler(new UDPMessageServer(bindPort));
-					rpc.sendRequest(new URI("udp://peerbox.org:20000"), "ipaddress", "", new RPCResponseListener(){
+					rpc.sendRequest(new URI("udp://peerbox.org:20000"), "ipaddress", "", new RPCResponseListener() {
 
 						@Override
 						public void onResponseReceived(RPCEvent event) {
@@ -69,56 +67,57 @@ public class FileShareCLI {
 							System.out.println("Could not obtain external IP");
 							System.exit(0);
 						}
-						
+
 					});
 				}
 			}
-		}
-		catch(Exception e){
+		} catch (Exception e) {
 			e.printStackTrace(System.out);
 			printUsageAndExit();
 		}
 	}
-	
-	private static void createInstance(RPCHandler rpc){
-		if(rpc == null){
+
+	private static void createInstance(RPCHandler rpc) {
+		if (rpc == null) {
 			rpc = new JsonRPCHandler(new UDPMessageServer(bindPort));
 			try {
 				rpc.setLocalURI(new URI("udp://" + bindIP + ":" + bindPort));
 			} catch (URISyntaxException e) {
 				System.out.println("Illegal URI syntax");
 			}
-		}		
+		}
 		networkInstance = new NetworkInstance(rpc);
-		if(!bootstrapURI.isEmpty()){
-			networkInstance.bootstrap(bootstrapURI, new BootstrapListener(){
-	
+		if (!bootstrapURI.isEmpty()) {
+			networkInstance.bootstrap(bootstrapURI, new BootstrapListener() {
+
 				@Override
 				public void onBootstrapFailure() {
 					System.out.println("Peerbox could not start");
 				}
-	
+
 				@Override
 				public void onBootstrapSuccess() {
-					System.out.println("Welcome to peerbox");				
+					System.out.println("Welcome to peerbox");
 				}
-				
+
 			});
 		}
 
-		friendManager = new FriendManager(networkInstance.getSingleMap("users"), new SecureMessageHandler(), rpc.getLocalURI());
-//		fileShareManager = new FileShareManager(rpc);
+		friendManager = new FriendManager(networkInstance.getSingleMap("users"), new SecureMessageHandler(), rpc
+				.getLocalURI());
+		// fileShareManager = new FileShareManager(rpc);
 		ChatManager chat = new ChatManager(rpc, friendManager);
-		
+
 		ExtendableCLI cli = new ExtendableCLI();
 		cli.registerHandler("friend", new FriendCLIHandler(friendManager));
-//		cli.registerHandler("fileshare", new FileShareCLIHandler(fileShareManager, friendManager));
+		// cli.registerHandler("fileshare", new
+		// FileShareCLIHandler(fileShareManager, friendManager));
 		cli.registerHandler("kad", new KadCLIHandler(networkInstance));
 		cli.registerHandler("msg", new ChatCLIHandler(chat));
 		cli.registerAlias("addFriend", "friend add");
 		cli.start();
 	}
-	
+
 	private static void printUsageAndExit() {
 		System.out.println("Usage: [bind ip]:port [bootstrap ip:port]");
 		System.exit(0);

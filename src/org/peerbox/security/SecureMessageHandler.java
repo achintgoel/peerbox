@@ -14,13 +14,13 @@ public class SecureMessageHandler {
 	protected Signature sig;
 	protected KeyPairGenerator keyGen;
 	protected KeyPair pair;
-	
+
 	public SecureMessageHandler(KeyPair pair) {
 		try {
 			sig = Signature.getInstance("SHA1withDSA");
 			this.pair = pair;
 			sig.initSign(this.pair.getPrivate());
-			//ver = Signature.getInstance("SHA1withDSA");
+			// ver = Signature.getInstance("SHA1withDSA");
 		} catch (NoSuchAlgorithmException e) {
 			e.printStackTrace();
 		} catch (InvalidKeyException e) {
@@ -28,7 +28,7 @@ public class SecureMessageHandler {
 			e.printStackTrace();
 		}
 	}
-	
+
 	public SecureMessageHandler() {
 		try {
 			sig = Signature.getInstance("SHA1withDSA");
@@ -43,37 +43,42 @@ public class SecureMessageHandler {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		
+
 	}
-	
+
 	public byte[] signMessage(String data) {
-		
-			
-			try {
-				sig.update(data.getBytes());
-				return sig.sign();
-			} catch (SignatureException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-		
+
+		try {
+			sig.update(data.getBytes());
+			return sig.sign();
+		} catch (SignatureException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
 		return null;
-		
+
 	}
+
 	/**
-	 * verifyMessage: verifies a signature given a public key with the original message
-	 * @param message represented as a String.  Will be converted to a UTF-8 encoded byte array for verification
-	 * @param signature represented as a byte array.
+	 * verifyMessage: verifies a signature given a public key with the original
+	 * message
+	 * 
+	 * @param message
+	 *            represented as a String. Will be converted to a UTF-8 encoded
+	 *            byte array for verification
+	 * @param signature
+	 *            represented as a byte array.
 	 * @param key
-	 * @return 
+	 * @return
 	 */
 	public boolean verifyMessage(String message, byte[] signature, PublicKey key) {
-		
+
 		try {
 			ver = Signature.getInstance("SHA1withDSA");
 			ver.initVerify(key);
 			ver.update(message.getBytes());
-			//System.out.println("signature is:"+signature.toString());
+			// System.out.println("signature is:"+signature.toString());
 			return ver.verify(signature);
 		} catch (InvalidKeyException e) {
 			e.printStackTrace();

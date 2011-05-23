@@ -17,29 +17,27 @@ public class MultiKadInstances {
 	private static int firstBindPort;
 	private static List<URI> bootstrapURI = new LinkedList<URI>();
 	private static HashMap<Integer, KadInstance> kadInstances = new HashMap<Integer, KadInstance>();
-	
-	public static void main(String[] args){
+
+	public static void main(String[] args) {
 		final RPCHandler rpc;
-		try{			
-			if(args.length >= 3){
-				for(int i = 2; i < args.length; i++){
-					bootstrapURI.add(new URI("udp://"+args[i]));
+		try {
+			if (args.length >= 3) {
+				for (int i = 2; i < args.length; i++) {
+					bootstrapURI.add(new URI("udp://" + args[i]));
 				}
 			}
-			if(args.length < 2){
+			if (args.length < 2) {
 				printUsageAndExit();
-			}
-			else if(args.length >= 2){
+			} else if (args.length >= 2) {
 				numInstances = Integer.parseInt(args[0]);
-				if(args[1].contains(":")){
+				if (args[1].contains(":")) {
 					bindIP = args[1].substring(0, args[1].indexOf(":"));
 					firstBindPort = Integer.parseInt(args[1].substring(args[1].indexOf(":") + 1));
 					createInstances(null);
-				}
-				else{
+				} else {
 					firstBindPort = Integer.parseInt(args[1]);
 					rpc = new JsonRPCHandler(new UDPMessageServer(firstBindPort));
-					rpc.sendRequest(new URI("udp://peerbox.org:20000"), "ipaddress", "", new RPCResponseListener(){
+					rpc.sendRequest(new URI("udp://peerbox.org:20000"), "ipaddress", "", new RPCResponseListener() {
 
 						@Override
 						public void onResponseReceived(RPCEvent event) {
@@ -52,12 +50,11 @@ public class MultiKadInstances {
 							System.out.println("Could not obtain external IP");
 							System.exit(0);
 						}
-						
+
 					});
 				}
 			}
-		}
-		catch(Exception e){
+		} catch (Exception e) {
 			printUsageAndExit();
 		}
 	}
@@ -71,16 +68,15 @@ public class MultiKadInstances {
 			}
 			KadInstance kadInstance;
 			int bindPort = firstBindPort + i;
-			if(rpc == null){
+			if (rpc == null) {
 				kadInstance = new KadInstance(bindIP, bindPort, bootstrapURI);
-			}
-			else{
+			} else {
 				kadInstance = new KadInstance(rpc, bindIP, bindPort, bootstrapURI);
 			}
 			kadInstances.put(bindPort, kadInstance);
 			new Thread(kadInstance).run();
 			bootstrapURI.add(kadInstance.getURI());
-		}		
+		}
 	}
 
 	private static void printUsageAndExit() {

@@ -11,12 +11,12 @@ import org.jboss.netty.channel.SimpleChannelUpstreamHandler;
 import org.jboss.netty.handler.codec.http.HttpChunk;
 import org.jboss.netty.handler.codec.http.HttpResponse;
 
-public class HttpResponseHandler extends SimpleChannelUpstreamHandler{
-	
+public class HttpResponseHandler extends SimpleChannelUpstreamHandler {
+
 	private boolean saveChunks;
 	protected RandomAccessFile downloadFile;
 	protected HttpClientListener listener;
-	
+
 	public HttpResponseHandler(File downloadFilePath, HttpClientListener listener) {
 		super();
 		this.listener = listener;
@@ -26,25 +26,26 @@ public class HttpResponseHandler extends SimpleChannelUpstreamHandler{
 			listener.localFileError();
 		}
 	}
-	
+
 	public void messageReceived(ChannelHandlerContext ctx, MessageEvent e) throws Exception {
-		if(!saveChunks) {
+		if (!saveChunks) {
 			if (!(e.getMessage() instanceof HttpResponse)) {
 				return;
 			}
 			HttpResponse response = (HttpResponse) e.getMessage();
-			 
-			//System.out.println("STATUS: " + response.getStatus());
-			//System.out.println("VERSION: " + response.getProtocolVersion());
-			//System.out.println();
+
+			// System.out.println("STATUS: " + response.getStatus());
+			// System.out.println("VERSION: " + response.getProtocolVersion());
+			// System.out.println();
 
 			if (!response.getHeaderNames().isEmpty()) {
-				for (String name: response.getHeaderNames()) {
-					for (String value: response.getHeaders(name)) {
-						//System.out.println("HEADER: " + name + " = " + value);
+				for (String name : response.getHeaderNames()) {
+					for (String value : response.getHeaders(name)) {
+						// System.out.println("HEADER: " + name + " = " +
+						// value);
 					}
 				}
-				//System.out.println();
+				// System.out.println();
 			}
 
 			if (response.getStatus().getCode() == 200) {
@@ -59,18 +60,18 @@ public class HttpResponseHandler extends SimpleChannelUpstreamHandler{
 				} else {
 					saveChunks = true;
 				}
-				
-					/*
-		      System.out.println("CONTENT {");
-		      System.out.println(content.toString(CharsetUtil.UTF_8));
-		      System.out.println("} END OF CONTENT");
-					 */
+
+				/*
+				 * System.out.println("CONTENT {");
+				 * System.out.println(content.toString(CharsetUtil.UTF_8));
+				 * System.out.println("} END OF CONTENT");
+				 */
 
 			} else {
 				listener.downloadError();
 			}
 		} else {
-			//TODO: save content to file on file system
+			// TODO: save content to file on file system
 			HttpChunk chunk = (HttpChunk) e.getMessage();
 			if (chunk.isLast()) {
 				saveChunks = false;
@@ -78,11 +79,10 @@ public class HttpResponseHandler extends SimpleChannelUpstreamHandler{
 				listener.finished();
 			} else {
 				downloadFile.write(chunk.getContent().array());
-				//System.out.print(chunk.getContent().toString(CharsetUtil.UTF_8));
-				//System.out.flush();
+				// System.out.print(chunk.getContent().toString(CharsetUtil.UTF_8));
+				// System.out.flush();
 			}
 		}
 	}
-	
 
 }

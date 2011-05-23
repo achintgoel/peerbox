@@ -11,48 +11,49 @@ import org.peerbox.friend.Friend;
 import org.peerbox.friend.FriendManager;
 import org.peerbox.network.http.HttpClientListener;
 
-public class FileShareCLIHandler implements CLIHandler{
-	
+public class FileShareCLIHandler implements CLIHandler {
+
 	protected FileShareManager fileshare;
 	protected FriendManager friend_manager;
+
 	public FileShareCLIHandler(FileShareManager fs_manager, FriendManager fr_manager) {
 		this.fileshare = fs_manager;
 		this.friend_manager = fr_manager;
 	}
+
 	@Override
 	public void handleCommand(final String[] args, final ExtendableCLI cli) {
 		// TODO Auto-generated method stub
-		if(args.length < 2) {
+		if (args.length < 2) {
 			help(cli.out());
 			return;
 		}
 		String function = args[1];
-		if(function.equalsIgnoreCase("share")) {
-			if(args.length != 3) {
+		if (function.equalsIgnoreCase("share")) {
+			if (args.length != 3) {
 				help(cli.out());
 				return;
 			}
 			String folder = args[2];
-			if(fileshare.setSharedFilePath(folder)) {
-				cli.out().println("Sharing folder located at "+folder);
+			if (fileshare.setSharedFilePath(folder)) {
+				cli.out().println("Sharing folder located at " + folder);
 			} else {
-				cli.out().println("No directory exists at "+folder+".  Please specify another folder to share");
+				cli.out().println("No directory exists at " + folder + ".  Please specify another folder to share");
 			}
-		}
-		else if(function.equalsIgnoreCase("downloadTo")) {
-			if(args.length != 3) {
+		} else if (function.equalsIgnoreCase("downloadTo")) {
+			if (args.length != 3) {
 				help(cli.out());
 				return;
 			}
 			String folder = args[2];
-			if(fileshare.setDownloadFilePath(folder)) {
-				cli.out().println("Download folder located at "+folder);
+			if (fileshare.setDownloadFilePath(folder)) {
+				cli.out().println("Download folder located at " + folder);
 			} else {
-				cli.out().println("No directory exists at "+folder+".  Please specify another folder to download files to");
+				cli.out().println(
+						"No directory exists at " + folder + ".  Please specify another folder to download files to");
 			}
-		}
-		else if(function.equalsIgnoreCase("browse")) {
-			if(args.length < 3 || args.length > 4) {
+		} else if (function.equalsIgnoreCase("browse")) {
+			if (args.length < 3 || args.length > 4) {
 				help(cli.out());
 				return;
 			}
@@ -62,9 +63,9 @@ public class FileShareCLIHandler implements CLIHandler{
 				System.out.println("friend is offline");
 				return;
 			}
-			if(friend != null) {
+			if (friend != null) {
 				String relativePath = "";
-				if(args.length == 4) {
+				if (args.length == 4) {
 					relativePath = args[3];
 				}
 				fileshare.getSharedDirectory(relativePath, friend, new ResponseListener<SharedDirectoryResponse>() {
@@ -72,40 +73,36 @@ public class FileShareCLIHandler implements CLIHandler{
 					@Override
 					public void onFailure() {
 						// TODO Auto-generated method stub
-						cli.out().println("Unable to retrieve shared directory from "+alias);
+						cli.out().println("Unable to retrieve shared directory from " + alias);
 					}
 
 					@Override
-					public void onResponseReceived(
-							SharedDirectoryResponse response) {
-						if(response.getContents() != null) {
+					public void onResponseReceived(SharedDirectoryResponse response) {
+						if (response.getContents() != null) {
 							FileInfo[] contents = response.getContents();
-							for(int i=0; i<contents.length;i++){
+							for (int i = 0; i < contents.length; i++) {
 								String directory = "";
-								if(contents[i].getType().equals("directory")){
+								if (contents[i].getType().equals("directory")) {
 									directory = "/";
 								}
-								cli.out().println(directory+contents[i].getName());
+								cli.out().println(directory + contents[i].getName());
 							}
-						}
-						else{
-							if(args.length == 4) {
+						} else {
+							if (args.length == 4) {
 								cli.out().println("The shared directory does not exist");
 							} else {
-								cli.out().println(alias+" is not sharing a directory");
+								cli.out().println(alias + " is not sharing a directory");
 							}
 						}
-						
+
 					}
-					
+
 				});
+			} else {
+				cli.out().println("The friend " + alias + " does not exist");
 			}
-			else {
-				cli.out().println("The friend "+alias+" does not exist");
-			}
-		}
-		else if(function.equalsIgnoreCase("get")) {
-			if(args.length != 4) {
+		} else if (function.equalsIgnoreCase("get")) {
+			if (args.length != 4) {
 				help(cli.out());
 				return;
 			}
@@ -115,54 +112,52 @@ public class FileShareCLIHandler implements CLIHandler{
 				System.out.println("friend is offline");
 				return;
 			}
-			if(friend != null) {
+			if (friend != null) {
 				final String filePath = args[3];
 				int index = filePath.lastIndexOf("/");
 				final String relativePath;
 				final String fileName;
-				if(index == -1) {
+				if (index == -1) {
 					relativePath = "";
 					fileName = filePath;
-				}
-				else {
+				} else {
 					relativePath = filePath.substring(0, index);
-					fileName = filePath.substring(index+1);
+					fileName = filePath.substring(index + 1);
 				}
-				//final File file = new File(filePath);
+				// final File file = new File(filePath);
 				fileshare.getFile(relativePath, friend, fileName, new ResponseListener<FileResponse>() {
 
 					@Override
 					public void onFailure() {
 						cli.out().println("Failed to receive response to file request");
-						
+
 					}
 
 					@Override
-					public void onResponseReceived(
-							FileResponse response) {
-						//System.out.println("RECEIVED RESPONSE TO FILE REQUEST");
-						//TODO: Pass full download path
-						if(response.getFileLocURI() == null) {
-							cli.out().println("The requested file "+fileName+" is not available");
+					public void onResponseReceived(FileResponse response) {
+						// System.out.println("RECEIVED RESPONSE TO FILE REQUEST");
+						// TODO: Pass full download path
+						if (response.getFileLocURI() == null) {
+							cli.out().println("The requested file " + fileName + " is not available");
 						} else {
 							fileshare.download(response.getFileLocURI(), fileName, new HttpClientListener() {
 
 								@Override
 								public void finished() {
 									// TODO Auto-generated method stub
-									cli.out().println("Successfully downloaded file "+fileName);
+									cli.out().println("Successfully downloaded file " + fileName);
 								}
 
 								@Override
 								public void downloadError() {
 									// TODO Auto-generated method stub
-									cli.out().println("Unable to download reqested file "+fileName);
+									cli.out().println("Unable to download reqested file " + fileName);
 								}
 
 								@Override
 								public void started() {
 									// TODO Auto-generated method stub
-									cli.out().println("Started downloading requested file "+fileName);
+									cli.out().println("Started downloading requested file " + fileName);
 								}
 
 								@Override
@@ -173,23 +168,21 @@ public class FileShareCLIHandler implements CLIHandler{
 
 							});
 						}
-						
+
 					}
-					
+
 				});
-				
+
+			} else {
+				cli.out().println("The friend " + alias + " does not exist");
 			}
-			else {
-				cli.out().println("The friend "+alias+" does not exist");
-			}
-		}
-		else {
+		} else {
 			help(cli.out());
 			return;
 		}
-		
+
 	}
-	
+
 	public void help(PrintStream out) {
 		out.println("Function:\t Command");
 		out.println("Share Directory:\t share [directory]");

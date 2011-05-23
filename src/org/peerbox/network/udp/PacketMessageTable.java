@@ -7,11 +7,11 @@ import java.util.Map.Entry;
 import org.jboss.netty.buffer.ChannelBuffer;
 import org.jboss.netty.buffer.ChannelBuffers;
 
-
 /**
  * This class stores the messages that have been partially received
+ * 
  * @author vineet
- *
+ * 
  */
 public class PacketMessageTable {
 	LinkedHashMap<Short, PacketSequence> messages;
@@ -19,64 +19,60 @@ public class PacketMessageTable {
 	int maxConcurrentMessages;
 	int maxSequenceId;
 	int timeout;
-	
-	public PacketMessageTable(int maxConcurrentMessages, int maxSequenceId, int timeout){
+
+	public PacketMessageTable(int maxConcurrentMessages, int maxSequenceId, int timeout) {
 		lastMessageId = 0;
 		messages = new LinkedHashMap<Short, PacketSequence>();
 		this.maxConcurrentMessages = maxConcurrentMessages;
 		this.maxSequenceId = maxSequenceId;
 		this.timeout = timeout;
 	}
-	
-	public ChannelBuffer put(short messageId, int sequenceId, ChannelBuffer channelBuffer){
+
+	public ChannelBuffer put(short messageId, int sequenceId, ChannelBuffer channelBuffer) {
 		PacketSequence currentMessage = getCurrentSequence(messageId);
 		currentMessage.put(sequenceId, channelBuffer);
-		if(currentMessage.getCount() == 0){
+		if (currentMessage.getCount() == 0) {
 			ChannelBuffer[] channelArray = currentMessage.toArray();
 			int length = messages.get(messageId).getLength();
 			messages.remove(messageId);
-			if(length > 1){
+			if (length > 1) {
 				return ChannelBuffers.wrappedBuffer(channelArray);
-			}
-			else{
+			} else {
 				return channelArray[0];
 			}
-		}
-		else{
+		} else {
 			return null;
 		}
 	}
-	
-	public void setLength(short messageId, int length){
+
+	public void setLength(short messageId, int length) {
 		PacketSequence currentSequence = getCurrentSequence(messageId);
 		currentSequence.setLength(length);
 	}
-	
-	public int getNumMessages(){
+
+	public int getNumMessages() {
 		return messages.size();
-	}	
-	
-	protected PacketSequence getCurrentSequence(short messageId){		
+	}
+
+	protected PacketSequence getCurrentSequence(short messageId) {
 		PacketSequence currentSequence;
-		if(messages.containsKey(messageId)){
+		if (messages.containsKey(messageId)) {
 			currentSequence = messages.get(messageId);
-			//messages.remove(messageId);
-			//messages.put(messageId, currentSequence);
-		}
-		else{
-			if(messages.size() == maxConcurrentMessages){
+			// messages.remove(messageId);
+			// messages.put(messageId, currentSequence);
+		} else {
+			if (messages.size() == maxConcurrentMessages) {
 				Iterator<Entry<Short, PacketSequence>> iterator = messages.entrySet().iterator();
 				Entry<Short, PacketSequence> entry = iterator.next();
 				messages.remove(entry.getKey());
 				iterator = messages.entrySet().iterator();
-				while(iterator.hasNext()){
+				while (iterator.hasNext()) {
 					entry = iterator.next();
 					long timestamp = entry.getValue().getTimeStamp();
-					if(timestamp + timeout < System.currentTimeMillis()/1000){
+					if (timestamp + timeout < System.currentTimeMillis() / 1000) {
 						messages.remove(entry.getKey());
 						iterator = messages.entrySet().iterator();
-					}
-					else{
+					} else {
 						break;
 					}
 				}

@@ -9,18 +9,18 @@ import org.peerbox.dht.ValueListener;
 import org.peerbox.kademlia.messages.FindValueResponse;
 import org.peerbox.kademlia.messages.StoreResponse;
 
-
 class PrimaryDHT implements DistributedMap<Key, Value> {
 	protected final NetworkInstance networkInstance;
-	
+
 	PrimaryDHT(NetworkInstance networkInstance) {
 		this.networkInstance = networkInstance;
 	}
-	
-	
+
 	/**
-	 * Retrieves Value via specified Key from associated Kademlia Network via simplified Map-like interface
-	 * NOTE: Retrieval failures are exposed only as if the Key does not exist in the DHT
+	 * Retrieves Value via specified Key from associated Kademlia Network via
+	 * simplified Map-like interface NOTE: Retrieval failures are exposed only
+	 * as if the Key does not exist in the DHT
+	 * 
 	 * @param key
 	 * @param valueListener
 	 */
@@ -34,21 +34,22 @@ class PrimaryDHT implements DistributedMap<Key, Value> {
 					valueListener.valueComplete(new ValueEvent<List<Value>>(response.getFoundValue()));
 				} else {
 					valueListener.valueComplete(new ValueEvent<List<Value>>());
-				}	
+				}
 			}
 
 			@Override
 			public void onFailure() {
 				valueListener.valueComplete(new ValueEvent<List<Value>>());
 			}
-			
+
 		});
 	}
 
 	/**
-	 * Stores Key, Value pair in associated Kademlia Network via simplified Map-like interface
-	 * NOTE: Currently does not support event-handling of storage failure / acknowledgement of success
-	 * Should this be implemented
+	 * Stores Key, Value pair in associated Kademlia Network via simplified
+	 * Map-like interface NOTE: Currently does not support event-handling of
+	 * storage failure / acknowledgement of success Should this be implemented
+	 * 
 	 * @param key
 	 * @param value
 	 */
@@ -57,12 +58,12 @@ class PrimaryDHT implements DistributedMap<Key, Value> {
 		networkInstance.storeValue(key, value, true, new ResponseListener<StoreResponse>() {
 			@Override
 			public void onResponseReceived(StoreResponse response) {
-				
+
 			}
 
 			@Override
 			public void onFailure() {
-				
+
 			}
 		});
 	}

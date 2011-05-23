@@ -11,24 +11,25 @@ import org.apache.commons.codec.binary.Base64;
 import org.peerbox.friend.Friend;
 import org.peerbox.friend.FriendManager;
 
-public class FriendCLIHandler implements CLIHandler{
-	
-	
+public class FriendCLIHandler implements CLIHandler {
+
 	protected FriendManager friend_manager;
+
 	public FriendCLIHandler(FriendManager manager) {
 		this.friend_manager = manager;
 	}
+
 	@Override
 	public void handleCommand(String[] args, ExtendableCLI cli) {
 		// TODO Auto-generated method stub
-		if(args.length < 2) {
+		if (args.length < 2) {
 			help(cli.out());
 			return;
 		}
 		String function = args[1];
-		if(function.equalsIgnoreCase("add")) {
-			
-			if(args.length != 4) {
+		if (function.equalsIgnoreCase("add")) {
+
+			if (args.length != 4) {
 				help(cli.out());
 				return;
 			}
@@ -40,7 +41,7 @@ public class FriendCLIHandler implements CLIHandler{
 				keyFactory = KeyFactory.getInstance("DSA");
 				publicKey = keyFactory.generatePublic(pubKeySpec);
 				friend_manager.createFriend(alias, null, publicKey);
-				cli.out().println("Added "+alias+" to buddy list");
+				cli.out().println("Added " + alias + " to buddy list");
 			} catch (NoSuchAlgorithmException e) {
 				cli.out().println("Unable to generate key based on algorithm specified");
 			} catch (InvalidKeySpecException e) {
@@ -48,23 +49,22 @@ public class FriendCLIHandler implements CLIHandler{
 			} catch (NumberFormatException e) {
 				cli.out().println("Specified key is invalid. Please check with your friend.");
 			}
-			
-		} else if(function.equalsIgnoreCase("delete")) {
-			if(args.length != 3) {
+
+		} else if (function.equalsIgnoreCase("delete")) {
+			if (args.length != 3) {
 				help(cli.out());
 				return;
 			}
 			String alias = args[2];
 			Friend friend = friend_manager.getFriend(alias);
-			if(friend != null) {
+			if (friend != null) {
 				friend_manager.removeFriend(alias);
+			} else {
+				cli.out().println("The friend " + alias + " does not exist. Imaginary friend?");
 			}
-			else {
-				cli.out().println("The friend "+alias+" does not exist. Imaginary friend?");
-			}
-			
-		} else if(function.equalsIgnoreCase("list")) {
-			if(args.length > 2) {
+
+		} else if (function.equalsIgnoreCase("list")) {
+			if (args.length > 2) {
 				help(cli.out());
 				return;
 			}
@@ -78,9 +78,10 @@ public class FriendCLIHandler implements CLIHandler{
 		} else {
 			help(cli.out());
 		}
-		
+
 	}
-	public void help(PrintStream out){
+
+	public void help(PrintStream out) {
 		out.println("Function:\t Command");
 		out.println("Add Friend:\t add [alias] [public key]");
 		out.println("Sign On:\t signon");

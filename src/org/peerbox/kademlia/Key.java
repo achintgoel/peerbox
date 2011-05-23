@@ -5,20 +5,19 @@ import java.security.NoSuchAlgorithmException;
 
 import org.peerbox.dht.CompositeKey;
 
-
 public class Key extends CompositeKey<String, String> implements Identifiable {
-	
-	protected Key(){
+
+	protected Key() {
 		super();
 	}
-	
+
 	public Key(String primaryKey, String secondaryKey) {
 		super(primaryKey, secondaryKey);
 	}
 
 	@Override
 	public Identifier getIdentifier() {
-		
+
 		try {
 			MessageDigest md;
 			md = MessageDigest.getInstance("SHA");
@@ -27,15 +26,14 @@ public class Key extends CompositeKey<String, String> implements Identifiable {
 			md.update("::".getBytes());
 			md.update(secondaryKey.getBytes());
 			byte[] digest = md.digest();
-			
+
 			return Identifier.fromBytes(digest);
 
 		} catch (NoSuchAlgorithmException e) {
 			e.printStackTrace();
 			throw new RuntimeException("Java Runtime does not support SHA-1");
 		}
-		
-		
+
 	}
 
 }

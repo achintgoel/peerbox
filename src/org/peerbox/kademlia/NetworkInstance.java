@@ -6,8 +6,8 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.peerbox.dht.CompositeDataFilter;
+import org.peerbox.dht.CompositeKey;
 import org.peerbox.dht.DistributedMap;
-import org.peerbox.dht.LocalDataStore;
 import org.peerbox.dht.MapDataFilter;
 import org.peerbox.dht.ValueListener;
 import org.peerbox.kademlia.messages.FindNodeRequest;
@@ -46,11 +46,11 @@ public class NetworkInstance implements Kademlia {
 		gson = new Gson();
 		rpcServiceName = "kad";
 		compositeDataFilter = new CompositeDataFilter();
-		localDataStore = new LocalDataStore();
+		localDataStore = new LocalDataStore(this);
 		this.rpcHandler = rpcHandler;
 		rpcHandler.registerServiceListener(rpcServiceName, new KademliaRequestListener(this));
 		localIdentifier = Identifier.generateRandom(); // Possibly remember for
-														// future restarts
+		// future restarts
 		buckets = new Buckets(this);
 		primaryDHT = new PrimaryDHT(this);
 	}
@@ -64,7 +64,7 @@ public class NetworkInstance implements Kademlia {
 		localDataStore = null;
 		this.rpcHandler = null;
 		localIdentifier = Identifier.fromBytes(bytes); // Possibly remember for
-														// future restarts
+		// future restarts
 		buckets = new Buckets(this);
 		primaryDHT = new PrimaryDHT(this);
 	}
@@ -245,12 +245,12 @@ public class NetworkInstance implements Kademlia {
 		}
 		int closerNodes = buckets.getCloserNodeCount(key);
 		int expiryTime = configuration.getMaxExpiry();
-		if(closerNodes > configuration.getK()){
-			expiryTime *= Math.exp(configuration.getK()/closerNodes);
-			if(expiryTime < configuration.getMinExpiry())
+		if (closerNodes > configuration.getK()) {
+			expiryTime *= Math.exp(configuration.getK() / closerNodes);
+			if (expiryTime < configuration.getMinExpiry())
 				expiryTime = configuration.getMinExpiry();
 		}
-		getLocalDataStore().put(key, value, original, expiryTime * 1000);		
+		getLocalDataStore().put(key, value, original, expiryTime * 1000);
 		return true;
 	}
 
@@ -279,5 +279,23 @@ public class NetworkInstance implements Kademlia {
 
 	public void bootstrap(List<URI> friends, BootstrapListener bootstrapListener) {
 		BootstrapProcess.execute(this, friends, bootstrapListener);
+	}
+
+	public void republish(Key key, Value value) {
+		StoreRequest request = new StoreRequest(getLocalNodeIdentifier(), key, value);
+		StoreProcess.execute(this, request, new ResponseListener<StoreResponse>() {
+
+			@Override
+			public void onFailure() {
+				return;
+			}
+
+			@Override
+			public void onResponseReceived(StoreResponse response) {
+				return;
+			}
+
+		});
+
 	}
 }

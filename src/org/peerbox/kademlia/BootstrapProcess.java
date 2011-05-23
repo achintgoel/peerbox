@@ -6,53 +6,53 @@ import java.util.List;
 import org.peerbox.kademlia.messages.FindNodeResponse;
 import org.peerbox.kademlia.messages.PingResponse;
 
-
-
 /**
- * Process created when joining the network 
- *
+ * Process created when joining the network
+ * 
  */
-public class BootstrapProcess {	
-	
+public class BootstrapProcess {
+
 	protected final NetworkInstance ni;
 	protected final List<URI> friends;
 	protected final BootstrapListener callback;
 	protected int successes;
 	protected int failures;
-	
-	
-	private BootstrapProcess(NetworkInstance networkInstance, List<URI> friends, BootstrapListener bootstrapListener){
+
+	private BootstrapProcess(NetworkInstance networkInstance, List<URI> friends, BootstrapListener bootstrapListener) {
 		this.ni = networkInstance;
 		this.friends = friends;
 		this.callback = bootstrapListener;
 		this.successes = 0;
 		this.failures = 0;
 	}
-	
+
 	/**
 	 * The static function called to initialize the bootstrap process
+	 * 
 	 * @param networkInstance
-	 * @param friends list of URIs we send ping to
-	 * @param bootstrapListener the callback from this process 
+	 * @param friends
+	 *            list of URIs we send ping to
+	 * @param bootstrapListener
+	 *            the callback from this process
 	 */
-	public static void execute(NetworkInstance networkInstance, List<URI> friends, BootstrapListener bootstrapListener){
+	public static void execute(NetworkInstance networkInstance, List<URI> friends, BootstrapListener bootstrapListener) {
 		BootstrapProcess bp = new BootstrapProcess(networkInstance, friends, bootstrapListener);
 		bp.pingFriends();
 	}
-	
+
 	/**
-	 * Method that pings all friends and sends 
-	 * an iterative findNode request to the first one
+	 * Method that pings all friends and sends an iterative findNode request to
+	 * the first one
 	 * 
 	 */
-	private void pingFriends(){
-		for(final URI uri : friends){
+	private void pingFriends() {
+		for (final URI uri : friends) {
 			Node node = new Node(uri);
 			ni.ping(node, new ResponseListener<PingResponse>() {
 				@Override
 				public void onFailure() {
 					failures++;
-					if(failures == friends.size()){
+					if (failures == friends.size()) {
 						callback.onBootstrapFailure();
 					}
 				}
@@ -63,11 +63,12 @@ public class BootstrapProcess {
 					Identifier friendId = response.getMyNodeId();
 					Node newNode = new Node(uri, friendId);
 					ni.getBuckets().add(newNode);
-					if(successes == 1){
-						ni.findNode(ni.getLocalNodeIdentifier(), false, new ResponseListener<FindNodeResponse>(){
+					if (successes == 1) {
+						ni.findNode(ni.getLocalNodeIdentifier(), false, new ResponseListener<FindNodeResponse>() {
 							public void onFailure() {
 								callback.onBootstrapFailure();
 							}
+
 							public void onResponseReceived(FindNodeResponse response) {
 								callback.onBootstrapSuccess();
 							}

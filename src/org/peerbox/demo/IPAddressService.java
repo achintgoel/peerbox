@@ -12,7 +12,7 @@ public class IPAddressService implements RPCServiceRequestListener {
 	public void onRequestRecieved(RPCEvent e) {
 		e.respond(e.getSenderURI().getHost());
 	}
-	
+
 	public static void main(String[] args) {
 		RPCHandler rpc = new JsonRPCHandler(new UDPMessageServer(20000));
 		rpc.registerServiceListener("ipaddress", new IPAddressService());

@@ -15,25 +15,23 @@ import org.peerbox.kademlia.messages.StoreResponse;
 import org.peerbox.rpc.RPCEvent;
 import org.peerbox.rpc.RPCServiceRequestListener;
 
-
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
-
 /**
  * The listener to handle the received kademlia requests
- *
+ * 
  */
 public class KademliaRequestListener implements RPCServiceRequestListener {
-	
+
 	protected final Gson gson = new Gson();
 	protected final NetworkInstance ni;
-	
+
 	public KademliaRequestListener(NetworkInstance networkInstance) {
 		this.ni = networkInstance;
 	}
-	
+
 	/**
 	 * the function called on receiving a request
 	 */
@@ -46,53 +44,50 @@ public class KademliaRequestListener implements RPCServiceRequestListener {
 			String command = root.get("command").getAsString();
 			Request request;
 			Response response;
-			if(command.equals(FindNodeRequest.COMMAND)){
+			if (command.equals(FindNodeRequest.COMMAND)) {
 				FindNodeRequest fnr = gson.fromJson(root, FindNodeRequest.class);
 				Node returnNode = ni.getBuckets().findNodeByIdentifier(fnr.getTargetIdentifier());
-				if(returnNode == null) {
-					response = new FindNodeResponse(ni.getBuckets().getNearestNodes(fnr.getTargetIdentifier(), ni.getConfiguration().getK()));
-				}
-				else{
-					response = new FindNodeResponse(returnNode, ni.getBuckets().getNearestNodes(fnr.getTargetIdentifier(), ni.getConfiguration().getK()));
+				if (returnNode == null) {
+					response = new FindNodeResponse(ni.getBuckets().getNearestNodes(fnr.getTargetIdentifier(),
+							ni.getConfiguration().getK()));
+				} else {
+					response = new FindNodeResponse(returnNode, ni.getBuckets().getNearestNodes(
+							fnr.getTargetIdentifier(), ni.getConfiguration().getK()));
 				}
 				request = fnr;
-			}
-			else if(command.equals(FindValueRequest.COMMAND)){
+			} else if (command.equals(FindValueRequest.COMMAND)) {
 				FindValueRequest fvr = gson.fromJson(root, FindValueRequest.class);
 				List<Value> returnValue = ni.getLocalDataStore().get(fvr.getKey());
-				if(returnValue == null) {
-					response = new FindValueResponse(ni.getBuckets().getNearestNodes(fvr.getTargetIdentifier(), ni.getConfiguration().getK()));
-				}
-				else{
-					response = new FindValueResponse(returnValue, ni.getBuckets().getNearestNodes(fvr.getTargetIdentifier(), ni.getConfiguration().getK()));
+				if (returnValue == null) {
+					response = new FindValueResponse(ni.getBuckets().getNearestNodes(fvr.getTargetIdentifier(),
+							ni.getConfiguration().getK()));
+				} else {
+					response = new FindValueResponse(returnValue, ni.getBuckets().getNearestNodes(
+							fvr.getTargetIdentifier(), ni.getConfiguration().getK()));
 				}
 				request = fvr;
-			}
-			else if(command.equals(StoreRequest.COMMAND)){
+			} else if (command.equals(StoreRequest.COMMAND)) {
 				StoreRequest sr = gson.fromJson(root, StoreRequest.class);
 				boolean success = ni.storeValueLocal(sr.getKey(), sr.getValue(), false);
 				response = new StoreResponse(success);
 				request = sr;
-			}
-			else if(command.equals(PingRequest.COMMAND)){
+			} else if (command.equals(PingRequest.COMMAND)) {
 				PingRequest pr = gson.fromJson(root, PingRequest.class);
 				response = new PingResponse(ni.getLocalNodeIdentifier());
 				request = pr;
-			}
-			else{
+			} else {
 				request = null;
 				response = null;
 			}
-			if(response != null){
+			if (response != null) {
 				String responseString = gson.toJson(response);
 				e.respond(responseString);
 			}
-			if(request != null){
+			if (request != null) {
 				Node newNode = new Node(e.getSenderURI(), request.getMyNodeId());
 				ni.getBuckets().add(newNode);
 			}
-		}
-		catch(Exception exception){
+		} catch (Exception exception) {
 			exception.printStackTrace();
 		}
 	}

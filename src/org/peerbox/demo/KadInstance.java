@@ -16,8 +16,8 @@ public class KadInstance implements Runnable {
 	private RPCHandler rpc;
 	private List<URI> bootstrapURI;
 	private NetworkInstance networkInstance;
-	
-	public KadInstance(String bindIP, int bindPort, List<URI> bootstrapURI){
+
+	public KadInstance(String bindIP, int bindPort, List<URI> bootstrapURI) {
 		this.bindIP = bindIP;
 		this.bindPort = bindPort;
 		this.bootstrapURI = bootstrapURI;
@@ -30,7 +30,7 @@ public class KadInstance implements Runnable {
 		networkInstance = new NetworkInstance(rpc);
 	}
 
-	public KadInstance(RPCHandler rpc, String bindIP, int bindPort,	List<URI> bootstrapURI) {
+	public KadInstance(RPCHandler rpc, String bindIP, int bindPort, List<URI> bootstrapURI) {
 		this.rpc = rpc;
 		this.bindPort = bindPort;
 		this.bindIP = bindIP;
@@ -39,11 +39,11 @@ public class KadInstance implements Runnable {
 	}
 
 	public void run() {
-		if(bootstrapURI.isEmpty()){
+		if (bootstrapURI.isEmpty()) {
 			System.out.println("Node started successfully at " + bindIP + ":" + bindPort);
 			return;
 		}
-		networkInstance.bootstrap(bootstrapURI, new BootstrapListener(){
+		networkInstance.bootstrap(bootstrapURI, new BootstrapListener() {
 
 			@Override
 			public void onBootstrapFailure() {
@@ -52,12 +52,12 @@ public class KadInstance implements Runnable {
 
 			@Override
 			public void onBootstrapSuccess() {
-				System.out.println("Node started successfully at " + bindIP + ":" + bindPort);				
-			}			
+				System.out.println("Node started successfully at " + bindIP + ":" + bindPort);
+			}
 		});
 	}
-	
-	public URI getURI(){
+
+	public URI getURI() {
 		return rpc.getLocalURI();
 	}
 }

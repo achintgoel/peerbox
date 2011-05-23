@@ -37,9 +37,9 @@ import org.jboss.netty.handler.ssl.SslHandler;
 import org.jboss.netty.handler.stream.ChunkedFile;
 import org.jboss.netty.util.CharsetUtil;
 
-public class FileshareServer extends SimpleChannelUpstreamHandler{
+public class FileshareServer extends SimpleChannelUpstreamHandler {
 	protected FileShareManager manager;
-	
+
 	public FileshareServer(FileShareManager manager) {
 		super();
 		this.manager = manager;
@@ -47,48 +47,48 @@ public class FileshareServer extends SimpleChannelUpstreamHandler{
 
 	public void messageReceived(ChannelHandlerContext ctx, MessageEvent e) throws Exception {
 		HttpRequest request = (HttpRequest) e.getMessage();
-		if(request.getMethod() != GET) {
+		if (request.getMethod() != GET) {
 			sendError(ctx, METHOD_NOT_ALLOWED);
 			return;
 		}
-		
+
 		final String path = manager.getFilePath(new URI(request.getUri()));
-		if(path == null) {
+		if (path == null) {
 			sendError(ctx, FORBIDDEN);
 			return;
 		}
-		
+
 		File file = new File(path);
 		if (file.isHidden() || !file.exists()) {
 			sendError(ctx, NOT_FOUND);
 			return;
 		}
-		if(!file.isFile()) {
+		if (!file.isFile()) {
 			sendError(ctx, FORBIDDEN);
 			return;
 		}
-		
+
 		RandomAccessFile raf;
 		try {
 			raf = new RandomAccessFile(file, "r");
-			
+
 		} catch (FileNotFoundException fnfe) {
 			sendError(ctx, NOT_FOUND);
 			return;
 		}
 		long fileLength = raf.length();
-		
+
 		HttpResponse response = new DefaultHttpResponse(HTTP_1_1, OK);
 		setContentLength(response, fileLength);
-		
+
 		Channel ch = e.getChannel();
-		
-		//Write the initial line and the header
+
+		// Write the initial line and the header
 		ch.write(response);
-		
-		//Write the content
+
+		// Write the content
 		ChannelFuture writeFuture;
-		if(ch.getPipeline().get(SslHandler.class) != null){
+		if (ch.getPipeline().get(SslHandler.class) != null) {
 			writeFuture = ch.write(new ChunkedFile(raf, 0, fileLength, 8192));
 		} else {
 			// No encryption - use zero-copy
@@ -98,20 +98,20 @@ public class FileshareServer extends SimpleChannelUpstreamHandler{
 				public void operationComplete(ChannelFuture future) {
 					region.releaseExternalResources();
 				}
-				
+
 				public void operationProgressed(ChannelFuture future, long amount, long current, long total) {
 					System.out.printf("%s: %d / %d (+%d)%n", path, current, total, amount);
 				}
 			});
 		}
-		
-		//Decide whether to close the connection or not.
-		if(!isKeepAlive(request)) {
-			//close the connection when the whole content is written out
+
+		// Decide whether to close the connection or not.
+		if (!isKeepAlive(request)) {
+			// close the connection when the whole content is written out
 			writeFuture.addListener(ChannelFutureListener.CLOSE);
 		}
 	}
-	
+
 	public void exceptionCaught(ChannelHandlerContext ctx, ExceptionEvent e) throws Exception {
 		Channel ch = e.getChannel();
 		Throwable cause = e.getCause();
@@ -120,20 +120,17 @@ public class FileshareServer extends SimpleChannelUpstreamHandler{
 			return;
 		}
 		cause.printStackTrace();
-		if(ch.isConnected()) {
+		if (ch.isConnected()) {
 			sendError(ctx, INTERNAL_SERVER_ERROR);
 		}
 	}
 
-	
 	private void sendError(ChannelHandlerContext ctx, HttpResponseStatus status) {
-		         HttpResponse response = new DefaultHttpResponse(HTTP_1_1, status);
-		         response.setHeader(CONTENT_TYPE, "text/plain; charset=UTF-8");
-		         response.setContent(ChannelBuffers.copiedBuffer(
-		                 "Failure: " + status.toString() + "\r\n",
-		                 CharsetUtil.UTF_8));
-		 
-		         // Close the connection as soon as the error message is sent.
-		         ctx.getChannel().write(response).addListener(ChannelFutureListener.CLOSE);
-		     }
+		HttpResponse response = new DefaultHttpResponse(HTTP_1_1, status);
+		response.setHeader(CONTENT_TYPE, "text/plain; charset=UTF-8");
+		response.setContent(ChannelBuffers.copiedBuffer("Failure: " + status.toString() + "\r\n", CharsetUtil.UTF_8));
+
+		// Close the connection as soon as the error message is sent.
+		ctx.getChannel().write(response).addListener(ChannelFutureListener.CLOSE);
+	}
 }

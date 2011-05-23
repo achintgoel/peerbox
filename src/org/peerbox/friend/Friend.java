@@ -8,16 +8,18 @@ public class Friend {
 	protected URI address;
 	protected PublicKey pubKey;
 	protected transient FriendManager manager;
-	
+
 	public Friend(FriendManager fm, String al, URI address, PublicKey pub) {
 		manager = fm;
 		alias = al;
 		this.address = address;
 		pubKey = pub;
 	}
+
 	protected Friend() {
-		
+
 	}
+
 	public String getAlias() {
 		return alias;
 	}
@@ -40,14 +42,12 @@ public class Friend {
 		return pubKey;
 	}
 
-
 	public FriendManager getManager() {
 		return manager;
 	}
-	
+
 	public boolean isAlive() {
 		return address != null;
 	}
 
-	
 }

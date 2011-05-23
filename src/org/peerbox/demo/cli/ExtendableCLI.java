@@ -11,30 +11,30 @@ public class ExtendableCLI {
 	protected HashMap<String, CLIHandler> handlers;
 	protected BufferedReader reader;
 	protected AliasHandler aliasHandler;
-	
+
 	public ExtendableCLI() {
 		handlers = new HashMap<String, CLIHandler>();
 		reader = new BufferedReader(new InputStreamReader(System.in));
 		aliasHandler = new AliasHandler();
 	}
-	
-	public void registerHandler(String name, CLIHandler cliHandler){
+
+	public void registerHandler(String name, CLIHandler cliHandler) {
 		handlers.put(name, cliHandler);
 	}
-	
+
 	public void registerAlias(String alias, String actual) {
 		aliasHandler.registerAlias(alias, actual);
 		registerHandler(alias, aliasHandler);
 	}
-	
+
 	public void executeCommand(String args[]) {
 		if (args.length >= 1) {
 			CLIHandler handler = handlers.get(args[0]);
 			if (handler != null) {
 				try {
 					handler.handleCommand(args, this);
-				} catch(Exception e) {
-					e.printStackTrace(); //TODO: REMOVE
+				} catch (Exception e) {
+					e.printStackTrace(); // TODO: REMOVE
 					out().println("Error executing command.");
 				}
 			} else {
@@ -44,8 +44,8 @@ public class ExtendableCLI {
 			}
 		}
 	}
-	
-	public void start(){
+
+	public void start() {
 		while (true) {
 			try {
 				String line = reader.readLine();
@@ -57,22 +57,22 @@ public class ExtendableCLI {
 			}
 		}
 	}
-	
-	public PrintStream out(){
-		return System.out;		
+
+	public PrintStream out() {
+		return System.out;
 	}
-	
+
 	class AliasHandler implements CLIHandler {
 		protected HashMap<String, String[]> aliases;
-		
+
 		public AliasHandler() {
 			aliases = new HashMap<String, String[]>();
 		}
-		
+
 		public void registerAlias(String alias, String actual) {
 			aliases.put(alias, actual.split("\\s+"));
 		}
-		
+
 		@Override
 		public void handleCommand(String[] args, ExtendableCLI cli) {
 			String[] actual = aliases.get(args[0]);
@@ -80,12 +80,12 @@ public class ExtendableCLI {
 				cli.out().println("Invalid command.");
 				return;
 			}
-			
+
 			String[] result = Arrays.copyOf(actual, actual.length + args.length - 1);
 			System.arraycopy(args, 1, result, actual.length, args.length - 1);
 			cli.executeCommand(result);
 		}
-		
+
 	}
 
 }

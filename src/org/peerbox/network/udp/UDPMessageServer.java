@@ -30,11 +30,11 @@ public class UDPMessageServer extends SimpleChannelUpstreamHandler implements Me
 	final protected String protocol = "udp";
 	protected MessageSender messageSender;
 	protected int port;
-	
+
 	public UDPMessageServer(int port) {
 		this.port = port;
 	}
-	
+
 	protected UDPMessageSender startUDPServer() {
 		DatagramChannelFactory f = new NioDatagramChannelFactory(Executors.newCachedThreadPool());
 

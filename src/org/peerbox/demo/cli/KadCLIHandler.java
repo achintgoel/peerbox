@@ -40,33 +40,24 @@ public class KadCLIHandler implements CLIHandler {
 				cli.out().println("Illegal value for the Node ID");
 				return;
 			}
-			final Node pingNode = networkInstance.getBuckets()
-					.findNodeByIdentifier(
-							Identifier.fromBytes(ID.toByteArray()));
+			final Node pingNode = networkInstance.getBuckets().findNodeByIdentifier(
+					Identifier.fromBytes(ID.toByteArray()));
 			if (pingNode == null) {
 				cli.out().println("The node ID does not exist in the buckets");
 			} else {
-				networkInstance.ping(networkInstance.getBuckets()
-						.findNodeByIdentifier(
-								Identifier.fromBytes(ID.toByteArray())),
-						new ResponseListener<PingResponse>() {
+				networkInstance.ping(networkInstance.getBuckets().findNodeByIdentifier(
+						Identifier.fromBytes(ID.toByteArray())), new ResponseListener<PingResponse>() {
 
-							@Override
-							public void onFailure() {
-								cli.out().println(
-										"Ping to node at "
-												+ pingNode.getNetworkURI()
-												+ " FAILED");
-							}
+					@Override
+					public void onFailure() {
+						cli.out().println("Ping to node at " + pingNode.getNetworkURI() + " FAILED");
+					}
 
-							@Override
-							public void onResponseReceived(PingResponse response) {
-								cli.out().println(
-										"Ping to node at "
-												+ pingNode.getIdentifier()
-												+ " is successful");
-							}
-						});
+					@Override
+					public void onResponseReceived(PingResponse response) {
+						cli.out().println("Ping to node at " + pingNode.getIdentifier() + " is successful");
+					}
+				});
 			}
 		} else if (args[1].equalsIgnoreCase("findnode")) {
 			if (args.length != 3) {
@@ -80,60 +71,54 @@ public class KadCLIHandler implements CLIHandler {
 				cli.out().println("Illegal value for the Node ID");
 				return;
 			}
-			networkInstance.findNode(Identifier.fromBytes(ID.toByteArray()),
-					new ResponseListener<FindNodeResponse>() {
+			networkInstance.findNode(Identifier.fromBytes(ID.toByteArray()), new ResponseListener<FindNodeResponse>() {
 
-						@Override
-						public void onFailure() {
-							cli.out().println("Did not find node");
-						}
+				@Override
+				public void onFailure() {
+					cli.out().println("Did not find node");
+				}
 
-						@Override
-						public void onResponseReceived(FindNodeResponse response) {
-							if (response.isFound()) {
-								cli.out().println(
-										"Found Node at: "
-												+ response.getFoundNode()
-														.getNetworkURI());
-							} else {
-								cli.out().println("Did not find Node");
-							}/*
-							cli.out().println("Nearest Nodes:-");
-							for (Node node : response.getNearbyNodes()) {
-								cli.out().println("\t" + node.getNetworkURI());
-							}*/
-						}
-					});
+				@Override
+				public void onResponseReceived(FindNodeResponse response) {
+					if (response.isFound()) {
+						cli.out().println("Found Node at: " + response.getFoundNode().getNetworkURI());
+					} else {
+						cli.out().println("Did not find Node");
+					}/*
+					 * cli.out().println("Nearest Nodes:-"); for (Node node :
+					 * response.getNearbyNodes()) { cli.out().println("\t" +
+					 * node.getNetworkURI()); }
+					 */
+				}
+			});
 		} else if (args[1].equalsIgnoreCase("findvalue")) {
 			if (args.length != 4) {
 				printHelp(cli.out());
 				return;
 			}
-			networkInstance.findValue(new Key(args[2], args[3]),
-					new ResponseListener<FindValueResponse>() {
+			networkInstance.findValue(new Key(args[2], args[3]), new ResponseListener<FindValueResponse>() {
 
-						@Override
-						public void onFailure() {
-							cli.out().println("Did not find the key key pair");
-						}
+				@Override
+				public void onFailure() {
+					cli.out().println("Did not find the key key pair");
+				}
 
-						@Override
-						public void onResponseReceived(
-								FindValueResponse response) {
-							if (response.isFound()) {
-								cli.out().println("Found Values are:");
-								for (Value value: response.getFoundValue()){
-									cli.out().println("\t" + value.getValue() + "\t" + new Date(value.getPublicationTime()));
-								}
-							} else {
-								cli.out().println("Did not find the key pair");
-							}/*
-							cli.out().println("Nearest Nodes:-");
-							for (Node node : response.getNearbyNodes()) {
-								cli.out().println("\t" + node.getNetworkURI());
-							}*/
+				@Override
+				public void onResponseReceived(FindValueResponse response) {
+					if (response.isFound()) {
+						cli.out().println("Found Values are:");
+						for (Value value : response.getFoundValue()) {
+							cli.out().println("\t" + value.getValue() + "\t" + new Date(value.getPublicationTime()));
 						}
-					});
+					} else {
+						cli.out().println("Did not find the key pair");
+					}/*
+					 * cli.out().println("Nearest Nodes:-"); for (Node node :
+					 * response.getNearbyNodes()) { cli.out().println("\t" +
+					 * node.getNetworkURI()); }
+					 */
+				}
+			});
 
 		} else if (args[1].equalsIgnoreCase("store")) {
 			if (args.length != 5) {
@@ -143,23 +128,23 @@ public class KadCLIHandler implements CLIHandler {
 			String key1 = args[2];
 			String key2 = args[3];
 			String value = args[4];
-			networkInstance.storeValue(new Key(key1, key2), new Value(value), true, new ResponseListener<StoreResponse>(){
-				
-				@Override
-				public void onFailure() {
-					cli.out().println("Could not store the value");
-				}
+			networkInstance.storeValue(new Key(key1, key2), new Value(value), true,
+					new ResponseListener<StoreResponse>() {
 
-				@Override
-				public void onResponseReceived(StoreResponse response) {
-					if(response.successful){
-						cli.out().println("Value stored successfully");
-					}
-					else{
-						cli.out().println("Could not store the value");							
-					}
-				}				
-			});
+						@Override
+						public void onFailure() {
+							cli.out().println("Could not store the value");
+						}
+
+						@Override
+						public void onResponseReceived(StoreResponse response) {
+							if (response.successful) {
+								cli.out().println("Value stored successfully");
+							} else {
+								cli.out().println("Could not store the value");
+							}
+						}
+					});
 
 		} else if (args[1].equalsIgnoreCase("buckets")) {
 			networkInstance.getBuckets().print(cli.out());

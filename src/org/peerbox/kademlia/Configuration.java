@@ -15,6 +15,8 @@ public class Configuration {
 	final static int refreshInterval = 900;
 	final static int minExpiry = 10;
 	final static int maxExpiry = 60;
+	final static int replicateInterval = 50;
+	final static int republishInterval = 120;
 	
 	public int getK() {
 		return k;
@@ -38,5 +40,13 @@ public class Configuration {
 
 	public int getMaxExpiry() {
 		return maxExpiry;
+	}
+	
+	public int getReplicateInterval() {
+		return replicateInterval;
+	}
+	
+	public int getRepublishInterval() {
+		return republishInterval;
 	}
 }

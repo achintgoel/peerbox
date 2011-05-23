@@ -6,24 +6,24 @@ import org.peerbox.kademlia.Value;
 
 public class StoreRequest extends Request {
 	protected Key key;
-	protected Value value; 
+	protected Value value;
 	final static public String COMMAND = "store";
-	
+
 	protected StoreRequest() {
-		
+
 	}
-	
-	public StoreRequest(Identifier myNodeID, Key key, Value value){
+
+	public StoreRequest(Identifier myNodeID, Key key, Value value) {
 		this.myNodeId = myNodeID;
 		this.key = key;
 		this.value = value;
 		this.command = COMMAND;
 	}
-	
-	public Key getKey(){
+
+	public Key getKey() {
 		return key;
 	}
-	
+
 	public Value getValue() {
 		return value;
 	}

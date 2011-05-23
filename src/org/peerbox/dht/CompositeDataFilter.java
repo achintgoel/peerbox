@@ -13,7 +13,7 @@ public class CompositeDataFilter implements MapDataFilter<CompositeKey<String, S
 	public CompositeDataFilter() {
 		dataFilters = new HashMap<String, List<MapDataFilter<String, String>>>();
 	}
-	
+
 	public void registerDataFilter(String primaryKey, MapDataFilter<String, String> dataFilter) {
 		List<MapDataFilter<String, String>> dataFilterList = dataFilters.get(primaryKey);
 		if (dataFilterList == null) {
@@ -22,7 +22,7 @@ public class CompositeDataFilter implements MapDataFilter<CompositeKey<String, S
 		}
 		dataFilterList.add(dataFilter);
 	}
-	
+
 	public boolean isValid(CompositeKey<String, String> key, String value) {
 		List<MapDataFilter<String, String>> dataFilterList = dataFilters.get(key.getPrimaryKey());
 		if (dataFilterList != null) {

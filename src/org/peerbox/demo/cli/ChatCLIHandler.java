@@ -8,7 +8,7 @@ public class ChatCLIHandler implements CLIHandler {
 	public ChatCLIHandler(ChatManager chat) {
 		this.chat = chat;
 	}
-	
+
 	@Override
 	public void handleCommand(String[] args, ExtendableCLI cli) {
 		if (args.length < 3) {
