@@ -281,7 +281,10 @@ public class NetworkInstance implements Kademlia {
 		BootstrapProcess.execute(this, friends, bootstrapListener);
 	}
 
-	public void republish(Key key, Value value) {
+	public void republish(Key key, Value value, boolean storeLocal) {
+		if(storeLocal){
+			storeValueLocal(key, value, true);
+		}
 		StoreRequest request = new StoreRequest(getLocalNodeIdentifier(), key, value);
 		StoreProcess.execute(this, request, new ResponseListener<StoreResponse>() {
 

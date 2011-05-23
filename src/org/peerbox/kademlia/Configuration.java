@@ -14,9 +14,9 @@ public class Configuration {
 	final static int MIN_PING_INTERVAL_SECS = 60;
 	final static int refreshInterval = 900;
 	final static int minExpiry = 10;
-	final static int maxExpiry = 60;
-	final static int replicateInterval = 50;
-	final static int republishInterval = 120;
+	final static int maxExpiry = 40;
+	final static int replicateInterval = 30;
+	final static int republishInterval = 90;
 	
 	public int getK() {
 		return k;

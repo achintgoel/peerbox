@@ -59,7 +59,10 @@ public class LocalDataStore {
 			if (valueMap.containsKey(value.getValue())) {
 				Calendar originaldate = valueMap.get(value.getValue()).publishDate;
 				original = valueMap.get(value.getValue()).original;
-				if (originaldate == null || originaldate.before(value.getPublicationTime())) {
+				Calendar newDate = Calendar.getInstance();
+				newDate.setTimeInMillis(value.getPublicationTime());
+				if (originaldate == null || originaldate.before(newDate)) {
+					valueMap.get(value.getValue()).republishTask.cancel();
 					valueMap.remove(value.getValue());
 				} else {
 					return;
@@ -76,7 +79,7 @@ public class LocalDataStore {
 			timerTask = new TimerTask() {
 				@Override
 				public void run() {
-					networkInstance.republish((Key) ckey, new Value(value.getValue()));
+					networkInstance.republish((Key) ckey, new Value(value.getValue()), true);
 				}
 			};
 			valueMap.put(value.getValue(), new StoredValueInfo(publishDate, null, true, timerTask));
@@ -86,7 +89,7 @@ public class LocalDataStore {
 			timerTask = new TimerTask() {
 				@Override
 				public void run() {
-					networkInstance.republish((Key) ckey, value);
+					networkInstance.republish((Key) ckey, value, false);
 				}
 			};
 			valueMap.put(value.getValue(), new StoredValueInfo(publishDate, expiryDate, false, timerTask));
@@ -125,6 +128,7 @@ public class LocalDataStore {
 			if (entry.getValue().original || (entry.getValue().expiryDate.after(now))) {
 				returnList.add(new Value(entry.getKey(), entry.getValue().publishDate.getTimeInMillis()));
 			} else if (!entry.getValue().original) {
+				entry.getValue().republishTask.cancel();
 				// System.out.println("removing "+ entry.getKey());
 				it.remove();
 			}
