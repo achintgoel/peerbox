@@ -63,7 +63,7 @@ public class FileShareCLIHandler implements CLIHandler {
 				System.out.println("friend is offline");
 				return;
 			}
-			if (friend != null) {
+			{
 				String relativePath = "";
 				if (args.length == 4) {
 					relativePath = args[3];
@@ -98,8 +98,6 @@ public class FileShareCLIHandler implements CLIHandler {
 					}
 
 				});
-			} else {
-				cli.out().println("The friend " + alias + " does not exist");
 			}
 		} else if (function.equalsIgnoreCase("get")) {
 			if (args.length != 4) {

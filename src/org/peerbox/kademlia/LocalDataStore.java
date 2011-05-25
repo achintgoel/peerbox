@@ -1,16 +1,18 @@
 package org.peerbox.kademlia;
 
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Timer;
 import java.util.TimerTask;
-import java.util.Map.Entry;
 
 import org.peerbox.dht.CompositeKey;
+import org.peerbox.kademlia.messages.StoreResponse;
 
 /**
  * Dump data storage TODO: Replace with standard map. NOTE: This does NOT do any
@@ -47,8 +49,7 @@ public class LocalDataStore {
 		networkInstance = ni;
 	}
 
-	public void put(final CompositeKey<String, String> ckey, final Value value, boolean originalPublisher,
-			long expiryInterval) {
+	public void put(final Key ckey, final Value value, boolean originalPublisher, long expiryInterval) {
 		if (!originalPublisher && (value.getPublicationTime() < (System.currentTimeMillis() - expiryInterval))) {
 			return;
 		}
@@ -57,12 +58,13 @@ public class LocalDataStore {
 		if (dataMap.containsKey(ckey)) {
 			valueMap = dataMap.get(ckey);
 			if (valueMap.containsKey(value.getValue())) {
-				Calendar originaldate = valueMap.get(value.getValue()).publishDate;
-				original = valueMap.get(value.getValue()).original;
+				StoredValueInfo originalValueInfo = valueMap.get(value.getValue());
+				Calendar originaldate = originalValueInfo.publishDate;
+				original = originalValueInfo.original;
 				Calendar newDate = Calendar.getInstance();
 				newDate.setTimeInMillis(value.getPublicationTime());
 				if (originaldate == null || originaldate.before(newDate)) {
-					valueMap.get(value.getValue()).republishTask.cancel();
+					originalValueInfo.republishTask.cancel();
 					valueMap.remove(value.getValue());
 				} else {
 					return;
@@ -79,7 +81,20 @@ public class LocalDataStore {
 			timerTask = new TimerTask() {
 				@Override
 				public void run() {
-					networkInstance.republish((Key) ckey, new Value(value.getValue()), true);
+					networkInstance.storeValue(ckey, new Value(value.getValue()),
+							new ResponseListener<StoreResponse>() {
+								@Override
+								public void onResponseReceived(StoreResponse response) {
+									// do nothing
+								}
+
+								@Override
+								public void onFailure() {
+									// do nothing
+
+								}
+
+							});
 				}
 			};
 			valueMap.put(value.getValue(), new StoredValueInfo(publishDate, null, true, timerTask));
@@ -89,7 +104,20 @@ public class LocalDataStore {
 			timerTask = new TimerTask() {
 				@Override
 				public void run() {
-					networkInstance.republish((Key) ckey, value, false);
+					networkInstance.storeValueNetwork(ckey, Arrays.asList(new Value(value.getValue())),
+							new ResponseListener<StoreResponse>() {
+								@Override
+								public void onResponseReceived(StoreResponse response) {
+									// do nothing
+								}
+
+								@Override
+								public void onFailure() {
+									// do nothing
+
+								}
+
+							});
 				}
 			};
 			valueMap.put(value.getValue(), new StoredValueInfo(publishDate, expiryDate, false, timerTask));
@@ -99,8 +127,7 @@ public class LocalDataStore {
 					.getConfiguration().getRepublishInterval() : networkInstance.getConfiguration()
 					.getReplicateInterval()));
 		} catch (IllegalStateException e) {
-			// This is OK; timer was already canceled because the response beat
-			// setting
+			// This is OK; timer was already canceled
 		}
 	}
 

@@ -1,6 +1,5 @@
 package org.peerbox.kademlia.messages;
 
-import java.util.LinkedList;
 import java.util.List;
 
 import org.peerbox.kademlia.Node;

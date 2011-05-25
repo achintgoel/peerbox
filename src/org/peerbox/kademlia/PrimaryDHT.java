@@ -1,6 +1,5 @@
 package org.peerbox.kademlia;
 
-import java.util.LinkedList;
 import java.util.List;
 
 import org.peerbox.dht.DistributedMap;
@@ -55,7 +54,7 @@ class PrimaryDHT implements DistributedMap<Key, Value> {
 	 */
 	@Override
 	public void put(Key key, Value value) {
-		networkInstance.storeValue(key, value, true, new ResponseListener<StoreResponse>() {
+		networkInstance.storeValue(key, value, new ResponseListener<StoreResponse>() {
 			@Override
 			public void onResponseReceived(StoreResponse response) {
 

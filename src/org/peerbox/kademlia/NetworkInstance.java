@@ -7,7 +7,6 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.peerbox.dht.CompositeDataFilter;
-import org.peerbox.dht.CompositeKey;
 import org.peerbox.dht.DistributedMap;
 import org.peerbox.dht.MapDataFilter;
 import org.peerbox.dht.ValueListener;
@@ -137,23 +136,22 @@ public class NetworkInstance implements Kademlia {
 		return buckets;
 	}
 
-	public void findNode(Identifier targetNodeId, boolean stopOnFound,
-			final ResponseListener<FindNodeResponse> responseListener) {
+	void findNode(Identifier targetNodeId, boolean stopOnFound, final ResponseListener<FindNodeResponse> responseListener) {
 		FindNodeRequest request = new FindNodeRequest(getLocalNodeIdentifier(), targetNodeId);
-		FindProcess.execute(this, request, stopOnFound, FindNodeResponse.class, new FindResponseListener<FindNodeResponse>(){
+		FindProcess.execute(this, request, stopOnFound, FindNodeResponse.class,
+				new FindResponseListener<FindNodeResponse>() {
 
-			@Override
-			public void onFailure() {
-				responseListener.onFailure();
-			}
+					@Override
+					public void onFailure() {
+						responseListener.onFailure();
+					}
 
+					@Override
+					public void onResponseReceived(FindNodeResponse response) {
+						responseListener.onResponseReceived(response);
+					}
 
-			@Override
-			public void onResponseReceived(FindNodeResponse response) {
-				responseListener.onResponseReceived(response);
-			}
-			
-		});
+				});
 	}
 
 	public void findNode(Identifier targetNodeId, ResponseListener<FindNodeResponse> responseListener) {
@@ -194,70 +192,87 @@ public class NetworkInstance implements Kademlia {
 		}
 
 		FindValueRequest request = new FindValueRequest(getLocalNodeIdentifier(), targetKey);
-		FindProcess.execute(this, request, true, FindValueResponse.class, new FindResponseListener<FindValueResponse>() {
+		FindProcess.execute(this, request, true, FindValueResponse.class,
+				new FindResponseListener<FindValueResponse>() {
 
-			@Override
-			public void onResponseReceived(FindValueResponse response) {
-				if (response.isFound()) {
-					List<Value> foundValues = response.getFoundValue();
-					storeValueLocal(targetKey, foundValues, false);
-					getLocalDataStore().updateLastRefreshed(targetKey);
-					foundValues = getLocalDataStore().get(targetKey);
-					if (foundValues == null || foundValues.isEmpty()) {
-						responseListener.onResponseReceived(new FindValueResponse(response.getNearbyNodes()));
-						return;
+					@Override
+					public void onResponseReceived(FindValueResponse response) {
+						if (response.isFound()) {
+							List<Value> foundValues = response.getFoundValue();
+							storeValueLocal(targetKey, foundValues, false);
+							getLocalDataStore().updateLastRefreshed(targetKey);
+							foundValues = getLocalDataStore().get(targetKey);
+							if (foundValues == null || foundValues.isEmpty()) {
+								responseListener.onResponseReceived(new FindValueResponse(response.getNearbyNodes()));
+								return;
+							}
+							responseListener.onResponseReceived(new FindValueResponse(foundValues, response
+									.getNearbyNodes()));
+						} else {
+							responseListener.onResponseReceived(response);
+						}
 					}
-					responseListener.onResponseReceived(new FindValueResponse(foundValues, response.getNearbyNodes()));
-				} else {
-					responseListener.onResponseReceived(response);
-				}
-			}
-
-			@Override
-			public void onFailure() {
-				responseListener.onFailure();
-			}
-			
-			@Override
-			public void onFindComplete(Node nearestNotFound, FindValueResponse response){
-				StoreRequest request = new StoreRequest(localIdentifier, targetKey, response.getFoundValue());
-				sendRequestRPC(nearestNotFound, request, StoreResponse.class, new ResponseListener<StoreResponse>() {
 
 					@Override
 					public void onFailure() {
-						
+						responseListener.onFailure();
 					}
 
 					@Override
-					public void onResponseReceived(StoreResponse response) {
-						
-					}
-					
-				});
-			}
+					public void onFindComplete(Node nearestNotFound, FindValueResponse response) {
+						StoreRequest request = new StoreRequest(localIdentifier, targetKey, response.getFoundValue());
+						sendRequestRPC(nearestNotFound, request, StoreResponse.class,
+								new ResponseListener<StoreResponse>() {
 
-		});
+									@Override
+									public void onFailure() {
+
+									}
+
+									@Override
+									public void onResponseReceived(StoreResponse response) {
+
+									}
+
+								});
+					}
+
+				});
 	}
 
 	/**
 	 * Stores the Key/Value pair in the local data store and then replicates the
 	 * data across the network. Verifies valid according to data filters prior
 	 * to storing. Calls failure callback if invalid. Replication is done via
-	 * sending
+	 * sending.
 	 * 
-	 * TODO: Expiration and re-publication of stored values
+	 * @param key
+	 * @param value
+	 * @param responseListener
+	 */
+	public void storeValue(Key key, List<Value> value, ResponseListener<StoreResponse> responseListener) {
+		// TODO: do not store values more than 24 hours old
+		if (!storeValueLocal(key, value, true)) {
+			responseListener.onFailure();
+			return;
+		}
+		storeValueNetwork(key, value, responseListener);
+	}
+
+	public void storeValue(Key key, Value value, ResponseListener<StoreResponse> responseListener) {
+		storeValue(key, Arrays.asList(value), responseListener);
+	}
+
+	/**
+	 * Stores the Key/Value pair in the network.
+	 * 
 	 * 
 	 * @param key
 	 * @param value
 	 * @param responseListener
 	 * @param publish
 	 */
-	public void storeValue(Key key, Value value, boolean publish, ResponseListener<StoreResponse> responseListener) {
-		// TODO: do not store values more than 24 hours old
-		if (!storeValueLocal(key, value, true)) {
-			responseListener.onFailure();
-			return;
-		}
+	void storeValueNetwork(Key key, List<Value> value, ResponseListener<StoreResponse> responseListener) {
 		StoreRequest request = new StoreRequest(getLocalNodeIdentifier(), key, value);
 		StoreProcess.execute(this, request, responseListener);
 	}
@@ -269,11 +284,11 @@ public class NetworkInstance implements Kademlia {
 	 * @param value
 	 * @return Whether store succeeded (filtering passed)
 	 */
-	public boolean storeValueLocal(Key key, List<Value> valueList, boolean original) {
+	boolean storeValueLocal(Key key, List<Value> valueList, boolean original) {
 		boolean retval = true;
-		for(Value value : valueList){
+		for (Value value : valueList) {
 			if (!compositeDataFilter.isValid(key, value.getValue())) {
-				retval = false;;
+				retval = false;
 			}
 			int closerNodes = buckets.getCloserNodeCount(key);
 			int expiryTime = configuration.getMaxExpiry();
@@ -286,8 +301,8 @@ public class NetworkInstance implements Kademlia {
 		}
 		return retval;
 	}
-	
-	public boolean storeValueLocal(Key key, Value value, boolean original){
+
+	public boolean storeValueLocal(Key key, Value value, boolean original) {
 		return storeValueLocal(key, Arrays.asList(value), original);
 	}
 
@@ -316,26 +331,5 @@ public class NetworkInstance implements Kademlia {
 
 	public void bootstrap(List<URI> friends, BootstrapListener bootstrapListener) {
 		BootstrapProcess.execute(this, friends, bootstrapListener);
-	}
-
-	public void republish(Key key, Value value, boolean storeLocal) {
-		if(storeLocal){
-			storeValueLocal(key, value, true);
-		}
-		StoreRequest request = new StoreRequest(getLocalNodeIdentifier(), key, value);
-		StoreProcess.execute(this, request, new ResponseListener<StoreResponse>() {
-
-			@Override
-			public void onFailure() {
-				return;
-			}
-
-			@Override
-			public void onResponseReceived(StoreResponse response) {
-				return;
-			}
-
-		});
-
 	}
 }

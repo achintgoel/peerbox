@@ -24,15 +24,11 @@ public interface Kademlia {
 
 	DistributedMap<String, Value> getSingleMap(String mapKey);
 
-	void findNode(Identifier targetNodeId, boolean stopOnFound, ResponseListener<FindNodeResponse> responseListener);
-
 	void findNode(Identifier targetNodeId, ResponseListener<FindNodeResponse> responseListener);
 
 	void findValue(Key targetKey, ResponseListener<FindValueResponse> responseListener);
-
-	void storeValue(Key key, Value value, boolean publish, ResponseListener<StoreResponse> responseListener);
-
-	boolean storeValueLocal(Key key, List<Value> value, boolean original);
+	
+	void storeValue(Key key, Value value, ResponseListener<StoreResponse> responseListener);
 
 	void ping(Node targetNode, ResponseListener<PingResponse> responseListener);
 

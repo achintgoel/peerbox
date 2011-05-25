@@ -45,19 +45,20 @@ public class KadCLIHandler implements CLIHandler {
 			if (pingNode == null) {
 				cli.out().println("The node ID does not exist in the buckets");
 			} else {
-				networkInstance.ping(networkInstance.getBuckets().findNodeByIdentifier(
-						Identifier.fromBytes(ID.toByteArray())), new ResponseListener<PingResponse>() {
+				networkInstance.ping(
+						networkInstance.getBuckets().findNodeByIdentifier(Identifier.fromBytes(ID.toByteArray())),
+						new ResponseListener<PingResponse>() {
 
-					@Override
-					public void onFailure() {
-						cli.out().println("Ping to node at " + pingNode.getNetworkURI() + " FAILED");
-					}
+							@Override
+							public void onFailure() {
+								cli.out().println("Ping to node at " + pingNode.getNetworkURI() + " FAILED");
+							}
 
-					@Override
-					public void onResponseReceived(PingResponse response) {
-						cli.out().println("Ping to node at " + pingNode.getIdentifier() + " is successful");
-					}
-				});
+							@Override
+							public void onResponseReceived(PingResponse response) {
+								cli.out().println("Ping to node at " + pingNode.getIdentifier() + " is successful");
+							}
+						});
 			}
 		} else if (args[1].equalsIgnoreCase("findnode")) {
 			if (args.length != 3) {
@@ -128,23 +129,22 @@ public class KadCLIHandler implements CLIHandler {
 			String key1 = args[2];
 			String key2 = args[3];
 			String value = args[4];
-			networkInstance.storeValue(new Key(key1, key2), new Value(value), true,
-					new ResponseListener<StoreResponse>() {
+			networkInstance.storeValue(new Key(key1, key2), new Value(value), new ResponseListener<StoreResponse>() {
 
-						@Override
-						public void onFailure() {
-							cli.out().println("Could not store the value");
-						}
+				@Override
+				public void onFailure() {
+					cli.out().println("Could not store the value");
+				}
 
-						@Override
-						public void onResponseReceived(StoreResponse response) {
-							if (response.successful) {
-								cli.out().println("Value stored successfully");
-							} else {
-								cli.out().println("Could not store the value");
-							}
-						}
-					});
+				@Override
+				public void onResponseReceived(StoreResponse response) {
+					if (response.successful) {
+						cli.out().println("Value stored successfully");
+					} else {
+						cli.out().println("Could not store the value");
+					}
+				}
+			});
 
 		} else if (args[1].equalsIgnoreCase("buckets")) {
 			networkInstance.getBuckets().print(cli.out());
