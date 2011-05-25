@@ -70,7 +70,7 @@ public class BootstrapProcess {
 							}
 
 							public void onResponseReceived(FindNodeResponse response) {
-								callback.onBootstrapSuccess();
+								callback.onBootstrapSuccess(ni);
 							}
 						});
 					}

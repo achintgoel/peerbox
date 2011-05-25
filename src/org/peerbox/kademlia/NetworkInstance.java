@@ -40,8 +40,9 @@ public class NetworkInstance implements Kademlia {
 	protected final CompositeDataFilter compositeDataFilter;
 	protected final PrimaryDHT primaryDHT;
 	protected final Configuration configuration;
+	protected boolean bootstrapped;
 
-	public NetworkInstance(RPCHandler rpcHandler) {
+	protected NetworkInstance(RPCHandler rpcHandler) {
 		configuration = new Configuration();
 		gson = new Gson();
 		rpcServiceName = "kad";
@@ -53,6 +54,7 @@ public class NetworkInstance implements Kademlia {
 		// future restarts
 		buckets = new Buckets(this);
 		primaryDHT = new PrimaryDHT(this);
+		bootstrapped = false;
 	}
 
 	// TODO: this constructor only for testing of buckets
@@ -67,6 +69,7 @@ public class NetworkInstance implements Kademlia {
 		// future restarts
 		buckets = new Buckets(this);
 		primaryDHT = new PrimaryDHT(this);
+		bootstrapped = false;
 	}
 
 	public void registerDataFilter(String primaryKey, MapDataFilter<String, String> dataFilter) {
@@ -329,7 +332,12 @@ public class NetworkInstance implements Kademlia {
 		});
 	}
 
-	public void bootstrap(List<URI> friends, BootstrapListener bootstrapListener) {
+	protected void bootstrap(List<URI> friends, BootstrapListener bootstrapListener) {
 		BootstrapProcess.execute(this, friends, bootstrapListener);
+	}
+	
+	public static void startNetworkInstance(RPCHandler rpcHandler, List<URI> friends, BootstrapListener bootstrapListener) {
+		NetworkInstance ni = new NetworkInstance(rpcHandler);
+		ni.bootstrap(friends, bootstrapListener);
 	}
 }

@@ -5,6 +5,7 @@ import java.net.URISyntaxException;
 import java.util.List;
 
 import org.peerbox.kademlia.BootstrapListener;
+import org.peerbox.kademlia.Kademlia;
 import org.peerbox.kademlia.NetworkInstance;
 import org.peerbox.network.udp.UDPMessageServer;
 import org.peerbox.rpc.RPCHandler;
@@ -15,7 +16,7 @@ public class KadInstance implements Runnable {
 	private int bindPort;
 	private RPCHandler rpc;
 	private List<URI> bootstrapURI;
-	private NetworkInstance networkInstance;
+	private Kademlia networkInstance;
 
 	public KadInstance(String bindIP, int bindPort, List<URI> bootstrapURI) {
 		this.bindIP = bindIP;
@@ -27,7 +28,6 @@ public class KadInstance implements Runnable {
 		} catch (URISyntaxException e) {
 			System.out.println("Illegal URI Syntax");
 		}
-		networkInstance = new NetworkInstance(rpc);
 	}
 
 	public KadInstance(RPCHandler rpc, String bindIP, int bindPort, List<URI> bootstrapURI) {
@@ -35,7 +35,6 @@ public class KadInstance implements Runnable {
 		this.bindPort = bindPort;
 		this.bindIP = bindIP;
 		this.bootstrapURI = bootstrapURI;
-		networkInstance = new NetworkInstance(rpc);
 	}
 
 	public void run() {
@@ -43,7 +42,7 @@ public class KadInstance implements Runnable {
 			System.out.println("Node started successfully at " + bindIP + ":" + bindPort);
 			return;
 		}
-		networkInstance.bootstrap(bootstrapURI, new BootstrapListener() {
+		NetworkInstance.startNetworkInstance(this.rpc, bootstrapURI, new BootstrapListener() {
 
 			@Override
 			public void onBootstrapFailure() {
@@ -51,7 +50,8 @@ public class KadInstance implements Runnable {
 			}
 
 			@Override
-			public void onBootstrapSuccess() {
+			public void onBootstrapSuccess(Kademlia kad) {
+				networkInstance = kad;
 				System.out.println("Node started successfully at " + bindIP + ":" + bindPort);
 			}
 		});

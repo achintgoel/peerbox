@@ -32,6 +32,5 @@ public interface Kademlia {
 
 	void ping(Node targetNode, ResponseListener<PingResponse> responseListener);
 
-	void bootstrap(List<URI> friends, BootstrapListener bootstrapListener);
 
 }

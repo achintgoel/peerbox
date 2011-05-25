@@ -6,7 +6,7 @@ package org.peerbox.kademlia;
  */
 
 public interface BootstrapListener {
-	void onBootstrapSuccess();
+	void onBootstrapSuccess(Kademlia networkInstance);
 
 	void onBootstrapFailure();
 }

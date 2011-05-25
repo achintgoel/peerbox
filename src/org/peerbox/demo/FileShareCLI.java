@@ -14,6 +14,7 @@ import org.peerbox.demo.cli.KadCLIHandler;
 import org.peerbox.fileshare.FileShareManager;
 import org.peerbox.friend.FriendManager;
 import org.peerbox.kademlia.BootstrapListener;
+import org.peerbox.kademlia.Kademlia;
 import org.peerbox.kademlia.NetworkInstance;
 import org.peerbox.network.udp.UDPMessageServer;
 import org.peerbox.rpc.RPCHandler;
@@ -26,7 +27,7 @@ public class FileShareCLI {
 	private static String bindIP;
 	private static int bindPort;
 	private static List<URI> bootstrapURI = new LinkedList<URI>();
-	private static NetworkInstance networkInstance;
+	private static Kademlia networkInstance;
 	private static FriendManager friendManager;
 	private static FileShareManager fileShareManager;
 
@@ -86,17 +87,18 @@ public class FileShareCLI {
 				System.out.println("Illegal URI syntax");
 			}
 		}
-		networkInstance = new NetworkInstance(rpc);
 		if (!bootstrapURI.isEmpty()) {
-			networkInstance.bootstrap(bootstrapURI, new BootstrapListener() {
+			NetworkInstance.startNetworkInstance(rpc, bootstrapURI, new BootstrapListener() {
 
 				@Override
 				public void onBootstrapFailure() {
 					System.out.println("Peerbox could not start");
+					System.exit(0);
 				}
 
 				@Override
-				public void onBootstrapSuccess() {
+				public void onBootstrapSuccess(Kademlia kad) {
+					networkInstance = kad;
 					System.out.println("Welcome to peerbox");
 				}
 

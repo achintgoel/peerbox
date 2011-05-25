@@ -5,8 +5,8 @@ import java.math.BigInteger;
 import java.util.Date;
 
 import org.peerbox.kademlia.Identifier;
+import org.peerbox.kademlia.Kademlia;
 import org.peerbox.kademlia.Key;
-import org.peerbox.kademlia.NetworkInstance;
 import org.peerbox.kademlia.Node;
 import org.peerbox.kademlia.ResponseListener;
 import org.peerbox.kademlia.Value;
@@ -16,9 +16,9 @@ import org.peerbox.kademlia.messages.PingResponse;
 import org.peerbox.kademlia.messages.StoreResponse;
 
 public class KadCLIHandler implements CLIHandler {
-	protected NetworkInstance networkInstance;
+	protected Kademlia networkInstance;
 
-	public KadCLIHandler(NetworkInstance networkInstance) {
+	public KadCLIHandler(Kademlia networkInstance) {
 		this.networkInstance = networkInstance;
 	}
 
