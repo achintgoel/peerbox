@@ -32,7 +32,7 @@ public interface Kademlia {
 
 	void storeValue(Key key, Value value, boolean publish, ResponseListener<StoreResponse> responseListener);
 
-	boolean storeValueLocal(Key key, Value value, boolean original);
+	boolean storeValueLocal(Key key, List<Value> value, boolean original);
 
 	void ping(Node targetNode, ResponseListener<PingResponse> responseListener);
 

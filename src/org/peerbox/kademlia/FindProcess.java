@@ -39,7 +39,7 @@ public class FindProcess<FRT extends FindResponse> {
 	// send store to the nearest nodes that do not find the value
 
 	private FindProcess(NetworkInstance ni, FindRequest request, boolean stopOnFound, Class<FRT> responseClass,
-			ResponseListener<FRT> responseListener) {
+			FindResponseListener<FRT> responseListener) {
 		networkInstance = ni;
 		maxRequests = networkInstance.getConfiguration().getAlpha() * networkInstance.getConfiguration().getAlpha();
 		searchSetSize = networkInstance.getConfiguration().getK() * 2;
@@ -72,7 +72,7 @@ public class FindProcess<FRT extends FindResponse> {
 	 *            callback
 	 */
 	public static <T extends FindResponse> void execute(NetworkInstance ni, FindRequest request, boolean stopOnFound,
-			Class<T> responseClass, ResponseListener<T> responseListener) {
+			Class<T> responseClass, FindResponseListener<T> responseListener) {
 		FindProcess<T> sh = new FindProcess<T>(ni, request, stopOnFound, responseClass, responseListener);
 		LinkedList<Node> unsearchedNodes = sh.computeUnsearchedNodes();
 		if (unsearchedNodes.isEmpty()) {

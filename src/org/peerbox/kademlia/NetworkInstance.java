@@ -1,6 +1,7 @@
 package org.peerbox.kademlia;
 
 import java.net.URI;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
@@ -137,9 +138,22 @@ public class NetworkInstance implements Kademlia {
 	}
 
 	public void findNode(Identifier targetNodeId, boolean stopOnFound,
-			ResponseListener<FindNodeResponse> responseListener) {
+			final ResponseListener<FindNodeResponse> responseListener) {
 		FindNodeRequest request = new FindNodeRequest(getLocalNodeIdentifier(), targetNodeId);
-		FindProcess.execute(this, request, stopOnFound, FindNodeResponse.class, responseListener);
+		FindProcess.execute(this, request, stopOnFound, FindNodeResponse.class, new FindResponseListener<FindNodeResponse>(){
+
+			@Override
+			public void onFailure() {
+				responseListener.onFailure();
+			}
+
+
+			@Override
+			public void onResponseReceived(FindNodeResponse response) {
+				responseListener.onResponseReceived(response);
+			}
+			
+		});
 	}
 
 	public void findNode(Identifier targetNodeId, ResponseListener<FindNodeResponse> responseListener) {
@@ -180,15 +194,13 @@ public class NetworkInstance implements Kademlia {
 		}
 
 		FindValueRequest request = new FindValueRequest(getLocalNodeIdentifier(), targetKey);
-		FindProcess.execute(this, request, true, FindValueResponse.class, new ResponseListener<FindValueResponse>() {
+		FindProcess.execute(this, request, true, FindValueResponse.class, new FindResponseListener<FindValueResponse>() {
 
 			@Override
 			public void onResponseReceived(FindValueResponse response) {
 				if (response.isFound()) {
 					List<Value> foundValues = response.getFoundValue();
-					for (Value value : foundValues) {
-						storeValueLocal(targetKey, value, false);
-					}
+					storeValueLocal(targetKey, foundValues, false);
 					getLocalDataStore().updateLastRefreshed(targetKey);
 					foundValues = getLocalDataStore().get(targetKey);
 					if (foundValues == null || foundValues.isEmpty()) {
@@ -204,6 +216,24 @@ public class NetworkInstance implements Kademlia {
 			@Override
 			public void onFailure() {
 				responseListener.onFailure();
+			}
+			
+			@Override
+			public void onFindComplete(Node nearestNotFound, FindValueResponse response){
+				StoreRequest request = new StoreRequest(localIdentifier, targetKey, response.getFoundValue());
+				sendRequestRPC(nearestNotFound, request, StoreResponse.class, new ResponseListener<StoreResponse>() {
+
+					@Override
+					public void onFailure() {
+						
+					}
+
+					@Override
+					public void onResponseReceived(StoreResponse response) {
+						
+					}
+					
+				});
 			}
 
 		});
@@ -239,19 +269,26 @@ public class NetworkInstance implements Kademlia {
 	 * @param value
 	 * @return Whether store succeeded (filtering passed)
 	 */
-	public boolean storeValueLocal(Key key, Value value, boolean original) {
-		if (!compositeDataFilter.isValid(key, value.getValue())) {
-			return false;
+	public boolean storeValueLocal(Key key, List<Value> valueList, boolean original) {
+		boolean retval = true;
+		for(Value value : valueList){
+			if (!compositeDataFilter.isValid(key, value.getValue())) {
+				retval = false;;
+			}
+			int closerNodes = buckets.getCloserNodeCount(key);
+			int expiryTime = configuration.getMaxExpiry();
+			if (closerNodes > configuration.getK()) {
+				expiryTime *= Math.exp(configuration.getK() / closerNodes);
+				if (expiryTime < configuration.getMinExpiry())
+					expiryTime = configuration.getMinExpiry();
+			}
+			getLocalDataStore().put(key, value, original, expiryTime * 1000);
 		}
-		int closerNodes = buckets.getCloserNodeCount(key);
-		int expiryTime = configuration.getMaxExpiry();
-		if (closerNodes > configuration.getK()) {
-			expiryTime *= Math.exp(configuration.getK() / closerNodes);
-			if (expiryTime < configuration.getMinExpiry())
-				expiryTime = configuration.getMinExpiry();
-		}
-		getLocalDataStore().put(key, value, original, expiryTime * 1000);
-		return true;
+		return retval;
+	}
+	
+	public boolean storeValueLocal(Key key, Value value, boolean original){
+		return storeValueLocal(key, Arrays.asList(value), original);
 	}
 
 	// Maybe put in Node

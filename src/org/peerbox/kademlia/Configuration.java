@@ -12,10 +12,10 @@ public class Configuration {
 	final static int B = 160;
 	final static int k = 20;
 	final static int MIN_PING_INTERVAL_SECS = 60;
-	final static int refreshInterval = 900;
+	final static int refreshInterval = 15;
 	final static int minExpiry = 10;
 	final static int maxExpiry = 40;
-	final static int replicateInterval = 30;
+	final static int replicateInterval = 15;
 	final static int republishInterval = 90;
 	
 	public int getK() {
