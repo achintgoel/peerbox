@@ -38,10 +38,6 @@ public class KadInstance implements Runnable {
 	}
 
 	public void run() {
-		if (bootstrapURI.isEmpty()) {
-			System.out.println("Node started successfully at " + bindIP + ":" + bindPort);
-			return;
-		}
 		NetworkInstance.startNetworkInstance(this.rpc, bootstrapURI, new BootstrapListener() {
 
 			@Override

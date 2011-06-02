@@ -338,6 +338,10 @@ public class NetworkInstance implements Kademlia {
 	
 	public static void startNetworkInstance(RPCHandler rpcHandler, List<URI> friends, BootstrapListener bootstrapListener) {
 		NetworkInstance ni = new NetworkInstance(rpcHandler);
-		ni.bootstrap(friends, bootstrapListener);
+		if (friends.isEmpty()) {
+			bootstrapListener.onBootstrapSuccess(ni);
+		} else {
+			ni.bootstrap(friends, bootstrapListener);
+		}
 	}
 }

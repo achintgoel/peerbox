@@ -27,7 +27,7 @@ public class LocalDataStore {
 		public Calendar publishDate;
 		public Calendar expiryDate;
 		public boolean original;
-		public TimerTask republishTask;
+		transient public TimerTask republishTask;
 
 		StoredValueInfo(Calendar publishDate, Calendar expiryDate, boolean original, TimerTask timerTask) {
 			this.publishDate = publishDate;

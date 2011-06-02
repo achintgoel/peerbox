@@ -5,11 +5,7 @@ import java.net.URISyntaxException;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.peerbox.chat.ChatManager;
-import org.peerbox.demo.cli.ChatCLIHandler;
 import org.peerbox.demo.cli.ExtendableCLI;
-import org.peerbox.demo.cli.FileShareCLIHandler;
-import org.peerbox.demo.cli.FriendCLIHandler;
 import org.peerbox.demo.cli.KadCLIHandler;
 import org.peerbox.fileshare.FileShareManager;
 import org.peerbox.friend.FriendManager;
@@ -17,11 +13,10 @@ import org.peerbox.kademlia.BootstrapListener;
 import org.peerbox.kademlia.Kademlia;
 import org.peerbox.kademlia.NetworkInstance;
 import org.peerbox.network.udp.UDPMessageServer;
-import org.peerbox.rpc.RPCHandler;
 import org.peerbox.rpc.RPCEvent;
+import org.peerbox.rpc.RPCHandler;
 import org.peerbox.rpc.RPCResponseListener;
 import org.peerbox.rpc.json.JsonRPCHandler;
-import org.peerbox.security.SecureMessageHandler;
 
 public class FileShareCLI {
 	private static String bindIP;
@@ -78,17 +73,20 @@ public class FileShareCLI {
 		}
 	}
 
-	private static void createInstance(RPCHandler rpc) {
-		if (rpc == null) {
-			rpc = new JsonRPCHandler(new UDPMessageServer(bindPort));
+	private static void createInstance(RPCHandler rpcIn) {
+		final RPCHandler rpcused;
+		if (rpcIn == null) {
+			rpcused = new JsonRPCHandler(new UDPMessageServer(bindPort));
 			try {
-				rpc.setLocalURI(new URI("udp://" + bindIP + ":" + bindPort));
+				rpcused.setLocalURI(new URI("udp://" + bindIP + ":" + bindPort));
 			} catch (URISyntaxException e) {
 				System.out.println("Illegal URI syntax");
 			}
+		} else {
+			rpcused = rpcIn;
 		}
 		if (!bootstrapURI.isEmpty()) {
-			NetworkInstance.startNetworkInstance(rpc, bootstrapURI, new BootstrapListener() {
+			NetworkInstance.startNetworkInstance(rpcused, bootstrapURI, new BootstrapListener() {
 
 				@Override
 				public void onBootstrapFailure() {
@@ -100,24 +98,26 @@ public class FileShareCLI {
 				public void onBootstrapSuccess(Kademlia kad) {
 					networkInstance = kad;
 					System.out.println("Welcome to peerbox");
+					
+					// friendManager = new FriendManager(networkInstance.getSingleMap("users"), new SecureMessageHandler(), rpcused
+						//	.getLocalURI());
+					// fileShareManager = new FileShareManager(rpc);
+					// ChatManager chat = new ChatManager(rpcused, friendManager);
+
+					ExtendableCLI cli = new ExtendableCLI();
+					// cli.registerHandler("friend", new FriendCLIHandler(friendManager));
+					// cli.registerHandler("fileshare", new
+					// FileShareCLIHandler(fileShareManager, friendManager));
+					cli.registerHandler("kad", new KadCLIHandler(networkInstance));
+					// cli.registerHandler("msg", new ChatCLIHandler(chat));
+					// cli.registerAlias("addFriend", "friend add");
+					cli.start();
 				}
 
 			});
 		}
 
-		friendManager = new FriendManager(networkInstance.getSingleMap("users"), new SecureMessageHandler(), rpc
-				.getLocalURI());
-		// fileShareManager = new FileShareManager(rpc);
-		ChatManager chat = new ChatManager(rpc, friendManager);
-
-		ExtendableCLI cli = new ExtendableCLI();
-		cli.registerHandler("friend", new FriendCLIHandler(friendManager));
-		// cli.registerHandler("fileshare", new
-		// FileShareCLIHandler(fileShareManager, friendManager));
-		cli.registerHandler("kad", new KadCLIHandler(networkInstance));
-		cli.registerHandler("msg", new ChatCLIHandler(chat));
-		cli.registerAlias("addFriend", "friend add");
-		cli.start();
+		
 	}
 
 	private static void printUsageAndExit() {

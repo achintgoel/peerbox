@@ -56,7 +56,7 @@ public class KadCLIHandler implements CLIHandler {
 
 							@Override
 							public void onResponseReceived(PingResponse response) {
-								cli.out().println("Ping to node at " + pingNode.getIdentifier() + " is successful");
+								cli.out().println("Ping to node at " + pingNode.getIdentifier());
 							}
 						});
 			}
