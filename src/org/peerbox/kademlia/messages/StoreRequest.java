@@ -3,9 +3,9 @@ package org.peerbox.kademlia.messages;
 import java.util.Arrays;
 import java.util.List;
 
+import org.peerbox.dht.Value;
 import org.peerbox.kademlia.Identifier;
 import org.peerbox.kademlia.Key;
-import org.peerbox.kademlia.Value;
 
 public class StoreRequest extends Request {
 	protected Key key;

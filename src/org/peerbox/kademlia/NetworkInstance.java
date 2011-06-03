@@ -9,6 +9,7 @@ import java.util.List;
 import org.peerbox.dht.CompositeDataFilter;
 import org.peerbox.dht.DistributedMap;
 import org.peerbox.dht.MapDataFilter;
+import org.peerbox.dht.Value;
 import org.peerbox.dht.ValueListener;
 import org.peerbox.kademlia.messages.FindNodeRequest;
 import org.peerbox.kademlia.messages.FindNodeResponse;

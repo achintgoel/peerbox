@@ -1,10 +1,8 @@
 package org.peerbox.kademlia;
 
-import java.net.URI;
-import java.util.List;
-
 import org.peerbox.dht.DistributedMap;
 import org.peerbox.dht.MapDataFilter;
+import org.peerbox.dht.Value;
 import org.peerbox.kademlia.messages.FindNodeResponse;
 import org.peerbox.kademlia.messages.FindValueResponse;
 import org.peerbox.kademlia.messages.PingResponse;

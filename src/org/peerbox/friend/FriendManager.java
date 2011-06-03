@@ -12,9 +12,9 @@ import java.util.Map.Entry;
 
 import org.apache.commons.codec.binary.Base64;
 import org.peerbox.dht.DistributedMap;
+import org.peerbox.dht.Value;
 import org.peerbox.dht.ValueEvent;
 import org.peerbox.dht.ValueListener;
-import org.peerbox.kademlia.Value;
 import org.peerbox.security.SecureMessageHandler;
 
 public class FriendManager {

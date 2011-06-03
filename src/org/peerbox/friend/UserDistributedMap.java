@@ -7,9 +7,9 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.peerbox.dht.DistributedMap;
+import org.peerbox.dht.Value;
 import org.peerbox.dht.ValueEvent;
 import org.peerbox.dht.ValueListener;
-import org.peerbox.kademlia.Value;
 import org.peerbox.security.SecureMessageHandler;
 import org.peerbox.security.SignedMessage;
 

@@ -3,6 +3,7 @@ package org.peerbox.kademlia;
 import java.util.List;
 
 import org.peerbox.dht.DistributedMap;
+import org.peerbox.dht.Value;
 import org.peerbox.dht.ValueEvent;
 import org.peerbox.dht.ValueListener;
 import org.peerbox.kademlia.messages.FindValueResponse;

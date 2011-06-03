@@ -2,8 +2,8 @@ package org.peerbox.kademlia.messages;
 
 import java.util.List;
 
+import org.peerbox.dht.Value;
 import org.peerbox.kademlia.Node;
-import org.peerbox.kademlia.Value;
 
 public class FindValueResponse extends FindResponse {
 	protected List<Value> foundValue;

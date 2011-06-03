@@ -1,4 +1,4 @@
-package org.peerbox.kademlia;
+package org.peerbox.dht;
 
 public class Value {
 	private long publicationTime;

@@ -2,6 +2,7 @@ package org.peerbox.kademlia;
 
 import java.util.List;
 
+import org.peerbox.dht.Value;
 import org.peerbox.kademlia.messages.FindNodeRequest;
 import org.peerbox.kademlia.messages.FindNodeResponse;
 import org.peerbox.kademlia.messages.FindValueRequest;

@@ -4,12 +4,12 @@ import java.io.PrintStream;
 import java.math.BigInteger;
 import java.util.Date;
 
+import org.peerbox.dht.Value;
 import org.peerbox.kademlia.Identifier;
 import org.peerbox.kademlia.Kademlia;
 import org.peerbox.kademlia.Key;
 import org.peerbox.kademlia.Node;
 import org.peerbox.kademlia.ResponseListener;
-import org.peerbox.kademlia.Value;
 import org.peerbox.kademlia.messages.FindNodeResponse;
 import org.peerbox.kademlia.messages.FindValueResponse;
 import org.peerbox.kademlia.messages.PingResponse;

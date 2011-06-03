@@ -12,6 +12,7 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 import org.peerbox.dht.CompositeKey;
+import org.peerbox.dht.Value;
 import org.peerbox.kademlia.messages.StoreResponse;
 
 /**
